@@ -71,8 +71,10 @@ public class CommandAnalyzer : ICommandAnalyzer
         {
             long chatId = update.Message.Chat.Id;
 
+            Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Получено сообщение \"{update.Message.Text}\" " +
-                $"от пользователя №{chatId} username {update.Message.Chat.Username}");           
+                $"от пользователя №{chatId} username {update.Message.Chat.Username}");
+            Console.ResetColor();
 
             foreach (var command in _baseTextCommands)
             {

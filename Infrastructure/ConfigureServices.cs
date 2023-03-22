@@ -4,6 +4,7 @@ using Infrastructure.Persistence.Interceptors;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Telegram.Bot.Types;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -22,6 +23,10 @@ public static class ConfigureService
         {
             services.AddDbContext<ThisBotDbContext>(options =>
             options.UseNpgsql(GetConnectionString(configuration)));
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(GetConnectionString(configuration));
+            Console.ResetColor();
         }
 
         services.AddScoped<IBotDbContext>(provider => 
