@@ -27,6 +27,10 @@ public class ThisBotDbContext : DbContext, IBotDbContext
         _auditableEntitySaveChangesInterceptor = auditableEntitySaveChangesInterceptor;
     }
 
+    public ThisBotDbContext()
+    {
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
@@ -37,6 +41,7 @@ public class ThisBotDbContext : DbContext, IBotDbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(_auditableEntitySaveChangesInterceptor);
+        optionsBuilder.UseNpgsql("Host=ec2-18-202-8-133.eu-west-1.compute.amazonaws.com;Port=5432;Database=darcqrveiljiu1;Username=tltenmhfpawurb;Password=38f6c2f89abab0084bf7d71cf95b28ba82ae3c6b42abc29bb43fc0757e5a1ebe;Pooling=true;SSL Mode=Require;Trust Server Certificate=True");
     }
 
     public async Task SaveChangesAsync()
