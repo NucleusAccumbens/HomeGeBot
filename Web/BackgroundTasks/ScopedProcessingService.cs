@@ -60,8 +60,6 @@ internal class ScopedProcessingService : IScopedProcessingService
 
             await AddNewHomeGeFlatInDb();
 
-            PingSite();
-
             await Task.Delay(new TimeSpan(0, 0, 10), stoppingToken);
         }
     }
@@ -156,22 +154,5 @@ internal class ScopedProcessingService : IScopedProcessingService
                 parseMode: Telegram.Bot.Types.Enums.ParseMode.Html,
                 disableWebPagePreview: true);
         }
-    }
-
-    private static void PingSite()
-    {
-        try
-        {
-            var client = new HttpClient();
-
-            var res = client.GetAsync("https://noncredist.bsite.net/").Result;
-
-            Console.WriteLine($"{res.Content.Headers}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-
     }
 }
