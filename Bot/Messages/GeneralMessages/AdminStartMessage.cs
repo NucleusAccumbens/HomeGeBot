@@ -17,7 +17,7 @@ public class AdminStartMessage : BaseMessage
         {
             new[]
             {
-                InlineKeyboardButton.WithUrl(text: "Перейти в админку", url: "https://propertyintbilisi-bot.herokuapp.com/"),
+                InlineKeyboardButton.WithUrl(text: "Перейти в админку", url: "https://propertyintbilisi-bot.herokuapp.com"),
             },
            
         });
