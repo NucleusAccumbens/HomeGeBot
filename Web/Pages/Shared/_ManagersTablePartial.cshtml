@@ -1,0 +1,43 @@
+﻿@model List<Web.Models.ManagerViewModel>
+
+<div id="managers" class="tabcontent">
+    <h3>Менеджеры</h3>
+    <table>
+        <tr>
+            <th>Телеграм</th>
+            <th>Заявки</th>
+        </tr>
+
+        @foreach (var manager in Model)
+        {
+            <tr>
+                <td><a href="https://t.me/@manager.Username">@manager.Username</a></td>
+                @if (@manager.ClientUsernames.Count != 0)
+                {
+                    <td>
+                        <div class="dropdown">
+                            <text class="dropdown-toggle"
+                          data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                                Количество заявок: @manager.ClientUsernames.Count
+                            </text>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                @foreach (var clientUsername in manager.ClientUsernames)
+                                {
+                                    <a class="dropdown-item"href="https://t.me/@clientUsername">
+                                        @clientUsername
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </td>
+                }
+                else
+                {
+                    <td style="color: gray;">Нет заявок.</td>
+                }
+            </tr>
+        }
+    </table>
+</div>
