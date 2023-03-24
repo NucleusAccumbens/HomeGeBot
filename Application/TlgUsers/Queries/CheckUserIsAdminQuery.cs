@@ -15,8 +15,13 @@ public class CheckUserIsAdminQuery : ICheckUserIsAdminQuery
             .Where(u => u.ChatId== chatId)
             .SingleOrDefaultAsync();
 
-        if (user != null)
+        var admin = await _context.Admins
+            .Where(a => a.ChatId== chatId)
+            .SingleOrDefaultAsync();
+
+        if (user != null && user.IsAdmin == true && admin != null)
         {
+                      
             return user.IsAdmin;
         }
 

@@ -14,7 +14,7 @@ public class GetAdminsQuery : IGetAdminsQuery
     public async Task<List<long>> GetAdminsChatIdsAsync()
     {
         return await _context.TlgUsers
-            .Where(u => u.IsAdmin == true)
+            .Where(u => u.IsAdmin == true && u.IsKicked == false)
             .Select(u => u.ChatId)
             .ToListAsync();
     }

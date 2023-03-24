@@ -60,7 +60,7 @@ internal class ScopedProcessingService : IScopedProcessingService
 
             await AddNewHomeGeFlatInDb();
 
-            await Task.Delay(new TimeSpan(0, 0, 10), stoppingToken);
+            await Task.Delay(new TimeSpan(0, 0, 40), stoppingToken);
         }
     }
 
