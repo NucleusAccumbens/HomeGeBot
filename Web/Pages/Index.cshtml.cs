@@ -79,7 +79,7 @@ public class IndexModel : PageModel
                 .GetClientUsernameAsync(client.ChatId),
                 Country = client.Country.ToString(),
                 Profession = client.Profession,
-                HasPets = GetHasPetsStringValue(client.HasPets),
+                HasPets = client.HasPets.ToString(),
                 Term = client.Term.ToString(),
                 ManagerUsername = await _getClientDependencyQuery
                 .GetClientsManaderUsernameAsync(client.AdminChatId)
