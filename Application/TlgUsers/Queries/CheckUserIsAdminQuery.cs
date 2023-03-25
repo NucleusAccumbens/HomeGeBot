@@ -21,7 +21,6 @@ public class CheckUserIsAdminQuery : ICheckUserIsAdminQuery
 
         if (user != null && user.IsAdmin == true && admin != null)
         {
-                      
             return user.IsAdmin;
         }
 
