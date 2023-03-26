@@ -139,8 +139,8 @@ public class IndexModel : PageModel
 
     private async Task<string> GetHasPetsStringValue(bool? hasPets)
     {
-        var hasPersEntity = await _context.HasPets.FindAsync();
-        
+        var hasPersEntity = await _context.HasPets.FirstAsync();
+
         if (hasPets == true) return hasPersEntity.Yes;
         else return hasPersEntity.No;
     }
