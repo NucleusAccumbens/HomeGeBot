@@ -20,6 +20,8 @@ public class ThisBotDbContext : DbContext, IBotDbContext
 
     public DbSet<Message> Messages => Set<Message>();
 
+    public DbSet<HasPets> HasPets => Set<HasPets>();
+
     public ThisBotDbContext(DbContextOptions<ThisBotDbContext> options,
         AuditableEntitySaveChangesInterceptor auditableEntitySaveChangesInterceptor)
         : base(options)

@@ -10,5 +10,6 @@ public interface IBotDbContext
     DbSet<Admin> Admins { get; }      
     DbSet<Flat> Flats { get; }
     DbSet<Message> Messages { get; }
+    DbSet<HasPets> HasPets { get; }
     Task SaveChangesAsync();
 }

@@ -79,7 +79,7 @@ public class IndexModel : PageModel
                 .GetClientUsernameAsync(client.ChatId),
                 Country = client.Country.ToString(),
                 Profession = client.Profession,
-                HasPets = GetHasPetsStringValue(client.HasPets),
+                HasPets = await GetHasPetsStringValue(client.HasPets),
                 Term = client.Term.ToString(),
                 ManagerUsername = await _getClientDependencyQuery
                 .GetClientsManaderUsernameAsync(client.AdminChatId)
@@ -137,10 +137,12 @@ public class IndexModel : PageModel
         return managers;
     }
 
-    private static string GetHasPetsStringValue(bool? hasPets)
+    private async Task<string> GetHasPetsStringValue(bool? hasPets)
     {
-        if (hasPets == true) return "Да";
-        else return "Нет";
+        var hasPersEntity = await _context.HasPets.FindAsync();
+        
+        if (hasPets == true) return hasPersEntity.Yes;
+        else return hasPersEntity.No;
     }
 
     private async Task<List<string>> GetClientsUsernames(List<Client> clents)
