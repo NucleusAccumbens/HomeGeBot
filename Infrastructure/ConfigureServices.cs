@@ -49,6 +49,10 @@ public static class ConfigureService
             string host = hostSide.Split("/")[0];
             var database = hostSide.Split("/")[1].Split("?")[0];
 
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(connectionUrl);
+            Console.ForegroundColor = ConsoleColor.Black;
+
             return $"Host={host};Database={database};Username={user};Password={password};SSL Mode=Require;Trust Server Certificate=true";
         }
 
