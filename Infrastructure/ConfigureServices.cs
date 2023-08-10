@@ -16,6 +16,10 @@ public static class ConfigureService
 
         if (configuration.GetValue<bool>("InDeveloping"))
         {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(configuration.GetConnectionString("DefaultConnection")));
+            Console.ResetColor();
+
             services.AddDbContext<ThisBotDbContext>(optionBuilder =>
             optionBuilder.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
         }
