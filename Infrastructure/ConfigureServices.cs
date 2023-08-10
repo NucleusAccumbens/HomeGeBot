@@ -17,7 +17,8 @@ public static class ConfigureService
         if (configuration.GetValue<bool>("InDeveloping"))
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(configuration.GetConnectionString("DefaultConnection"));
+            Console.WriteLine($"THE Add Infrastructure Services METHOD WORKED. CONNECTION STRING: " +
+                $"{configuration.GetConnectionString("DefaultConnection")}");
             Console.ResetColor();
             
             services.AddDbContext<ThisBotDbContext>(optionBuilder =>
@@ -26,7 +27,7 @@ public static class ConfigureService
         else
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(GetConnectionString(configuration));
+            Console.WriteLine($"THE Add Infrastructure Services METHOD WORKED. CONNECTION STRING: {GetConnectionString(configuration)}");
             Console.ResetColor();
 
             services.AddDbContext<ThisBotDbContext>(options =>
