@@ -1,4 +1,6 @@
-﻿namespace Web.BackgroundTasks;
+﻿using Web.Logger;
+
+namespace Web.BackgroundTasks;
 
 public class ConsumeScopedHostedService : BackgroundService
 {
@@ -35,9 +37,9 @@ public class ConsumeScopedHostedService : BackgroundService
 
             await scopedProcessingService.DoWork(stoppingToken);
         }
-        catch(Exception)
+        catch(Exception ex)
         {
-
+            LoggerService.LogError(ex);
         }
     }
 

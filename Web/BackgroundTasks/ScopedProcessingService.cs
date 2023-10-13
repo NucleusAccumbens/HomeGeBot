@@ -56,7 +56,7 @@ internal class ScopedProcessingService : IScopedProcessingService
             _logger.LogInformation(
                 "Scoped Processing Service is working. Count: {Count}", executionCount);
 
-            await AddNewSsGeFlatInDb();
+            //await AddNewSsGeFlatInDb();
 
             await AddNewHomeGeFlatInDb();
 
