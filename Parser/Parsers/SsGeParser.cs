@@ -24,6 +24,8 @@ public class SsGeParser
             .Where(item => item.ClassName != null && item.ClassName.Contains("latest_article_each "))
             .FirstOrDefault();
 
+        if (priceItem == null) { Console.WriteLine("\n\nGetLastestItemId SSGeParser вернул null\n\n"); }
+
         return priceItem?.GetAttribute("data-id");
     }
 
