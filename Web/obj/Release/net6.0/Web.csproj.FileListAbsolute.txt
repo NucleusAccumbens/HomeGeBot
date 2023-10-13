@@ -106,3 +106,5 @@ C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\ne
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\Web.RazorAssemblyInfo.cache
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\Web.RazorAssemblyInfo.cs
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\bin\Release\net6.0\Web.staticwebassets.runtime.json
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\bin\Release\net6.0\Npgsql.dll
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\bin\Release\net6.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

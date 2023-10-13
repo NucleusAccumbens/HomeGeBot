@@ -39,6 +39,8 @@ C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\ne
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\PubTmp\Out\Microsoft.Win32.SystemEvents.dll
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\PubTmp\Out\Newtonsoft.Json.dll
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\PubTmp\Out\Newtonsoft.Json.Bson.dll
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\PubTmp\Out\Npgsql.dll
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\PubTmp\Out\Npgsql.EntityFrameworkCore.PostgreSQL.dll
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Release\net6.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll

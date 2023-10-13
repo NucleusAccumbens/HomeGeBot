@@ -73,7 +73,7 @@ internal class ScopedProcessingService : IScopedProcessingService
             string flatUrlPostfix = await _ssParser.GetItemUrlPostfix(_ssPostfix, newFlatId);
 
             string ownerNumber = await _ssParser.GetOwnerNumber(flatUrlPostfix);
-            
+
             var newFlat = new Flat()
             {
                 ItemId = newFlatId,
@@ -123,7 +123,7 @@ internal class ScopedProcessingService : IScopedProcessingService
             else return lastestItemId;
         }
 
-        else throw new NullReferenceException();
+        else return null;
     }
 
     private async Task<string?> GetLastestFlatIdFromHomeGe()
@@ -139,7 +139,7 @@ internal class ScopedProcessingService : IScopedProcessingService
             else return lastestItemId;
         }
 
-        else throw new NullReferenceException();
+        else return null;
     }
 
     private async Task SendNotifyToAdmins(string url, string site)

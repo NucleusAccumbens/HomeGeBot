@@ -23,15 +23,22 @@ public class ConsumeScopedHostedService : BackgroundService
 
     private async Task DoWork(CancellationToken stoppingToken)
     {
-        _logger.LogInformation(
+        try
+        {
+            _logger.LogInformation(
             "Consume Scoped Service Hosted Service is working.");
 
-        using var scope = Services.CreateScope();
-        var scopedProcessingService =
-            scope.ServiceProvider
-                .GetRequiredService<IScopedProcessingService>();
+            using var scope = Services.CreateScope();
+            var scopedProcessingService =
+                scope.ServiceProvider
+                    .GetRequiredService<IScopedProcessingService>();
 
-        await scopedProcessingService.DoWork(stoppingToken);
+            await scopedProcessingService.DoWork(stoppingToken);
+        }
+        catch(Exception)
+        {
+
+        }
     }
 
     public override async Task StopAsync(CancellationToken stoppingToken)
