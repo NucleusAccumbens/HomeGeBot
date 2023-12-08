@@ -1,4 +1,5 @@
-﻿using Application.Admins.Interfaces;
+﻿using AngleSharp.Dom;
+using Application.Admins.Interfaces;
 using Application.Flats.Interfaces;
 using Bot.Common.Interfaces;
 using Domain.Entities;
@@ -68,6 +69,8 @@ internal class ScopedProcessingService : IScopedProcessingService
     {
         try
         {
+            Console.WriteLine("Вызван метод AddNewHomeGeFlatInDb");
+
             string? newFlatId = await GetLastestFlatIdFromHomeGe();
 
             if (newFlatId != null)
@@ -99,6 +102,8 @@ internal class ScopedProcessingService : IScopedProcessingService
         try
         {
             string? lastestItemId = await _homeGeParser.GetLatestItemId(_homeGePostfix);
+
+            Console.WriteLine("Получен ID последнего элемента");
 
             if (lastestItemId != null)
             {

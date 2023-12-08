@@ -19,6 +19,8 @@ internal class HtmlLoadService
     {
         string url = _settings.GetFullUrl(postfix);
 
+        Console.WriteLine(url);
+
         var response = await _client.GetAsync(url);
 
         if (response == null) 
@@ -37,7 +39,9 @@ internal class HtmlLoadService
     }
 
     public async Task<string> GetSourceByUrl(string url)
-    {      
+    {
+        Console.WriteLine(url);
+
         var response = await _client.GetAsync(url);
 
         if (response == null)
