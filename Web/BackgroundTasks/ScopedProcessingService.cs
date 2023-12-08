@@ -50,10 +50,10 @@ internal class ScopedProcessingService : IScopedProcessingService
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                await AddNewHomeGeFlatInDb();
+
                 _executionCount++;
                 _logger.LogAction($"Scoped Processing Service is working. Count: {_executionCount}");
-
-                await AddNewHomeGeFlatInDb();
 
                 await Task.Delay(new TimeSpan(0, 0, 40), stoppingToken);
             }
