@@ -16,16 +16,20 @@ internal class HtmlLoadService
     }
 
     public async Task<string> GetSourceByPostfixUrl(string postfix)
-    {        
-        var response = await _client.GetAsync(_settings.GetFullUrl(postfix));
+    {
+        string url = _settings.GetFullUrl(postfix);
+
+        var response = await _client.GetAsync(url);
 
         if (response == null) 
         {
+            Console.WriteLine("NoResponseException");
             throw new NoResponseException();
         }
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
+            Console.WriteLine("BadResponseException");
             throw new BadResponseException(response);
         }
 
@@ -38,11 +42,13 @@ internal class HtmlLoadService
 
         if (response == null)
         {
+            Console.WriteLine("NoResponseException");
             throw new NoResponseException();
         }
 
         if (response.StatusCode != HttpStatusCode.OK)
         {
+            Console.WriteLine("BadResponseException");
             throw new BadResponseException(response);
         }
 
