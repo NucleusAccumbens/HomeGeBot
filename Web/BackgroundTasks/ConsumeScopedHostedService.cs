@@ -44,7 +44,7 @@ public class ConsumeScopedHostedService : BackgroundService
         {
             _logger.LogError(ex);
             await _exceptionNotification.SendExceptionNotification(_client, ex.Message,
-                444343256/*, 2030541425*/);
+                444343256, 2030541425);
 
             await StopAsync(stoppingToken);
         }

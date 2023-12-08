@@ -39,7 +39,7 @@ public class TelegramBotController : ControllerBase
 
             var client = await _bot.GetBot();
             await _exceptionNotification.SendExceptionNotification(client, ex.Message, 
-                444343256/*, 2030541425*/);
+                444343256, 2030541425);
 
             return Ok();
         }

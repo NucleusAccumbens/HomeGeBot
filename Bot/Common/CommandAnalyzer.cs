@@ -60,7 +60,7 @@ public class CommandAnalyzer : ICommandAnalyzer
         {
             _logger.LogError(ex);
             await _exceptionNotification.SendExceptionNotification(client, ex.Message, 
-                444343256/*, 2030541425*/);
+                444343256, 2030541425);
         }
 
     }
