@@ -1,8 +1,11 @@
 ﻿using Application.Admins.Interfaces;
 using Application.Flats.Interfaces;
+using Bot.Common.Interfaces;
 using Domain.Entities;
+using Logger.Interfaces;
 using Parser.Parsers;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 
 namespace Web.BackgroundTasks;
 
@@ -13,133 +16,105 @@ internal interface IScopedProcessingService
 
 internal class ScopedProcessingService : IScopedProcessingService
 {
-    private int executionCount = 0;
-
-    private readonly ILogger _logger;
-
+    private readonly IExceptionNotification _exceptionNotification;
+    private readonly ICustomLogger _logger;
     private readonly ICheckFlatIsInBdQuery _checkFlatIsInBdQuery;
-
     private readonly ICreateFlatCommand _createFlatCommand;
-
     private readonly IGetAdminsQuery _getAdminsQuery;
+    private readonly ITelegramBotClient _client;
+    private readonly string _ssPostfix;
+    private readonly string _homeGePostfix;
+    private readonly SsGeParser _ssParser;
+    private readonly HomeGeParser _homeGeParser;
+    private int _executionCount = 0;
 
-    private readonly ITelegramBotClient _client = new TelegramBotClient("6123649331:AAH5GpUd2w5KarrU-LZanqMTfq4IDI6viWE");
-
-    private readonly string _ssPostfix 
-        = "/en/real-estate/l/Flat/For-Rent?MunicipalityId=95&CityIdList=95" +
-        "&CommercialRealEstateType=&PriceType=false&CurrencyId=1" +
-        "&Context.Request.Query%5BQuery%5D=&IndividualEntityOnly=true&";
-
-    private readonly string _homeGePostfix =
-        "/en/s/Apartment-for-rent-House-for-rent-Tbilisi?Keyword=Tbilisi&AdTypeID=3&PrTypeID=1.2&mapC=41.73188365%2C44.8368762993663&cities=1996871&GID=1996871&OwnerTypeID=1";
-
-    private readonly SsGeParser _ssParser = new("https://ss.ge");
-
-    private readonly HomeGeParser _homeGeParser = new("https://www.myhome.ge");
-
-    public ScopedProcessingService(ILogger<ScopedProcessingService> logger,
-        ICheckFlatIsInBdQuery checkFlatIsInBdQuery, ICreateFlatCommand createFlatCommand,
-        IGetAdminsQuery getAdminsQuery)
+    public ScopedProcessingService(ICustomLogger logger, ICheckFlatIsInBdQuery checkFlatIsInBdQuery,
+    ICreateFlatCommand createFlatCommand, IGetAdminsQuery getAdminsQuery, 
+    IConfiguration configuration, IExceptionNotification exceptionNotification)
     {
         _logger = logger;
         _checkFlatIsInBdQuery = checkFlatIsInBdQuery;
         _createFlatCommand = createFlatCommand;
         _getAdminsQuery = getAdminsQuery;
+        _exceptionNotification = exceptionNotification;
+        _client = new TelegramBotClient(configuration["Token"]);
+        _ssPostfix = configuration["Postfixes:ssPostfix"];
+        _homeGePostfix = configuration["Postfixes:homeGePostfix"];
+        _ssParser = new SsGeParser(configuration["BaseUrls:ss"]);
+        _homeGeParser = new HomeGeParser(configuration["BaseUrls:myhome"]);
     }
 
     public async Task DoWork(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        try
         {
-            executionCount++;
-
-            _logger.LogInformation(
-                "Scoped Processing Service is working. Count: {Count}", executionCount);
-
-            //await AddNewSsGeFlatInDb();
-
-            await AddNewHomeGeFlatInDb();
-
-            await Task.Delay(new TimeSpan(0, 0, 40), stoppingToken);
-        }
-    }
-
-    private async Task AddNewSsGeFlatInDb()
-    {
-        string? newFlatId = await GetLastestFlatIdFromSsGe();
-
-        if (newFlatId != null) 
-        {
-            string flatUrlPostfix = await _ssParser.GetItemUrlPostfix(_ssPostfix, newFlatId);
-
-            string ownerNumber = await _ssParser.GetOwnerNumber(flatUrlPostfix);
-
-            var newFlat = new Flat()
+            while (!stoppingToken.IsCancellationRequested)
             {
-                ItemId = newFlatId,
-                OwnerNumber = ownerNumber,
-                Link = $"https://ss.ge{flatUrlPostfix}"
-            };
+                _executionCount++;
+                _logger.LogAction($"Scoped Processing Service is working. Count: {_executionCount}");
 
-            await _createFlatCommand.CreateFlatAsync(newFlat);
+                await AddNewHomeGeFlatInDb();
 
-            await SendNotifyToAdmins($"https://ss.ge{flatUrlPostfix}", "ss.ge");
+                await Task.Delay(new TimeSpan(0, 0, 40), stoppingToken);
+            }
+        }
+        catch(Exception) 
+        {
+            throw;
         }
     }
 
     private async Task AddNewHomeGeFlatInDb()
     {
-        string? newFlatId = await GetLastestFlatIdFromHomeGe();
-
-        if (newFlatId != null)
+        try
         {
-            string flatUrl = await _homeGeParser.GetItemUrl(_homeGePostfix, newFlatId);
+            string? newFlatId = await GetLastestFlatIdFromHomeGe();
 
-            string ownerNumber = await _homeGeParser.GetOwnerNumber(flatUrl);
-
-            var newFlat = new Flat()
+            if (newFlatId != null)
             {
-                ItemId = newFlatId,
-                OwnerNumber = ownerNumber,
-                Link = $"{flatUrl}"
-            };
+                string flatUrl = await _homeGeParser.GetItemUrl(_homeGePostfix, newFlatId);
 
-            await _createFlatCommand.CreateFlatAsync(newFlat);
+                string ownerNumber = await _homeGeParser.GetOwnerNumber(flatUrl);
 
-            await SendNotifyToAdmins(flatUrl, "myhome.ge");
+                var newFlat = new Flat()
+                {
+                    ItemId = newFlatId,
+                    OwnerNumber = ownerNumber,
+                    Link = $"{flatUrl}"
+                };
+
+                await _createFlatCommand.CreateFlatAsync(newFlat);
+
+                await SendNotifyToAdmins(flatUrl, "myhome.ge");
+            }
         }
-    }
-
-    private async Task<string?> GetLastestFlatIdFromSsGe()
-    {
-        string? lastestItemId = await _ssParser.GetLatestItemId(_ssPostfix);
-
-        if (lastestItemId != null)
+        catch(Exception)
         {
-            bool isInDb = await _checkFlatIsInBdQuery.CheckFlatIsInBdAsync(lastestItemId);
-
-            if (isInDb) return null;
-
-            else return lastestItemId;
+            throw;
         }
-
-        else return null;
     }
 
     private async Task<string?> GetLastestFlatIdFromHomeGe()
     {
-        string? lastestItemId = await _homeGeParser.GetLatestItemId(_homeGePostfix);
-
-        if (lastestItemId != null)
+        try
         {
-            bool isInDb = await _checkFlatIsInBdQuery.CheckFlatIsInBdAsync(lastestItemId);
+            string? lastestItemId = await _homeGeParser.GetLatestItemId(_homeGePostfix);
 
-            if (isInDb) return null;
+            if (lastestItemId != null)
+            {
+                bool isInDb = await _checkFlatIsInBdQuery.CheckFlatIsInBdAsync(lastestItemId);
 
-            else return lastestItemId;
+                if (isInDb) return null;
+
+                else return lastestItemId;
+            }
+
+            else return null;
         }
-
-        else return null;
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     private async Task SendNotifyToAdmins(string url, string site)

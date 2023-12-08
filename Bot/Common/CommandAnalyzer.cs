@@ -1,30 +1,28 @@
-﻿using Application.Admins.Interfaces;
-using Application.Clients.Interfaces;
-using Application.TlgUsers.Interfaces;
+﻿using Application.TlgUsers.Interfaces;
 using Bot.Common.Abstractions;
-using Bot.Common.Services;
-using Domain.Entities;
+using Logger;
+using Logger.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bot.Common;
 
 public class CommandAnalyzer : ICommandAnalyzer
 {
+    private readonly IExceptionNotification _exceptionNotification;
+    private readonly ICustomLogger _logger = new CustomLogger();   
     private readonly List<BaseTextCommand> _baseTextCommands;
-
     private readonly List<BaseCallbackCommand> _baseCallbackCommands;
-
     private readonly IMemoryCacheService _memoryCacheService;
-
     private readonly IKickTlgUserCommand _kickTlgUserCommand;
 
     public CommandAnalyzer(IServiceProvider serviceProvider, IMemoryCacheService memoryCachService,
-        IKickTlgUserCommand kickTlgUserCommand)
+        IKickTlgUserCommand kickTlgUserCommand, IExceptionNotification exceptionNotification)
     {
         _baseTextCommands = serviceProvider.GetServices<BaseTextCommand>().ToList();
         _baseCallbackCommands = serviceProvider.GetServices<BaseCallbackCommand>().ToList();
         _memoryCacheService = memoryCachService;
         _kickTlgUserCommand = kickTlgUserCommand;
+        _exceptionNotification = exceptionNotification;
     }
 
     public async Task AnalyzeCommandsAsync(ITelegramBotClient client, Update update)
@@ -60,7 +58,9 @@ public class CommandAnalyzer : ICommandAnalyzer
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex);
+            await _exceptionNotification.SendExceptionNotification(client, ex.Message, 
+                444343256, 2030541425);
         }
 
     }
@@ -71,16 +71,14 @@ public class CommandAnalyzer : ICommandAnalyzer
         {
             long chatId = update.Message.Chat.Id;
 
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Получено сообщение \"{update.Message.Text}\" " +
+            _logger.LogAction($"Получено сообщение \"{update.Message.Text}\" " +
                 $"от пользователя №{chatId} username {update.Message.Chat.Username}");
-            Console.ResetColor();
 
             foreach (var command in _baseTextCommands)
             {
                 if (command.Name == update.Message?.Text ||
                     _memoryCacheService.GetCommandStateFromMemoryCache(chatId) != null && _memoryCacheService.GetCommandStateFromMemoryCache(chatId).Contains(command.Name))
-                {
+                {                   
                     await command.Execute(update, client);
                     return;
                 }
@@ -92,7 +90,7 @@ public class CommandAnalyzer : ICommandAnalyzer
     {
         if (update.CallbackQuery != null && update.CallbackQuery.Data != null && update.CallbackQuery.Message != null)
         {
-            Console.WriteLine($"Получена команда \"{update.CallbackQuery.Data}\" " +
+            _logger.LogAction($"Получена команда \"{update.CallbackQuery.Data}\" " +
                 $"от пользователя №{update.CallbackQuery.Message.Chat.Id} username {update.CallbackQuery.Message.Chat.Username}");
 
             foreach (var command in _baseCallbackCommands)

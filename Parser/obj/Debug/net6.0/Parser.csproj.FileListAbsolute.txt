@@ -17,3 +17,5 @@ C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Parser\bin\Debug\n
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Parser\bin\Debug\net6.0\Bot.pdb
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Parser\bin\Debug\net6.0\Domain.pdb
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Parser\obj\Debug\net6.0\Parser.csproj.CopyComplete
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Parser\bin\Debug\net6.0\Logger.dll
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Parser\bin\Debug\net6.0\Logger.pdb

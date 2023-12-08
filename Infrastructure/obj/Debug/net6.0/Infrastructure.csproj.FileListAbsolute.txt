@@ -19,3 +19,5 @@ C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Infrastructure\obj
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Infrastructure\obj\Debug\net6.0\Infrastructure.pdb
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Infrastructure\obj\Debug\net6.0\Infrastructure.genruntimeconfig.cache
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Infrastructure\obj\Debug\net6.0\ref\Infrastructure.dll
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Infrastructure\bin\Debug\net6.0\Logger.dll
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Infrastructure\bin\Debug\net6.0\Logger.pdb

@@ -1,4 +1,5 @@
-﻿using AngleSharp.Html.Dom;
+﻿using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using Parser.Services;
 
@@ -7,7 +8,6 @@ namespace Parser.Parsers;
 public class HomeGeParser
 {
     private readonly string _baseUrl;
-
     private readonly HtmlLoadService _htmlLoader;
 
     public HomeGeParser(string baseUrl)
@@ -28,70 +28,96 @@ public class HomeGeParser
 
             return priceItem?.GetAttribute("data-product-id");
         }
-        catch (Exception ex) 
-        { 
-            Console.WriteLine(ex.Message); 
-            return null;
+        catch (Exception)
+        {
+            throw;
         }
     }
 
     public async Task<string?> GetItemUrl(string postfix, string id)
     {
-        var document = await GetHtmlDocumentByPostfix(postfix);
-
-        var links = document.QuerySelectorAll("a");
-
-        foreach (var link in links)
+        try
         {
-            if (link.Attributes["href"] != null && link.Attributes["href"].Value.Contains(id))
+            var document = await GetHtmlDocumentByPostfix(postfix);
+
+            var links = document.QuerySelectorAll("a");
+
+            foreach (var link in links)
             {
-                return link.Attributes["href"].Value;
+                if (link.Attributes["href"] != null && link.Attributes["href"].Value.Contains(id))
+                {
+                    return link.Attributes["href"].Value;
+                }
             }
+
+            return null;
         }
-
-
-        return null;
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public async Task<string?> GetOwnerNumber(string url)
     {
-        var document = await GetHtmlDocument(url);
-
-        var links = document.QuerySelectorAll("a");
-
-        foreach (var link in links)
+        try
         {
-            if (link.Attributes["href"] != null && link.Attributes["href"].Value.Contains("tel"))
+            var document = await GetHtmlDocument(url);
+
+            var links = document.QuerySelectorAll("a");
+
+            foreach (var link in links)
             {
-                string? res = link?.Attributes["href"]?.Value;
-
-                if (res != null && res.Length <= 16)
+                if (link.Attributes["href"] != null && link.Attributes["href"].Value.Contains("tel"))
                 {
-                    return res[7..];
+                    string? res = link?.Attributes["href"]?.Value;
+
+                    if (res != null && res.Length <= 16)
+                    {
+                        return res[7..];
+                    }
+
+                    else if (res != null && res.Contains('+')) return res[8..];
                 }
-
-                else if (res != null && res.Contains('+')) return res[8..];
             }
-        }
 
-        return null;
+            return null;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     private async Task<IHtmlDocument> GetHtmlDocumentByPostfix(string postfix)
     {
-        string? sourse = await _htmlLoader.GetSourceByPostfixUrl(postfix);
+        try
+        {
+            string sourse = await _htmlLoader.GetSourceByPostfixUrl(postfix);
 
-        var parser = new HtmlParser();
+            var parser = new HtmlParser();
 
-        return parser.ParseDocument(sourse);
+            return parser.ParseDocument(sourse);
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     private async Task<IHtmlDocument> GetHtmlDocument(string url)
     {
-        string? sourse = await _htmlLoader.GetSourceByUrl(url);
+        try
+        {
+            string sourse = await _htmlLoader.GetSourceByUrl(url);
 
-        var parser = new HtmlParser();
+            var parser = new HtmlParser();
 
-        return parser.ParseDocument(sourse);
+            return parser.ParseDocument(sourse);
+        }
+        catch (Exception) 
+        {
+            throw;
+        }
     }
 }

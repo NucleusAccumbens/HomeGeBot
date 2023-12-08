@@ -801,7 +801,7 @@
           }
         }
       },
-      "NLog/5.2.4": {
+      "NLog/5.2.7": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/NLog.dll": {
@@ -1443,6 +1443,7 @@
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
           "Application": "1.0.0",
+          "Logger": "1.0.0",
           "Microsoft.Extensions.Configuration": "7.0.0",
           "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
           "Microsoft.Extensions.Configuration.Binder": "7.0.0",
@@ -1484,6 +1485,19 @@
         },
         "runtime": {
           "bin/placeholder/Infrastructure.dll": {}
+        }
+      },
+      "Logger/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "NLog": "5.2.7"
+        },
+        "compile": {
+          "bin/placeholder/Logger.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Logger.dll": {}
         }
       },
       "Parser/1.0.0": {
@@ -2654,10 +2668,10 @@
         "newtonsoft.json.bson.nuspec"
       ]
     },
-    "NLog/5.2.4": {
-      "sha512": "/qzds1Cp9rQD53La3mlWOmCHsFSbmT9BCb8q6k3eOrbOYDfdf3ZN1hBW7IDImUD6V8BfPfEFBhXGDLOEOQxHgQ==",
+    "NLog/5.2.7": {
+      "sha512": "Ww/0b6V1NL8iqpFKtRKVQFFX03LoowNzYeNG6FpVzmhgCfLAkW0h/4lT3+V8mHfyvtHptNoV8Cz0YePLFRUaPA==",
       "type": "package",
-      "path": "nlog/5.2.4",
+      "path": "nlog/5.2.7",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2674,7 +2688,7 @@
         "lib/netstandard1.5/NLog.xml",
         "lib/netstandard2.0/NLog.dll",
         "lib/netstandard2.0/NLog.xml",
-        "nlog.5.2.4.nupkg.sha512",
+        "nlog.5.2.7.nupkg.sha512",
         "nlog.nuspec"
       ]
     },
@@ -4209,6 +4223,11 @@
       "path": "../Infrastructure/Infrastructure.csproj",
       "msbuildProject": "../Infrastructure/Infrastructure.csproj"
     },
+    "Logger/1.0.0": {
+      "type": "project",
+      "path": "../Logger/Logger.csproj",
+      "msbuildProject": "../Logger/Logger.csproj"
+    },
     "Parser/1.0.0": {
       "type": "project",
       "path": "../Parser/Parser.csproj",
@@ -4219,9 +4238,9 @@
     "net6.0": [
       "Bot >= 1.0.0",
       "Infrastructure >= 1.0.0",
+      "Logger >= 1.0.0",
       "Microsoft.AspNetCore.Mvc.NewtonsoftJson >= 6.0.11",
       "Microsoft.EntityFrameworkCore.Design >= 7.0.0",
-      "NLog >= 5.2.4",
       "Parser >= 1.0.0",
       "Swashbuckle.AspNetCore >= 6.2.3"
     ]
@@ -4265,6 +4284,9 @@
             "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Infrastructure\\Infrastructure.csproj": {
               "projectPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Infrastructure\\Infrastructure.csproj"
             },
+            "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Logger\\Logger.csproj": {
+              "projectPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Logger\\Logger.csproj"
+            },
             "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Parser\\Parser.csproj": {
               "projectPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Parser\\Parser.csproj"
             }
@@ -4290,10 +4312,6 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[7.0.0, )"
-          },
-          "NLog": {
-            "target": "Package",
-            "version": "[5.2.4, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",

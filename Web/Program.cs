@@ -1,6 +1,7 @@
 using Bot;
 using Bot.Common;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Logger;
+using Logger.Interfaces;
 using Web.BackgroundTasks;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,9 +17,11 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddTelegramBotServices();
 builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddSingleton<ICustomLogger, CustomLogger>();
 builder.Services.AddHostedService<ConsumeScopedHostedService>();
 builder.Services.AddScoped<IScopedProcessingService, ScopedProcessingService>();
 builder.Services.AddAntiforgery(o => o.HeaderName = "XSRF-TOKEN");
+
 
 var app = builder.Build();
 

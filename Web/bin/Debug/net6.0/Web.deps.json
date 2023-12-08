@@ -10,6 +10,7 @@
         "dependencies": {
           "Bot": "1.0.0",
           "Infrastructure": "1.0.0",
+          "Logger": "1.0.0",
           "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "6.0.11",
           "Microsoft.EntityFrameworkCore.Design": "7.0.0",
           "Parser": "1.0.0",
@@ -534,6 +535,14 @@
           }
         }
       },
+      "NLog/5.2.7": {
+        "runtime": {
+          "lib/netstandard2.0/NLog.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.2.7.2287"
+          }
+        }
+      },
       "Npgsql/7.0.2": {
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "7.0.0",
@@ -874,6 +883,7 @@
       "Bot/1.0.0": {
         "dependencies": {
           "Application": "1.0.0",
+          "Logger": "1.0.0",
           "Microsoft.Extensions.Configuration": "7.0.0",
           "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
           "Microsoft.Extensions.Configuration.Binder": "7.0.0",
@@ -902,6 +912,14 @@
         },
         "runtime": {
           "Infrastructure.dll": {}
+        }
+      },
+      "Logger/1.0.0": {
+        "dependencies": {
+          "NLog": "5.2.7"
+        },
+        "runtime": {
+          "Logger.dll": {}
         }
       },
       "Parser/1.0.0": {
@@ -1245,6 +1263,13 @@
       "path": "newtonsoft.json.bson/1.0.2",
       "hashPath": "newtonsoft.json.bson.1.0.2.nupkg.sha512"
     },
+    "NLog/5.2.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Ww/0b6V1NL8iqpFKtRKVQFFX03LoowNzYeNG6FpVzmhgCfLAkW0h/4lT3+V8mHfyvtHptNoV8Cz0YePLFRUaPA==",
+      "path": "nlog/5.2.7",
+      "hashPath": "nlog.5.2.7.nupkg.sha512"
+    },
     "Npgsql/7.0.2": {
       "type": "package",
       "serviceable": true,
@@ -1520,6 +1545,11 @@
       "sha512": ""
     },
     "Infrastructure/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Logger/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

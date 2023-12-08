@@ -6,7 +6,6 @@ namespace Bot.Common;
 public class TelegramBot
 {
     private readonly IConfiguration _configuration;
-
     private TelegramBotClient? _client;
 
     public TelegramBot(IConfiguration configuration)

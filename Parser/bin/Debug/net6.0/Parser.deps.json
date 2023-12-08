@@ -185,6 +185,14 @@
           }
         }
       },
+      "NLog/5.2.7": {
+        "runtime": {
+          "lib/netstandard2.0/NLog.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.2.7.2287"
+          }
+        }
+      },
       "System.Buffers/4.5.1": {},
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {},
       "System.Text.Encoding.CodePages/6.0.0": {
@@ -217,6 +225,7 @@
       "Bot/1.0.0": {
         "dependencies": {
           "Application": "1.0.0",
+          "Logger": "1.0.0",
           "Microsoft.Extensions.Configuration": "7.0.0",
           "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
           "Microsoft.Extensions.Configuration.Binder": "7.0.0",
@@ -232,6 +241,14 @@
         },
         "runtime": {
           "Domain.dll": {}
+        }
+      },
+      "Logger/1.0.0": {
+        "dependencies": {
+          "NLog": "5.2.7"
+        },
+        "runtime": {
+          "Logger.dll": {}
         }
       }
     }
@@ -354,6 +371,13 @@
       "path": "newtonsoft.json/12.0.2",
       "hashPath": "newtonsoft.json.12.0.2.nupkg.sha512"
     },
+    "NLog/5.2.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Ww/0b6V1NL8iqpFKtRKVQFFX03LoowNzYeNG6FpVzmhgCfLAkW0h/4lT3+V8mHfyvtHptNoV8Cz0YePLFRUaPA==",
+      "path": "nlog/5.2.7",
+      "hashPath": "nlog.5.2.7.nupkg.sha512"
+    },
     "System.Buffers/4.5.1": {
       "type": "package",
       "serviceable": true,
@@ -393,6 +417,11 @@
       "sha512": ""
     },
     "Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Logger/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

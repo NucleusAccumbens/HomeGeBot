@@ -108,3 +108,6 @@ C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\obj\Debug\net6
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\bin\Debug\net6.0\Web.staticwebassets.runtime.json
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\bin\Debug\net6.0\Npgsql.dll
 C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\bin\Debug\net6.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\bin\Debug\net6.0\NLog.dll
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\bin\Debug\net6.0\Logger.dll
+C:\Users\User\Desktop\Projects\freelans\home-ge.bot\HomeGeBot\Web\bin\Debug\net6.0\Logger.pdb

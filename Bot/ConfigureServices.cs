@@ -7,6 +7,7 @@ using Bot.Commands.ClientCommands.CallbackCommands;
 using Bot.Messages.ClientMessages;
 using Bot.Commands.ClientCommands.TextCommands;
 using Bot.Messages.GeneralMessages;
+using Bot.Services;
 
 namespace Bot;
 
@@ -18,6 +19,7 @@ public static class ConfigureService
         services.AddSingleton<TelegramBot>();
         services.AddScoped<IMemoryCacheService, MemoryCachService>();
         services.AddScoped<ICommandAnalyzer, CommandAnalyzer>();
+        services.AddSingleton<IExceptionNotification, ExceptionNotification>();
 
         AddMessages(services);
         AddTextCommands(services);

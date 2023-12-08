@@ -1,0 +1,13 @@
+2023-12-08 15:51:32.9721 Info Consume Scoped Service Hosted Service running. 
+2023-12-08 15:51:33.0149 Info Consume Scoped Service Hosted Service is working. 
+2023-12-08 15:51:33.4174 Info Scoped Processing Service is working. Count: 1 
+2023-12-08 15:52:26.0477 Info Consume Scoped Service Hosted Service running. 
+2023-12-08 15:52:26.0860 Info Consume Scoped Service Hosted Service is working. 
+2023-12-08 15:52:26.3656 Info Scoped Processing Service is working. Count: 1 
+2023-12-08 15:52:49.9630 Error Ошибка: Error occurred while requesting URL. Status code: Forbidden, Reason: Forbidden 
+2023-12-08 15:52:54.1117 Info Consume Scoped Service Hosted Service is stopping. 
+2023-12-08 15:53:53.6734 Info Consume Scoped Service Hosted Service running. 
+2023-12-08 15:53:53.7223 Info Consume Scoped Service Hosted Service is working. 
+2023-12-08 15:53:53.9915 Info Scoped Processing Service is working. Count: 1 
+2023-12-08 15:54:03.2092 Error Ошибка: Error occurred while requesting URL. Status code: Forbidden, Reason: Forbidden 
+2023-12-08 15:54:04.4340 Info Consume Scoped Service Hosted Service is stopping. 

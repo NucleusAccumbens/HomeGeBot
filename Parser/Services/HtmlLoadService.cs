@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Parser.Exceptions;
 using Parser.Settings;
 
 namespace Parser.Services;
@@ -6,7 +7,6 @@ namespace Parser.Services;
 internal class HtmlLoadService
 {
     private readonly HttpClient _client;
-
     private readonly ParserSettings _settings;
 
     public HtmlLoadService(string baseUrl)
@@ -15,27 +15,37 @@ internal class HtmlLoadService
         _settings = new(baseUrl);
     }
 
-    public async Task<string?> GetSourceByPostfixUrl(string postfix)
-    {
+    public async Task<string> GetSourceByPostfixUrl(string postfix)
+    {        
         var response = await _client.GetAsync(_settings.GetFullUrl(postfix));
 
-        if (response != null && response.StatusCode == HttpStatusCode.OK)
+        if (response == null) 
         {
-            return await response.Content.ReadAsStringAsync();
+            throw new NoResponseException();
         }
 
-        return null;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            throw new BadResponseException(response);
+        }
+
+        return await response.Content.ReadAsStringAsync();
     }
 
-    public async Task<string?> GetSourceByUrl(string url)
+    public async Task<string> GetSourceByUrl(string url)
     {      
         var response = await _client.GetAsync(url);
 
-        if (response != null && response.StatusCode == HttpStatusCode.OK)
+        if (response == null)
         {
-            return await response.Content.ReadAsStringAsync();
+            throw new NoResponseException();
         }
 
-        return null;
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            throw new BadResponseException(response);
+        }
+
+        return await response.Content.ReadAsStringAsync();
     }
 }
