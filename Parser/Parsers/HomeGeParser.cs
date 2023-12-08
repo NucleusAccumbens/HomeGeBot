@@ -22,11 +22,11 @@ public class HomeGeParser
         {
             var document = await GetHtmlDocumentByPostfix(postfix);
 
-            var priceItem = document.QuerySelectorAll("div")
+            var cardItem = document.QuerySelectorAll("div")
                 .Where(item => item.ClassName != null && item.ClassName.Contains("statement-card"))
                 .FirstOrDefault();
 
-            return priceItem?.GetAttribute("data-product-id");
+            return cardItem?.GetAttribute("data-product-id");
         }
         catch (Exception)
         {

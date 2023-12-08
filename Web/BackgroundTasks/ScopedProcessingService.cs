@@ -69,15 +69,19 @@ internal class ScopedProcessingService : IScopedProcessingService
     {
         try
         {
-            Console.WriteLine("Вызван метод AddNewHomeGeFlatInDb");
-
             string? newFlatId = await GetLastestFlatIdFromHomeGe();
 
             if (newFlatId != null)
             {
-                string flatUrl = await _homeGeParser.GetItemUrl(_homeGePostfix, newFlatId);
+                string? flatUrl = await _homeGeParser.GetItemUrl(_homeGePostfix, newFlatId);
 
-                string ownerNumber = await _homeGeParser.GetOwnerNumber(flatUrl);
+                if (flatUrl == null) throw new NullReferenceException(
+                    "Не удалось получить ссылку на объявление.");
+
+                string? ownerNumber = await _homeGeParser.GetOwnerNumber(flatUrl);
+
+                if (flatUrl == null) throw new NullReferenceException(
+                    "Не удалось получить номер владельца.");
 
                 var newFlat = new Flat()
                 {
@@ -103,7 +107,8 @@ internal class ScopedProcessingService : IScopedProcessingService
         {
             string? lastestItemId = await _homeGeParser.GetLatestItemId(_homeGePostfix);
 
-            Console.WriteLine("Получен ID последнего элемента");
+            if (lastestItemId == null) throw new NullReferenceException(
+                "Не удалось получить ID объявления.");
 
             if (lastestItemId != null)
             {
