@@ -1,0 +1,39 @@
+﻿@page 
+@model Web.Pages.IndexModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
+
+
+<body>
+
+    @Html.AntiForgeryToken()
+
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'applications')" id="defaultOpen">Заявки</button>
+        <button class="tablinks" onclick="openTab(event, 'apartments')">Квартиры</button>
+        <button class="tablinks" onclick="openTab(event, 'managers')">Менеджеры</button>
+    </div>
+
+    @await Html.PartialAsync("_AppTablePartial", Model.Applications)
+
+    <div id="apartments" class="tabcontent">
+        <h3>Квартиры</h3>
+        <table>
+            <tr>
+                <th>Дата публикации</th>
+                <th>Ссылка</th>
+                <th>Номер владельца</th>
+                <th>Комментарий</th>
+                <th></th>
+            </tr>
+
+            @foreach (var flat in @Model.Flats)
+            {
+                @await Html.PartialAsync("_FlatRowPartial", flat)
+            }
+        </table>
+    </div>
+
+    @await Html.PartialAsync("_ManagersTablePartial", Model.Managers)
+
+</body>
+

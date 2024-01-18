@@ -1,0 +1,54 @@
+{
+  "Version": 1,
+  "Hash": "SolvwzCOyqMx5Vprbq3T70ofzOd0S7Qn3IS0HcX5+Mc=",
+  "Source": "Web",
+  "BasePath": "_content/Web",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "Web\\wwwroot",
+      "Source": "Web",
+      "ContentRoot": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\",
+      "BasePath": "_content/Web",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\css\\styles.css",
+      "SourceId": "Web",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\",
+      "BasePath": "_content/Web",
+      "RelativePath": "css/styles.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\styles.css"
+    },
+    {
+      "Identity": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\js\\jquery.js",
+      "SourceId": "Web",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\",
+      "BasePath": "_content/Web",
+      "RelativePath": "js/jquery.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\jquery.js"
+    }
+  ]
+}

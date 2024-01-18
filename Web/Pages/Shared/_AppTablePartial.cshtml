@@ -1,0 +1,28 @@
+﻿@using System.Globalization
+@model List<Web.Models.AppViewModel>
+
+<div id="applications" class="tabcontent">
+    <h3>Заявки</h3>
+    <table>
+        <tr>
+            <th>Телеграм</th>
+            <th>Страна</th>
+            <th>Деятельность</th>
+            <th>Животные</th>
+            <th>Срок аренды</th>
+            <th>Менеджер</th>
+        </tr>
+
+        @foreach (var app in @Model)
+        {
+            <tr>
+                <td><a href="https://t.me/@app.Username">@app.Username</a></td>
+                <td>@app.Country</td>
+                <td>@app.Profession</td>
+                <td>@app.HasPets</td>
+                <td>@app.Term</td>
+                <td>@app.ManagerUsername</td>
+            </tr>
+        }
+    </table>
+</div>

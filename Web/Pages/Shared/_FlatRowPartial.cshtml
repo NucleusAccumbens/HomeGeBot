@@ -1,0 +1,22 @@
+﻿@model Web.Models.FlatViewModel
+
+<tr>
+    <td style="width: 15%">@Model.PublicationDate</td>
+    <td style="width: 20%"><a href="@Model.Link">Посмотреть объявление</a></td>
+    <td style="width: 15%">@Model.OwnerNumber</td>
+    <td>
+        <input type="hidden" name="itemId" value="@Model.ItemId" />
+        <input type="text" id="flatComment" name="comment" style="width: 100%" value="@Model.Comment" title="@Model.Comment" />
+    </td>
+    <td style="width: 9%">
+        <div>
+            <button class="remove-btn" style="margin-right: 10px" id="removeBtn">×</button>
+            <button class="update-btn" id="updBtn" type="submit">✓</button>
+        </div>
+    </td>
+</tr>
+
+
+
+
+
