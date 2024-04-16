@@ -6,4 +6,5 @@ public class Admin : BaseAuditableEntity
 {   
     public long ChatId { get; set; }
     public List<Client> Clients { get; set; } = new();
+    public bool IsActive { get; set; } = true;
 }

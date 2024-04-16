@@ -13,23 +13,10 @@
           "Logger": "1.0.0",
           "Microsoft.AspNetCore.Mvc.NewtonsoftJson": "6.0.11",
           "Microsoft.EntityFrameworkCore.Design": "7.0.0",
-          "Parser": "1.0.0",
           "Swashbuckle.AspNetCore": "6.2.3"
         },
         "runtime": {
           "Web.dll": {}
-        }
-      },
-      "AngleSharp/1.0.1": {
-        "dependencies": {
-          "System.Buffers": "4.5.1",
-          "System.Text.Encoding.CodePages": "6.0.0"
-        },
-        "runtime": {
-          "lib/net6.0/AngleSharp.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
         }
       },
       "Azure.Core/1.24.0": {
@@ -125,7 +112,7 @@
           "System.Runtime.Caching": "5.0.0",
           "System.Security.Cryptography.Cng": "5.0.0",
           "System.Security.Principal.Windows": "5.0.0",
-          "System.Text.Encoding.CodePages": "6.0.0",
+          "System.Text.Encoding.CodePages": "5.0.0",
           "System.Text.Encodings.Web": "7.0.0"
         },
         "runtime": {
@@ -795,9 +782,9 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "System.Text.Encoding.CodePages/6.0.0": {
+      "System.Text.Encoding.CodePages/5.0.0": {
         "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+          "Microsoft.NETCore.Platforms": "5.0.0"
         }
       },
       "System.Text.Encodings.Web/7.0.0": {
@@ -921,17 +908,6 @@
         "runtime": {
           "Logger.dll": {}
         }
-      },
-      "Parser/1.0.0": {
-        "dependencies": {
-          "AngleSharp": "1.0.1",
-          "Application": "1.0.0",
-          "Bot": "1.0.0",
-          "Domain": "1.0.0"
-        },
-        "runtime": {
-          "Parser.dll": {}
-        }
       }
     }
   },
@@ -940,13 +916,6 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
-    },
-    "AngleSharp/1.0.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-uIezZhHZqWEb4zw/D5Xnskqb/sivIFwfWcUX2srPWTE10IYahfrdhWTIk859BpEmPmxSlMoL+S0JimFTaWGaHA==",
-      "path": "anglesharp/1.0.1",
-      "hashPath": "anglesharp.1.0.1.nupkg.sha512"
     },
     "Azure.Core/1.24.0": {
       "type": "package",
@@ -1480,12 +1449,12 @@
       "path": "system.text.encoding/4.3.0",
       "hashPath": "system.text.encoding.4.3.0.nupkg.sha512"
     },
-    "System.Text.Encoding.CodePages/6.0.0": {
+    "System.Text.Encoding.CodePages/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ZFCILZuOvtKPauZ/j/swhvw68ZRi9ATCfvGbk1QfydmcXBkIWecWKn/250UH7rahZ5OoDBaiAudJtPvLwzw85A==",
-      "path": "system.text.encoding.codepages/6.0.0",
-      "hashPath": "system.text.encoding.codepages.6.0.0.nupkg.sha512"
+      "sha512": "sha512-NyscU59xX6Uo91qvhOs2Ccho3AR2TnZPomo1Z0K6YpyztBPM/A5VbkzOO19sy3A3i1TtEnTxA7bCe3Us+r5MWg==",
+      "path": "system.text.encoding.codepages/5.0.0",
+      "hashPath": "system.text.encoding.codepages.5.0.0.nupkg.sha512"
     },
     "System.Text.Encodings.Web/7.0.0": {
       "type": "package",
@@ -1550,11 +1519,6 @@
       "sha512": ""
     },
     "Logger/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Parser/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "SolvwzCOyqMx5Vprbq3T70ofzOd0S7Qn3IS0HcX5+Mc=",
+  "Hash": "KrrSLjYBcj43urw9jbN1RjDJbrJauhX/NIKvFccOzuc=",
   "Source": "Web",
   "BasePath": "_content/Web",
   "Mode": "Default",
@@ -10,22 +10,24 @@
     {
       "Name": "Web\\wwwroot",
       "Source": "Web",
-      "ContentRoot": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\wwwroot\\",
       "BasePath": "_content/Web",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\css\\styles.css",
+      "Identity": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\wwwroot\\css\\styles.css",
       "SourceId": "Web",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\wwwroot\\",
       "BasePath": "_content/Web",
       "RelativePath": "css/styles.css",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
@@ -34,15 +36,17 @@
       "OriginalItemSpec": "wwwroot\\css\\styles.css"
     },
     {
-      "Identity": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\js\\jquery.js",
+      "Identity": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\wwwroot\\js\\jquery.js",
       "SourceId": "Web",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Web\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\wwwroot\\",
       "BasePath": "_content/Web",
       "RelativePath": "js/jquery.js",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",

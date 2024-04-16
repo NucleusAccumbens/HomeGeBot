@@ -19,7 +19,6 @@
     <ProjectReference Include="..\Bot\Bot.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     <ProjectReference Include="..\Logger\Logger.csproj" />
-    <ProjectReference Include="..\Parser\Parser.csproj" />
   </ItemGroup>
 
   <ItemGroup>

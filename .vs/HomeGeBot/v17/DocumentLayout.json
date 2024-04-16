@@ -1,0 +1,180 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\application\\admins\\queries\\getadminsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|solutionrelative:application\\admins\\queries\\getadminsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0219FB19-28BB-4D6A-99CB-A9AF20739636}|Domain\\Domain.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\domain\\entities\\admin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0219FB19-28BB-4D6A-99CB-A9AF20739636}|Domain\\Domain.csproj|solutionrelative:domain\\entities\\admin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D92FCA5D-7E84-4BBD-AAF9-CDE65B0CB215}|Web\\Web.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D92FCA5D-7E84-4BBD-AAF9-CDE65B0CB215}|Web\\Web.csproj|solutionrelative:web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D92FCA5D-7E84-4BBD-AAF9-CDE65B0CB215}|Web\\Web.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\web\\controllers\\telegrambotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D92FCA5D-7E84-4BBD-AAF9-CDE65B0CB215}|Web\\Web.csproj|solutionrelative:web\\controllers\\telegrambotcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{72ABA8F5-CBD5-4AB6-8487-B1063337CC53}|Bot\\Bot.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\bot\\common\\commandanalyzer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{72ABA8F5-CBD5-4AB6-8487-B1063337CC53}|Bot\\Bot.csproj|solutionrelative:bot\\common\\commandanalyzer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D92FCA5D-7E84-4BBD-AAF9-CDE65B0CB215}|Web\\Web.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{D92FCA5D-7E84-4BBD-AAF9-CDE65B0CB215}|Web\\Web.csproj|solutionrelative:web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{007a3a6b-b5b2-454d-a2bd-cf929f989be2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{a80febb4-e7e0-4147-b476-21aaf2453969}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GetAdminsQuery.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Admins\\Queries\\GetAdminsQuery.cs",
+              "RelativeDocumentMoniker": "Application\\Admins\\Queries\\GetAdminsQuery.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Admins\\Queries\\GetAdminsQuery.cs",
+              "RelativeToolTip": "Application\\Admins\\Queries\\GetAdminsQuery.cs",
+              "ViewState": "AQIAAA8AAAAAAAAAAAAIwBYAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-16T04:49:46.874Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Admin.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Domain\\Entities\\Admin.cs",
+              "RelativeDocumentMoniker": "Domain\\Entities\\Admin.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Domain\\Entities\\Admin.cs",
+              "RelativeToolTip": "Domain\\Entities\\Admin.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAuAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-16T04:49:04.366Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\Program.cs",
+              "RelativeDocumentMoniker": "Web\\Program.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\Program.cs",
+              "RelativeToolTip": "Web\\Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAAxAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-16T04:48:12.582Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TelegramBotController.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\Controllers\\TelegramBotController.cs",
+              "RelativeDocumentMoniker": "Web\\Controllers\\TelegramBotController.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\Controllers\\TelegramBotController.cs",
+              "RelativeToolTip": "Web\\Controllers\\TelegramBotController.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACMAAAAcAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-16T04:47:30.406Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "CommandAnalyzer.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Bot\\Common\\CommandAnalyzer.cs",
+              "RelativeDocumentMoniker": "Bot\\Common\\CommandAnalyzer.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Bot\\Common\\CommandAnalyzer.cs",
+              "RelativeToolTip": "Bot\\Common\\CommandAnalyzer.cs",
+              "ViewState": "AQIAADoAAAAAAAAAAAAAAD4AAAAlAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-16T04:47:30.487Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\appsettings.json",
+              "RelativeDocumentMoniker": "Web\\appsettings.json",
+              "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Web\\appsettings.json",
+              "RelativeToolTip": "Web\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABIAAAAmAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-04-16T04:47:30.497Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 1059,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{9a7cebbb-dc5c-4986-bc49-962da46aa506}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 75,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{ecb7191a-597b-41f5-9843-03a4cf275dde}"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 75,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

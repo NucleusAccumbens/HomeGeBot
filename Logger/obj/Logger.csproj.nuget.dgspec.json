@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Logger\\Logger.csproj": {}
+    "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Logger\\Logger.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Logger\\Logger.csproj": {
+    "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Logger\\Logger.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Logger\\Logger.csproj",
+        "projectUniqueName": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Logger\\Logger.csproj",
         "projectName": "Logger",
-        "projectPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Logger\\Logger.csproj",
+        "projectPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Logger\\Logger.csproj",
         "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Logger\\obj\\",
+        "outputPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Logger\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -39,6 +39,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -66,7 +71,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.103\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200\\RuntimeIdentifierGraph.json"
         }
       }
     }

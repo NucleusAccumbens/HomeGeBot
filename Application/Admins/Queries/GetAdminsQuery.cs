@@ -22,6 +22,7 @@ public class GetAdminsQuery : IGetAdminsQuery
     public async Task<long> GetAdminWithLeastClientCountAsync()
     {
         List<int> counts = await _context.Admins
+            .Where(a => a.IsActive == true)
             .Include(a => a.Clients)
             .Select(a => a.Clients.Count)
             .ToListAsync();

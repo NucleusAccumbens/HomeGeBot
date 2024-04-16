@@ -3885,11 +3885,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Infrastructure\\Infrastructure.csproj",
+      "projectUniqueName": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Infrastructure\\Infrastructure.csproj",
       "projectName": "Infrastructure",
-      "projectPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Infrastructure\\Infrastructure.csproj",
+      "projectPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Infrastructure\\Infrastructure.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Infrastructure\\obj\\",
+      "outputPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -3911,14 +3911,14 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Application\\Application.csproj": {
-              "projectPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Application\\Application.csproj"
+            "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Application.csproj": {
+              "projectPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Application.csproj"
             },
-            "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Bot\\Bot.csproj": {
-              "projectPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Bot\\Bot.csproj"
+            "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Bot\\Bot.csproj": {
+              "projectPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Bot\\Bot.csproj"
             },
-            "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Domain\\Domain.csproj": {
-              "projectPath": "C:\\Users\\User\\Desktop\\Projects\\freelans\\home-ge.bot\\HomeGeBot\\Domain\\Domain.csproj"
+            "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Domain\\Domain.csproj": {
+              "projectPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Domain\\Domain.csproj"
             }
           }
         }
@@ -3927,6 +3927,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -3968,7 +3973,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.103\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200\\RuntimeIdentifierGraph.json"
       }
     }
   }
