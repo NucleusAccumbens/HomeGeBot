@@ -31,6 +31,7 @@ public static class ConfigureServices
         services.AddScoped<ICheckUserIsAdminQuery, CheckUserIsAdminQuery>();
         services.AddScoped<IUpdateFlatCommand, UpdateFlatCommand>();
         services.AddScoped<IDeleteFlatCommand, DeleteFlatCommand>();
+        services.AddScoped<IDeactivateAdminCommand, DeactivateAdminCommand>();
 
         return services;
     }

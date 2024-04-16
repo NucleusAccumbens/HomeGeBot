@@ -45,6 +45,7 @@ public static class ConfigureService
         services.AddScoped<BaseTextCommand, ProfessionTextCommand>();
         services.AddScoped<BaseTextCommand, AddAdminTextCommand>();
         services.AddScoped<BaseTextCommand, AppTextCommand>();
+        services.AddScoped<BaseTextCommand, RemoveAdminTextCommand>();
     }
 
     private static void AddCallbackCommands(IServiceCollection services)

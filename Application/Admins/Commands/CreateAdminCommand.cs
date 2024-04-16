@@ -10,18 +10,16 @@ public class CreateAdminCommand : ICreateAdminCommand
     {
         _context = context;
     }
-    
+
     public async Task CreateAdminAsync(Admin admin)
     {
         var thisAdmin = await _context.Admins
             .Where(a => a.ChatId == admin.ChatId)
             .SingleOrDefaultAsync();
 
-        if (thisAdmin == null) 
-        {
-            await _context.Admins.AddAsync(admin);
+        if (thisAdmin == null) await _context.Admins.AddAsync(admin);
+        else thisAdmin.IsActive = true;
 
-            await _context.SaveChangesAsync();
-        }      
+        await _context.SaveChangesAsync();
     }
 }
