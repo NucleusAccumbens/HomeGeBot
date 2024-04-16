@@ -48,7 +48,7 @@
               "RelativeDocumentMoniker": "Application\\Admins\\Commands\\CreateAdminCommand.cs",
               "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Admins\\Commands\\CreateAdminCommand.cs",
               "RelativeToolTip": "Application\\Admins\\Commands\\CreateAdminCommand.cs",
-              "ViewState": "AQIAAAoAAAAAAAAAAAAAwBcAAAAFAAAA",
+              "ViewState": "AQIAABUAAAAAAAAAAAAIwBcAAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-16T05:02:07.465Z",
               "EditorCaption": ""
@@ -63,8 +63,7 @@
               "RelativeToolTip": "Application\\Admins\\Queries\\GetAdminsQuery.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAABcAAAAwAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-16T04:59:51.438Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-16T04:59:51.438Z"
             },
             {
               "$type": "Document",
@@ -76,8 +75,7 @@
               "RelativeToolTip": "Application\\ConfigureServices.cs",
               "ViewState": "AQIAABUAAAAAAAAAAAAAACEAAABOAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-16T04:59:26.487Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-04-16T04:59:26.487Z"
             }
           ]
         },
