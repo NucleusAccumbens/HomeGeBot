@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\application\\admins\\commands\\createadmincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|solutionrelative:application\\admins\\commands\\createadmincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\application\\admins\\queries\\getadminsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|solutionrelative:application\\admins\\queries\\getadminsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\application\\admins\\interfaces\\igetadminsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|solutionrelative:application\\admins\\interfaces\\igetadminsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\application\\configureservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|solutionrelative:application\\configureservices.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|c:\\users\\user\\desktop\\propertyintbilisi-bot\\application\\admins\\queries\\getadminsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D6A416FB-FA02-49F3-A59B-2CE477AB18BF}|Application\\Application.csproj|solutionrelative:application\\admins\\queries\\getadminsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -42,32 +42,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "CreateAdminCommand.cs",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Admins\\Commands\\CreateAdminCommand.cs",
-              "RelativeDocumentMoniker": "Application\\Admins\\Commands\\CreateAdminCommand.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Admins\\Commands\\CreateAdminCommand.cs",
-              "RelativeToolTip": "Application\\Admins\\Commands\\CreateAdminCommand.cs",
-              "ViewState": "AQIAABUAAAAAAAAAAAAIwBcAAAAFAAAA",
+              "DocumentIndex": 1,
+              "Title": "IGetAdminsQuery.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Admins\\Interfaces\\IGetAdminsQuery.cs",
+              "RelativeDocumentMoniker": "Application\\Admins\\Interfaces\\IGetAdminsQuery.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Admins\\Interfaces\\IGetAdminsQuery.cs",
+              "RelativeToolTip": "Application\\Admins\\Interfaces\\IGetAdminsQuery.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-16T05:02:07.465Z",
+              "WhenOpened": "2024-06-12T12:48:55.604Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "GetAdminsQuery.cs",
               "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Admins\\Queries\\GetAdminsQuery.cs",
               "RelativeDocumentMoniker": "Application\\Admins\\Queries\\GetAdminsQuery.cs",
               "ToolTip": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Admins\\Queries\\GetAdminsQuery.cs",
               "RelativeToolTip": "Application\\Admins\\Queries\\GetAdminsQuery.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABcAAAAwAAAA",
+              "ViewState": "AQIAAB0AAAAAAAAAAAAQwB8AAAAbAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-04-16T04:59:51.438Z"
+              "WhenOpened": "2024-04-16T04:59:51.438Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "ConfigureServices.cs",
               "DocumentMoniker": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\ConfigureServices.cs",
               "RelativeDocumentMoniker": "Application\\ConfigureServices.cs",

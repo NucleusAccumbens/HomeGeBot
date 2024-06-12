@@ -21,18 +21,24 @@ public class GetAdminsQuery : IGetAdminsQuery
 
     public async Task<long> GetAdminWithLeastClientCountAsync()
     {
-        List<int> counts = await _context.Admins
+        var counts = await _context.Admins
             .Where(a => a.IsActive == true)
             .Include(a => a.Clients)
-            .Select(a => a.Clients.Count)
+            .Select(a => new
+            {
+                Count = a.Clients.Count,
+                ChatId = a.ChatId
+            })
             .ToListAsync();
 
-        var min = counts.Min();
+        var min = counts.OrderBy(c => c.Count).FirstOrDefault();
 
-        return await _context.Admins
-            .Include(a => a.Clients)
-            .Where(a => a.Clients.Count == min)
-            .Select(a => a.ChatId)
-            .FirstAsync();
+        if (min != null)
+        {
+            return min.ChatId;
+        }
+
+        return -1; 
     }
+
 }
