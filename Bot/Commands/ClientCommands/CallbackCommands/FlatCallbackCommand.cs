@@ -2,19 +2,18 @@
 using Bot.Common.Services;
 using Bot.Exceptions;
 using Bot.Messages.ClientMessages;
-
+using Bot.Session;
 
 namespace Bot.Commands.ClientCommands.CallbackCommands;
 
 public class FlatCallbackCommand : BaseCallbackCommand
 {
     private readonly CountryMessage _countryMessage;
-    
-    private readonly IMemoryCacheService _memoryCacheService;
+    private readonly IBotSessionStore _sessionStore;
 
-    public FlatCallbackCommand(IMemoryCacheService memoryCacheService, CountryMessage countryMessage)
+    public FlatCallbackCommand(IBotSessionStore sessionStore, CountryMessage countryMessage)
     {
-        _memoryCacheService = memoryCacheService;
+        _sessionStore = sessionStore;
         _countryMessage = countryMessage;
     }
 
@@ -30,8 +29,7 @@ public class FlatCallbackCommand : BaseCallbackCommand
 
             try
             {
-                _memoryCacheService.RemoveClienteFromMemoryCache(chatId);
-                _memoryCacheService.RemoveMessageIdFromMemoryCache(messageId);
+                await _sessionStore.ClearAsync(chatId);
 
                 await MessageService.ShowAllert(callbackId, client, "Заявка отменена!");
                 await _countryMessage.EditMessage(chatId, messageId, client);

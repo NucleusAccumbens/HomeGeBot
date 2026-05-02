@@ -1,38 +1,39 @@
-﻿using Application.Admins.Interfaces;
-using Application.Clients.Interfaces;
-using Application.Messages.Interfaces;
-using Application.TlgUsers.Interfaces;
+﻿using Application.Messages.Interfaces;
+using Application.RentalApplications;
 using Bot.Common.Abstractions;
 using Bot.Common.Services;
+using Bot.Configuration;
 using Bot.Exceptions;
-using Domain.Entities;
+using Bot.Session;
+using Domain.Common;
+using Microsoft.Extensions.Options;
 
 namespace Bot.Commands.ClientCommands.TextCommands;
 
 public class AppTextCommand : BaseTextCommand
 {
-    private readonly IMemoryCacheService _memoryCacheService;
+    private readonly IBotSessionStore _sessionStore;
 
-    private readonly IGetAdminsQuery _getAdminsQuery;
-
-    private readonly IUpdateAdminCommand _updateAdminCommand;
-
-    private readonly ICreateClientCommand _createClientCommand;
+    private readonly ISubmitRentalApplicationUseCase _submitRentalApplicationUseCase;
 
     private readonly IGetMessageQuery _getMessageQuery;
 
-    public AppTextCommand(IMemoryCacheService memoryCacheService, IGetAdminsQuery getAdminsQuery, 
-        IUpdateAdminCommand updateAdminCommand, ICreateClientCommand createClientCommand, 
-        IGetMessageQuery getMessageQuery)
+    private readonly BotConfiguration _botConfig;
+
+    public AppTextCommand(IBotSessionStore sessionStore, 
+        ISubmitRentalApplicationUseCase submitRentalApplicationUseCase, 
+        IGetMessageQuery getMessageQuery,
+        IOptions<BotConfiguration> botConfigOptions)
     {
-        _memoryCacheService = memoryCacheService;
-        _getAdminsQuery = getAdminsQuery;
-        _updateAdminCommand = updateAdminCommand;
-        _createClientCommand = createClientCommand;
+        _sessionStore = sessionStore;
+        _submitRentalApplicationUseCase = submitRentalApplicationUseCase;
         _getMessageQuery = getMessageQuery;
+        _botConfig = botConfigOptions.Value;
     }
 
     public override string Name => "app";
+
+    public override BotStep? HandledStep => BotStep.WaitForFlatForward;
 
     public override async Task Execute(Update update, ITelegramBotClient client)
     {
@@ -44,33 +45,50 @@ public class AppTextCommand : BaseTextCommand
             {
                 if (update.Message.ForwardFromChat != null)
                 {
-                    if (update.Message.ForwardFromChat.Id != -1001580911411)
+                    if (update.Message.ForwardFromChat.Id != _botConfig.SourceChannelId)
                     {
                         if (update.Message.Caption != null)
                         {
                             var message = await _getMessageQuery.GetMessageAsync("channelError");
+                            var body = message?.Body ?? "Перешлите пост из канала @propertyintbilisi";
 
-                            await MessageService.SendMessage(chatId, client, message.Body, null);
+                            await MessageService.SendMessage(chatId, client, body, null);
 
                             return;
                         }
                     }
 
-                    if (update.Message.ForwardFromChat.Id == -1001580911411)
+                    if (update.Message.ForwardFromChat.Id == _botConfig.SourceChannelId)
                     {                       
                         if (update.Message.Caption != null)
                         {                          
-                            int messageId = _memoryCacheService.GetMessageIdFromMemoryCache(chatId);
-                            var message = await _getMessageQuery.GetMessageAsync("app");
-                            var createdClient = await CreateClientAsync(chatId);
+                            var session = await _sessionStore.GetAsync(chatId);
+                            if (session?.RentalApplication == null || session.MessageId == null)
+                                throw new MemoryCacheException();
 
-                            await _updateAdminCommand.AddClientToAdminAsync(createdClient.AdminChatId, createdClient);
-                            await client.ForwardMessageAsync(createdClient.AdminChatId, chatId, update.Message.MessageId);
-                            await MessageService.SendMessage(createdClient.AdminChatId, client,
-                                $"<b>Страна:</b> {createdClient.Country}\n" +
-                                $"<b>Деятельность:</b> {createdClient.Profession}\n" +
-                                $"<b>Домашние животные:</b> {GetHasPetsStringValue(createdClient)}\n" +
-                                $"<b>Срок аренды:</b> {createdClient.Term}",
+                            var message = await _getMessageQuery.GetMessageAsync("app");
+
+                            var result = await _submitRentalApplicationUseCase.ExecuteAsync(new SubmitRentalApplicationRequest
+                            {
+                                ChatId = chatId,
+                                Country = session.RentalApplication.Country!.Value,
+                                Profession = session.RentalApplication.Profession!,
+                                HasPets = session.RentalApplication.HasPets!.Value,
+                                Term = session.RentalApplication.Term!.Value
+                            });
+
+                            if (!result.Success)
+                            {
+                                await MessageService.SendMessage(chatId, client, result.ErrorMessage!, null);
+                                return;
+                            }
+
+                            await client.ForwardMessageAsync(result.AssignedManagerChatId!.Value, chatId, update.Message.MessageId);
+                            await MessageService.SendMessage(result.AssignedManagerChatId.Value, client,
+                                $"<b>Страна:</b> {session.RentalApplication.Country?.GetDisplayName()}\n" +
+                                $"<b>Деятельность:</b> {session.RentalApplication.Profession}\n" +
+                                $"<b>Домашние животные:</b> {(session.RentalApplication.HasPets.Value ? "Да" : "Нет")}\n" +
+                                $"<b>Срок аренды:</b> {session.RentalApplication.Term?.GetDisplayName()}",
                                 new(new[]
                                 {
                                     new[]
@@ -79,12 +97,11 @@ public class AppTextCommand : BaseTextCommand
                                     },
                                 }));
 
-                            await MessageService.DeleteMessage(chatId, messageId, client);
-                            await MessageService.SendMessage(chatId, client,
-                                message.Body, null);
+                            await MessageService.DeleteMessage(chatId, session.MessageId.Value, client);
+                            var appBody = message?.Body ?? "Заявка принята! Менеджер скоро свяжется с вами.";
+                            await MessageService.SendMessage(chatId, client, appBody, null);
 
-                            _memoryCacheService.RemoveMessageIdFromMemoryCache(chatId);
-                            _memoryCacheService.RemoveClienteFromMemoryCache(chatId);
+                            await _sessionStore.ClearAsync(chatId);
 
                             return;
                         }
@@ -96,9 +113,10 @@ public class AppTextCommand : BaseTextCommand
                 {
                     if (update.Message.Caption != null)
                     {
-                        var message = await _getMessageQuery.GetMessageAsync("channelError");
-                        
-                        await MessageService.SendMessage(chatId, client, message.Body, null);
+                        var channelErrMsg = await _getMessageQuery.GetMessageAsync("channelError");
+                        var channelErrBody = channelErrMsg?.Body ?? "Перешлите пост из канала @propertyintbilisi";
+
+                        await MessageService.SendMessage(chatId, client, channelErrBody, null);
 
                         return;
                     }
@@ -109,20 +127,5 @@ public class AppTextCommand : BaseTextCommand
                 await ex.SendExceptionMessage(chatId, client);
             }
         }
-    }
-
-    private static string GetHasPetsStringValue(Client client)
-    {
-        if (client.HasPets == true) return "Да";
-        else return "Нет";
-    }
-
-    private async Task<Client> CreateClientAsync(long chatId)
-    {
-        var serviceClient = _memoryCacheService.GetClientFromMemoryCache(chatId);
-        long adminChatId = await _getAdminsQuery.GetAdminWithLeastClientCountAsync();
-        serviceClient.AdminChatId = adminChatId;
-
-        return await _createClientCommand.CreateClientAsync(serviceClient);
     }
 }

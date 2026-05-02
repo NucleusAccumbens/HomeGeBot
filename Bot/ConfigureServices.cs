@@ -8,6 +8,7 @@ using Bot.Messages.ClientMessages;
 using Bot.Commands.ClientCommands.TextCommands;
 using Bot.Messages.GeneralMessages;
 using Bot.Services;
+using Bot.Session;
 
 namespace Bot;
 
@@ -17,7 +18,7 @@ public static class ConfigureService
     {
         services.AddMemoryCache();
         services.AddSingleton<TelegramBot>();
-        services.AddScoped<IMemoryCacheService, MemoryCachService>();
+        services.AddScoped<IBotSessionStore, MemoryBotSessionStore>();
         services.AddScoped<ICommandAnalyzer, CommandAnalyzer>();
         services.AddSingleton<IExceptionNotification, ExceptionNotification>();
 
@@ -43,9 +44,8 @@ public static class ConfigureService
     {
         services.AddScoped<BaseTextCommand, StartTextCommand>();
         services.AddScoped<BaseTextCommand, ProfessionTextCommand>();
-        services.AddScoped<BaseTextCommand, AddAdminTextCommand>();
         services.AddScoped<BaseTextCommand, AppTextCommand>();
-        services.AddScoped<BaseTextCommand, RemoveAdminTextCommand>();
+        // AddAdminTextCommand и RemoveAdminTextCommand удалены — управление администраторами через веб-панель
     }
 
     private static void AddCallbackCommands(IServiceCollection services)

@@ -1,4 +1,4 @@
-﻿using Application.TlgUsers.Interfaces;
+﻿using Application.BotStart;
 using Bot.Common.Abstractions;
 using Bot.Messages.ClientMessages;
 using Bot.Messages.GeneralMessages;
@@ -11,21 +11,14 @@ public class StartTextCommand : BaseTextCommand
 
     private readonly AdminStartMessage _adminStartMessage;
 
-    private readonly ICreateTlgUserCommand _createTlgUserCommand;
-
-    private readonly ICheckUserIsInDbQuery _checkUserIsInDbQuery;
-
-    private readonly ICheckUserIsAdminQuery _checkUserIsAdminQuery;
+    private readonly IStartBotUseCase _startBotUseCase;
     public override string Name => "/start";
 
-    public StartTextCommand(CountryMessage startMessage, ICreateTlgUserCommand createTlgUserCommand, 
-        ICheckUserIsInDbQuery checkUserIsInDbQuery, ICheckUserIsAdminQuery checkUserIsAdminQuery, 
+    public StartTextCommand(CountryMessage startMessage, IStartBotUseCase startBotUseCase, 
         AdminStartMessage adminStartMessage)
     {
         _startMessage = startMessage;
-        _createTlgUserCommand = createTlgUserCommand;
-        _checkUserIsInDbQuery = checkUserIsInDbQuery;
-        _checkUserIsAdminQuery = checkUserIsAdminQuery;
+        _startBotUseCase = startBotUseCase;
         _adminStartMessage = adminStartMessage;
     }
 
@@ -35,19 +28,18 @@ public class StartTextCommand : BaseTextCommand
         {
             long chatId = update.Message.Chat.Id;
 
-            bool oldUser = await _checkUserIsInDbQuery.CheckUserIsInDbAsync(chatId);
-
-            if (!oldUser)
+            var result = await _startBotUseCase.ExecuteAsync(new StartBotRequest()
             {
-                await _createTlgUserCommand.CreateTlgUserAsync(update.Message.Chat);
-            }
+                ChatId = chatId,
+                Username = update.Message.Chat.Username,
+            });
 
-            bool? isAdmin = await _checkUserIsAdminQuery.CheckUserIsAdminAsync(chatId);
+            if (result.IsKicked)
+                return;
 
-            if (isAdmin == true)
+            if (result.IsAdmin)
             {
                 await _adminStartMessage.SendMessage(chatId, client);
-
                 return;
             }
 

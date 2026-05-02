@@ -61,10 +61,6 @@
             "Microsoft.Extensions.DependencyInjection.Abstractions": {
               "target": "Package",
               "version": "[7.0.0, )"
-            },
-            "Telegram.Bot": {
-              "target": "Package",
-              "version": "[18.0.0, )"
             }
           },
           "imports": [
@@ -280,9 +276,6 @@
               "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Application.csproj": {
                 "projectPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Application\\Application.csproj"
               },
-              "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Bot\\Bot.csproj": {
-                "projectPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Bot\\Bot.csproj"
-              },
               "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Domain\\Domain.csproj": {
                 "projectPath": "C:\\Users\\User\\Desktop\\propertyintbilisi-bot\\Domain\\Domain.csproj"
               }
@@ -317,6 +310,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[7.0.3, )"
+            },
+            "Microsoft.Extensions.Configuration.Binder": {
+              "target": "Package",
+              "version": "[7.0.0, )"
             },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",

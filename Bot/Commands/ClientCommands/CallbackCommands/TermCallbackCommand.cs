@@ -1,7 +1,8 @@
 ﻿using Bot.Common.Abstractions;
 using Bot.Exceptions;
 using Bot.Messages.ClientMessages;
-using Domain.Entities;
+using Bot.Session;
+using Domain.Common;
 using Domain.Enums;
 
 namespace Bot.Commands.ClientCommands.CallbackCommands;
@@ -12,13 +13,13 @@ public class TermCallbackCommand : BaseCallbackCommand
 
     private readonly FlatMessage _flatMessage;
 
-    private readonly IMemoryCacheService _memoryCacheService;
+    private readonly IBotSessionStore _sessionStore;
 
-    public TermCallbackCommand(HasPetsMessage hasPetsMessage, FlatMessage flatMessage, IMemoryCacheService memoryCacheService)
+    public TermCallbackCommand(HasPetsMessage hasPetsMessage, FlatMessage flatMessage, IBotSessionStore sessionStore)
     {
         _hasPetsMessage = hasPetsMessage;
         _flatMessage = flatMessage;
-        _memoryCacheService = memoryCacheService;
+        _sessionStore = sessionStore;
     }
 
     public override char CallbackDataCode => 'c';
@@ -33,41 +34,39 @@ public class TermCallbackCommand : BaseCallbackCommand
 
             try
             {
-                var serviceClient = _memoryCacheService.GetClientFromMemoryCache(chatId);
+                var session = await _sessionStore.GetAsync(chatId);
+                if (session?.RentalApplication == null)
+                    throw new MemoryCacheException();
 
                 if (update.CallbackQuery.Data == "cGoBack")
                 {
+                    session.Step = BotStep.SelectPets;
+                    await _sessionStore.SaveAsync(session);
+                    
                     await _hasPetsMessage.EditMessage(chatId, messageId, client,
-                        $"<b>Страна:</b> {serviceClient.Country}\n" +
-                        $"<b>Деятельность:</b> {serviceClient.Profession}");
+                        $"<b>Страна:</b> {session.RentalApplication.Country?.GetDisplayName()}\n" +
+                        $"<b>Деятельность:</b> {session.RentalApplication.Profession}");
                     return;
                 }
 
+                if (update.CallbackQuery.Data == "cSixMonths") session.RentalApplication.Term = Term.SixMonths;
+                if (update.CallbackQuery.Data == "cOneYear") session.RentalApplication.Term = Term.OneYear;
+                if (update.CallbackQuery.Data == "cOther") session.RentalApplication.Term = Term.Other;
 
-                if (update.CallbackQuery.Data == "cПолгода") serviceClient.Term = Term.Полгода;
-                if (update.CallbackQuery.Data == "cГод") serviceClient.Term = Term.Год;
-                if (update.CallbackQuery.Data == "cДругое") serviceClient.Term = Term.Другое;
-
-                _memoryCacheService.SetMemoryCache(chatId, serviceClient);
-                _memoryCacheService.SetMemoryCache(chatId, messageId);
-                _memoryCacheService.SetMemoryCache(chatId, "app");
+                session.Step = BotStep.WaitForFlatForward;
+                session.MessageId = messageId;
+                await _sessionStore.SaveAsync(session);
                 
                 await _flatMessage.EditMessage(chatId, messageId, client,
-                    $"<b>Страна:</b> {serviceClient.Country}\n" +
-                    $"<b>Деятельность:</b> {serviceClient.Profession}\n" +
-                    $"<b>Домашние животные:</b> {GetHasPetsStringValue(serviceClient)}\n" +
-                    $"<b>Срок аренды:</b> {serviceClient.Term}");
+                    $"<b>Страна:</b> {session.RentalApplication.Country?.GetDisplayName()}\n" +
+                    $"<b>Деятельность:</b> {session.RentalApplication.Profession}\n" +
+                    $"<b>Домашние животные:</b> {(session.RentalApplication.HasPets == true ? "Да" : "Нет")}\n" +
+                    $"<b>Срок аренды:</b> {session.RentalApplication.Term?.GetDisplayName()}");
             }
             catch (MemoryCacheException ex)
             {
                 await ex.SendExceptionMessage(chatId, client);
             }
         }
-    }
-
-    private static string GetHasPetsStringValue(Client client)
-    {
-        if (client.HasPets == true) return "Да";
-        else return "Нет";
     }
 }

@@ -29,11 +29,6 @@ public class MessageService
         }
     }
 
-    public static async Task SendMediaGroup(long chatId, ITelegramBotClient client, IEnumerable<IAlbumInputMedia> media)
-    {
-        await client.SendMediaGroupAsync(chatId, media);
-    }
-
     public static async Task EditMessage(long chatId, int messageId, ITelegramBotClient client,
         string text, InlineKeyboardMarkup? inlineKeyboardMarkup)
     {
@@ -88,10 +83,6 @@ public class MessageService
 
     public static async Task<string> GetMessagePathToPhoto(IGetMessageQuery getMessageQuery, string name)
     {
-        var messagePathToPhoto = await getMessageQuery.GetMessagePathToPhotoAsync(name);
-
-        if (messagePathToPhoto != null && messagePathToPhoto != String.Empty) return messagePathToPhoto;
-
-        else return "https://drive.google.com/file/d/10HjMQvD-v9sZIBKbRvo_OcoSG0OExjDk/view?usp=sharing";
+        return await getMessageQuery.GetMessagePathToPhotoAsync(name) ?? string.Empty;
     }
 }

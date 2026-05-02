@@ -1,8 +1,10 @@
-﻿namespace Domain.Enums;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Domain.Enums;
 
 public enum Term
 {
-    Полгода,
-    Год,
-    Другое
+    [Display(Name = "6 месяцев")] SixMonths,
+    [Display(Name = "1 год")] OneYear,
+    [Display(Name = "Другое")] Other
 }

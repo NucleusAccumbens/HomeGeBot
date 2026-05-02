@@ -3,7 +3,8 @@ using Bot.Common.Abstractions;
 using Bot.Common.Services;
 using Bot.Exceptions;
 using Bot.Messages.ClientMessages;
-using Domain.Entities;
+using Bot.Session;
+using Domain.Common;
 using Domain.Enums;
 
 namespace Bot.Commands.ClientCommands.CallbackCommands;
@@ -14,16 +15,16 @@ public class CountryCallbackCommand : BaseCallbackCommand
 
     private readonly CountryMessage _countryMessage;
 
-    private readonly IMemoryCacheService _memoryCacheService;
+    private readonly IBotSessionStore _sessionStore;
 
     private readonly IUpdateTlgUserCommand _updateTlgUserCommand;
 
     public CountryCallbackCommand(ProfessionMessage professionMessage, CountryMessage countryMessage,
-        IMemoryCacheService memoryCacheService, IUpdateTlgUserCommand updateTlgUserCommand)
+        IBotSessionStore sessionStore, IUpdateTlgUserCommand updateTlgUserCommand)
     {
         _countryMessage = countryMessage;
         _professionMessage = professionMessage;
-        _memoryCacheService = memoryCacheService;
+        _sessionStore = sessionStore;
         _updateTlgUserCommand = updateTlgUserCommand;
     }
     
@@ -53,28 +54,26 @@ public class CountryCallbackCommand : BaseCallbackCommand
             {
                 if (update.CallbackQuery.Data == "aGoBack")
                 {
-                    _memoryCacheService.RemoveCommandStateFromMemoryCache(chatId);
-
-                    _memoryCacheService.RemoveClienteFromMemoryCache(messageId);
-                    
+                    await _sessionStore.ClearAsync(chatId);
                     await _countryMessage.EditMessage(chatId, messageId, client);
-
                     return;
                 }
                 
-                var serviceClient = new Client() { ChatId = chatId };
+                var session = await _sessionStore.GetAsync(chatId) ?? new BotSession { ChatId = chatId };
+                session.RentalApplication = new RentalApplicationDraft();
 
-                if (update.CallbackQuery.Data == "aРоссия") serviceClient.Country = Country.Россия;
-                if (update.CallbackQuery.Data == "aУкраина") serviceClient.Country = Country.Украина;
-                if (update.CallbackQuery.Data == "aБеларусь") serviceClient.Country = Country.Беларусь;
-                if (update.CallbackQuery.Data == "aДругое") serviceClient.Country = Country.Другое;
+                if (update.CallbackQuery.Data == "aRussia") session.RentalApplication.Country = Country.Russia;
+                if (update.CallbackQuery.Data == "aUkraine") session.RentalApplication.Country = Country.Ukraine;
+                if (update.CallbackQuery.Data == "aBelarus") session.RentalApplication.Country = Country.Belarus;
+                if (update.CallbackQuery.Data == "aOther") session.RentalApplication.Country = Country.Other;
 
-                _memoryCacheService.SetMemoryCache(chatId, serviceClient);
-                _memoryCacheService.SetMemoryCache(chatId, "profession");
-                _memoryCacheService.SetMemoryCache(chatId, messageId);
+                session.Step = BotStep.EnterProfession;
+                session.MessageId = messageId;
 
-                await _professionMessage.EditMessage(chatId, messageId, client, 
-                    $"<b>Страна:</b> {serviceClient.Country}");
+                await _sessionStore.SaveAsync(session);
+
+                await _professionMessage.EditMessage(chatId, messageId, client,
+                    $"<b>Страна:</b> {session.RentalApplication.Country?.GetDisplayName()}");
             }
             catch (MemoryCacheException ex)
             {

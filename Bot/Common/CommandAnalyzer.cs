@@ -1,28 +1,35 @@
 ﻿using Application.TlgUsers.Interfaces;
 using Bot.Common.Abstractions;
-using Logger;
+using Bot.Configuration;
+using Bot.Session;
 using Logger.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Bot.Common;
 
 public class CommandAnalyzer : ICommandAnalyzer
 {
     private readonly IExceptionNotification _exceptionNotification;
-    private readonly ICustomLogger _logger = new CustomLogger();   
-    private readonly List<BaseTextCommand> _baseTextCommands;
-    private readonly List<BaseCallbackCommand> _baseCallbackCommands;
-    private readonly IMemoryCacheService _memoryCacheService;
+    private readonly ICustomLogger _logger;
+    private readonly IEnumerable<BaseTextCommand> _baseTextCommands;
+    private readonly IEnumerable<BaseCallbackCommand> _baseCallbackCommands;
+    private readonly IBotSessionStore _sessionStore;
     private readonly IKickTlgUserCommand _kickTlgUserCommand;
+    private readonly AdminNotificationConfiguration _adminNotifications;
 
-    public CommandAnalyzer(IServiceProvider serviceProvider, IMemoryCacheService memoryCachService,
-        IKickTlgUserCommand kickTlgUserCommand, IExceptionNotification exceptionNotification)
+    public CommandAnalyzer(IEnumerable<BaseTextCommand> textCommands,
+        IEnumerable<BaseCallbackCommand> callbackCommands,
+        IBotSessionStore sessionStore,
+        IKickTlgUserCommand kickTlgUserCommand, IExceptionNotification exceptionNotification,
+        ICustomLogger logger, IOptions<AdminNotificationConfiguration> adminNotifications)
     {
-        _baseTextCommands = serviceProvider.GetServices<BaseTextCommand>().ToList();
-        _baseCallbackCommands = serviceProvider.GetServices<BaseCallbackCommand>().ToList();
-        _memoryCacheService = memoryCachService;
+        _baseTextCommands = textCommands;
+        _baseCallbackCommands = callbackCommands;
+        _sessionStore = sessionStore;
         _kickTlgUserCommand = kickTlgUserCommand;
         _exceptionNotification = exceptionNotification;
+        _logger = logger;
+        _adminNotifications = adminNotifications.Value;
     }
 
     public async Task AnalyzeCommandsAsync(ITelegramBotClient client, Update update)
@@ -59,8 +66,8 @@ public class CommandAnalyzer : ICommandAnalyzer
         catch (Exception ex)
         {
             _logger.LogError(ex);
-            await _exceptionNotification.SendExceptionNotification(client, ex.Message, 
-                444343256, 2030541425);
+            await _exceptionNotification.SendExceptionNotification(client, ex.Message,
+                _adminNotifications.ChatIds);
         }
 
     }
@@ -74,11 +81,15 @@ public class CommandAnalyzer : ICommandAnalyzer
             _logger.LogAction($"Получено сообщение \"{update.Message.Text}\" " +
                 $"от пользователя №{chatId} username {update.Message.Chat.Username}");
 
+            var session = await _sessionStore.GetAsync(chatId);
+
             foreach (var command in _baseTextCommands)
             {
-                if (command.Name == update.Message?.Text ||
-                    _memoryCacheService.GetCommandStateFromMemoryCache(chatId) != null && _memoryCacheService.GetCommandStateFromMemoryCache(chatId).Contains(command.Name))
-                {                   
+                bool isDirectCommand = command.Name == update.Message.Text;
+                bool isStepCommand = command.HandledStep.HasValue && session?.Step == command.HandledStep;
+
+                if (isDirectCommand || isStepCommand)
+                {
                     await command.Execute(update, client);
                     return;
                 }

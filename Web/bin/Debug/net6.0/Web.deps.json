@@ -860,8 +860,7 @@
         "dependencies": {
           "Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore": "7.0.3",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0",
-          "Telegram.Bot": "18.0.0"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0"
         },
         "runtime": {
           "Application.dll": {}
@@ -891,10 +890,10 @@
       "Infrastructure/1.0.0": {
         "dependencies": {
           "Application": "1.0.0",
-          "Bot": "1.0.0",
           "Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore": "7.0.3",
           "Microsoft.EntityFrameworkCore.SqlServer": "7.0.3",
+          "Microsoft.Extensions.Configuration.Binder": "7.0.0",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "7.0.3"
         },
         "runtime": {

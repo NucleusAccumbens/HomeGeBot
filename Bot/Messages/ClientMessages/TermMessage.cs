@@ -17,9 +17,9 @@ public class TermMessage : BaseMessage
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "6 месяцев", callbackData: "cПолгода"),
-                InlineKeyboardButton.WithCallbackData(text: "1 год", callbackData: "cГод"),
-                InlineKeyboardButton.WithCallbackData(text: "Другое", callbackData: "cДругое"),
+                InlineKeyboardButton.WithCallbackData(text: "6 месяцев", callbackData: "cSixMonths"),
+                InlineKeyboardButton.WithCallbackData(text: "1 год", callbackData: "cOneYear"),
+                InlineKeyboardButton.WithCallbackData(text: "Другое", callbackData: "cOther"),
             },
             new[]
             {

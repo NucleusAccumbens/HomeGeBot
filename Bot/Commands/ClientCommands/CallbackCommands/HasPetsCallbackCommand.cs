@@ -1,9 +1,8 @@
 ﻿using Bot.Common.Abstractions;
 using Bot.Exceptions;
 using Bot.Messages.ClientMessages;
-using Domain.Entities;
-using Domain.Enums;
-using System.ComponentModel.DataAnnotations;
+using Bot.Session;
+using Domain.Common;
 
 namespace Bot.Commands.ClientCommands.CallbackCommands;
 
@@ -13,13 +12,13 @@ public class HasPetsCallbackCommand : BaseCallbackCommand
 
     private readonly TermMessage _termMessage;
 
-    private readonly IMemoryCacheService _memoryCacheService;
+    private readonly IBotSessionStore _sessionStore;
 
-    public HasPetsCallbackCommand(ProfessionMessage professionMessage, TermMessage termMessage, IMemoryCacheService memoryCacheService)
+    public HasPetsCallbackCommand(ProfessionMessage professionMessage, TermMessage termMessage, IBotSessionStore sessionStore)
     {
         _professionMessage = professionMessage;
         _termMessage = termMessage;
-        _memoryCacheService = memoryCacheService;
+        _sessionStore = sessionStore;
     }
 
     public override char CallbackDataCode => 'b';
@@ -34,28 +33,31 @@ public class HasPetsCallbackCommand : BaseCallbackCommand
 
             try
             {
-                var serviceClient = _memoryCacheService.GetClientFromMemoryCache(chatId);
+                var session = await _sessionStore.GetAsync(chatId);
+                if (session?.RentalApplication == null)
+                    throw new MemoryCacheException();
 
                 if (update.CallbackQuery.Data == "bGoBack")
                 {
-                    _memoryCacheService.SetMemoryCache(chatId, "profession");
-                    _memoryCacheService.SetMemoryCache(chatId, messageId);
+                    session.Step = BotStep.EnterProfession;
+                    session.MessageId = messageId;
+                    await _sessionStore.SaveAsync(session);
                     
                     await _professionMessage.EditMessage(chatId, messageId, client,
-                        $"<b>Страна:</b> {serviceClient.Country}");
+                        $"<b>Страна:</b> {session.RentalApplication.Country?.GetDisplayName()}");
                     return;
                 }
                 
-                
-                if (update.CallbackQuery.Data == "bДа") serviceClient.HasPets = true;
-                if (update.CallbackQuery.Data == "bНет") serviceClient.HasPets = false;
+                if (update.CallbackQuery.Data == "bДа") session.RentalApplication.HasPets = true;
+                if (update.CallbackQuery.Data == "bНет") session.RentalApplication.HasPets = false;
 
-                _memoryCacheService.SetMemoryCache(chatId, serviceClient);
+                session.Step = BotStep.SelectTerm;
+                await _sessionStore.SaveAsync(session);
 
                 await _termMessage.EditMessage(chatId, messageId, client,
-                    $"<b>Страна:</b> {serviceClient.Country}\n" +
-                    $"<b>Деятельность:</b> {serviceClient.Profession}\n" +
-                    $"<b>Домашние животные:</b> {update.CallbackQuery.Data[1..]}");
+                    $"<b>Страна:</b> {session.RentalApplication.Country?.GetDisplayName()}\n" +
+                    $"<b>Деятельность:</b> {session.RentalApplication.Profession}\n" +
+                    $"<b>Домашние животные:</b> {(session.RentalApplication.HasPets == true ? "Да" : "Нет")}");
             }
             catch (MemoryCacheException ex)
             {

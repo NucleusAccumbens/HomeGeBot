@@ -120,27 +120,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Flats");
                 });
 
-            modelBuilder.Entity("Domain.Entities.HasPets", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("No")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Yes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("HasPets");
-                });
-
             modelBuilder.Entity("Domain.Entities.Message", b =>
                 {
                     b.Property<long>("Id")

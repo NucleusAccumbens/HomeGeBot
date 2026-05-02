@@ -9,11 +9,11 @@
       "Infrastructure/1.0.0": {
         "dependencies": {
           "Application": "1.0.0",
-          "Bot": "1.0.0",
           "Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore": "7.0.3",
           "Microsoft.EntityFrameworkCore.SqlServer": "7.0.3",
           "Microsoft.EntityFrameworkCore.Tools": "7.0.3",
+          "Microsoft.Extensions.Configuration.Binder": "7.0.0",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "7.0.3"
         },
         "runtime": {
@@ -475,22 +475,6 @@
           }
         }
       },
-      "Newtonsoft.Json/12.0.2": {
-        "runtime": {
-          "lib/netstandard2.0/Newtonsoft.Json.dll": {
-            "assemblyVersion": "12.0.0.0",
-            "fileVersion": "12.0.2.23222"
-          }
-        }
-      },
-      "NLog/5.2.7": {
-        "runtime": {
-          "lib/netstandard2.0/NLog.dll": {
-            "assemblyVersion": "5.0.0.0",
-            "fileVersion": "5.2.7.2287"
-          }
-        }
-      },
       "Npgsql/7.0.2": {
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "7.0.0",
@@ -768,39 +752,14 @@
           }
         }
       },
-      "Telegram.Bot/18.0.0": {
-        "dependencies": {
-          "Newtonsoft.Json": "12.0.2"
-        },
-        "runtime": {
-          "lib/netcoreapp3.1/Telegram.Bot.dll": {
-            "assemblyVersion": "18.0.0.0",
-            "fileVersion": "18.0.0.0"
-          }
-        }
-      },
       "Application/1.0.0": {
         "dependencies": {
           "Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore": "7.0.3",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0",
-          "Telegram.Bot": "18.0.0"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0"
         },
         "runtime": {
           "Application.dll": {}
-        }
-      },
-      "Bot/1.0.0": {
-        "dependencies": {
-          "Application": "1.0.0",
-          "Logger": "1.0.0",
-          "Microsoft.Extensions.Configuration": "7.0.0",
-          "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
-          "Microsoft.Extensions.Configuration.Binder": "7.0.0",
-          "Telegram.Bot": "18.0.0"
-        },
-        "runtime": {
-          "Bot.dll": {}
         }
       },
       "Domain/1.0.0": {
@@ -809,14 +768,6 @@
         },
         "runtime": {
           "Domain.dll": {}
-        }
-      },
-      "Logger/1.0.0": {
-        "dependencies": {
-          "NLog": "5.2.7"
-        },
-        "runtime": {
-          "Logger.dll": {}
         }
       }
     }
@@ -1107,20 +1058,6 @@
       "path": "mono.texttemplating/2.2.1",
       "hashPath": "mono.texttemplating.2.2.1.nupkg.sha512"
     },
-    "Newtonsoft.Json/12.0.2": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-rTK0s2EKlfHsQsH6Yx2smvcTCeyoDNgCW7FEYyV01drPlh2T243PR2DiDXqtC5N4GDm4Ma/lkxfW5a/4793vbA==",
-      "path": "newtonsoft.json/12.0.2",
-      "hashPath": "newtonsoft.json.12.0.2.nupkg.sha512"
-    },
-    "NLog/5.2.7": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-Ww/0b6V1NL8iqpFKtRKVQFFX03LoowNzYeNG6FpVzmhgCfLAkW0h/4lT3+V8mHfyvtHptNoV8Cz0YePLFRUaPA==",
-      "path": "nlog/5.2.7",
-      "hashPath": "nlog.5.2.7.nupkg.sha512"
-    },
     "Npgsql/7.0.2": {
       "type": "package",
       "serviceable": true,
@@ -1345,29 +1282,12 @@
       "path": "system.windows.extensions/5.0.0",
       "hashPath": "system.windows.extensions.5.0.0.nupkg.sha512"
     },
-    "Telegram.Bot/18.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-BD0UchUXINymCGS+1O1tv2enCRyv+VbSJQAgfnueTZs3j7K4XXyJyW0CgyJleTrqB1oq1hS1ux6gBpi3Ajp+ZQ==",
-      "path": "telegram.bot/18.0.0",
-      "hashPath": "telegram.bot.18.0.0.nupkg.sha512"
-    },
     "Application/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Bot/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
     "Domain/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "Logger/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

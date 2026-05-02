@@ -17,13 +17,13 @@ public class CountryMessage : BaseMessage
         {
             new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "Россия", callbackData: "aРоссия"),
-                InlineKeyboardButton.WithCallbackData(text: "Украина", callbackData: "aУкраина"),
+                InlineKeyboardButton.WithCallbackData(text: "Россия", callbackData: "aRussia"),
+                InlineKeyboardButton.WithCallbackData(text: "Украина", callbackData: "aUkraine"),
             },
             new[]
             {
-                InlineKeyboardButton.WithCallbackData(text: "Беларусь", callbackData: "aБеларусь"),
-                InlineKeyboardButton.WithCallbackData(text: "Другое", callbackData: "aДругое"),
+                InlineKeyboardButton.WithCallbackData(text: "Беларусь", callbackData: "aBelarus"),
+                InlineKeyboardButton.WithCallbackData(text: "Другое", callbackData: "aOther"),
             },
 
         });

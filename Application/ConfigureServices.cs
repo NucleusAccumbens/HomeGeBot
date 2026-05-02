@@ -1,13 +1,10 @@
-﻿using Application.Admins.Commands;
-using Application.Admins.Interfaces;
-using Application.Admins.Queries;
-using Application.Clients.Commands;
-using Application.Clients.Interfaces;
-using Application.Clients.Queries;
-using Application.Flats.Command;
-using Application.Flats.Interfaces;
-using Application.Flats.Queries;
+﻿using Application.AdminManagement;
+using Application.BotStart;
+using Application.Dashboard;
 using Application.Messages.Queries;
+using Application.RentalApplications;
+using Application.TlgUsers.Commands;
+using Application.TlgUsers.Interfaces;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -15,23 +12,20 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        // Команды, используемые напрямую из Bot-слоя
         services.AddScoped<IKickTlgUserCommand, KickTlgUserCommand>();
-        services.AddScoped<ICreateTlgUserCommand, CreateTlgUserCommand>();
-        services.AddScoped<ICheckUserIsInDbQuery, CheckUserIsInDbQuery>();
-        services.AddScoped<IGetMessageQuery, GetMessageQuery>();
-        services.AddScoped<IGetAdminsQuery, GetAdminsQuery>();
-        services.AddScoped<ICreateAdminCommand, CreateAdminCommand>();
         services.AddScoped<IUpdateTlgUserCommand, UpdateTlgUserCommand>();
-        services.AddScoped<ICreateClientCommand, CreateClientCommand>();
-        services.AddScoped<IUpdateAdminCommand, UpdateAdminCommand>();
-        services.AddScoped<ICheckFlatIsInBdQuery, CheckFlatIsInBdQuery>();
-        services.AddScoped<ICreateFlatCommand, CreateFlatCommand>();
-        services.AddScoped<IGetClientDependencyQuery, GetClientDependencyQuery>();
-        services.AddScoped<IGetFlatsQuery, GetFlatsQuery>();
-        services.AddScoped<ICheckUserIsAdminQuery, CheckUserIsAdminQuery>();
-        services.AddScoped<IUpdateFlatCommand, UpdateFlatCommand>();
-        services.AddScoped<IDeleteFlatCommand, DeleteFlatCommand>();
-        services.AddScoped<IDeactivateAdminCommand, DeactivateAdminCommand>();
+        services.AddScoped<IGetMessageQuery, GetMessageQuery>();
+
+        // Use Cases
+        services.AddScoped<IStartBotUseCase, StartBotUseCase>();
+        services.AddScoped<ISubmitRentalApplicationUseCase, SubmitRentalApplicationUseCase>();
+        services.AddScoped<IGetBotUsersUseCase, GetBotUsersUseCase>();
+        services.AddScoped<IGrantAdminRightsUseCase, GrantAdminRightsUseCase>();
+        services.AddScoped<IRevokeAdminRightsUseCase, RevokeAdminRightsUseCase>();
+        services.AddScoped<IGetAdminDashboardUseCase, GetAdminDashboardUseCase>();
+        services.AddScoped<IUpdateFlatCommentUseCase, UpdateFlatCommentUseCase>();
+        services.AddScoped<IDeleteFlatUseCase, DeleteFlatUseCase>();
 
         return services;
     }
