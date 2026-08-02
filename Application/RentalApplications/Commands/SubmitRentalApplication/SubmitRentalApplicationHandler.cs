@@ -61,15 +61,13 @@ public class SubmitRentalApplicationHandler : IRequestHandler<SubmitRentalApplic
         await _context.Clients.AddAsync(client, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        string? clientUsername = await _context.TlgUsers
-            .Where(u => u.ChatId == request.ChatId)
-            .Select(u => u.Username)
-            .SingleOrDefaultAsync(cancellationToken);
+        var usernames = await _context.TlgUsers
+            .AsNoTracking()
+            .Where(u => u.ChatId == request.ChatId || u.ChatId == manager.ChatId)
+            .ToDictionaryAsync(u => u.ChatId, u => u.Username, cancellationToken);
 
-        string? managerUsername = await _context.TlgUsers
-            .Where(u => u.ChatId == manager.ChatId)
-            .Select(u => u.Username)
-            .SingleOrDefaultAsync(cancellationToken);
+        usernames.TryGetValue(request.ChatId, out var clientUsername);
+        usernames.TryGetValue(manager.ChatId, out var managerUsername);
 
         return Result<SubmitRentalApplicationResult>.Success(
             SubmitRentalApplicationResult.Success(manager.ChatId, managerUsername, clientUsername));

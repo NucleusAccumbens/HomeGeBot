@@ -16,10 +16,30 @@ public class GetUserApplicationsHandler : IRequestHandler<GetUserApplicationsReq
 
     public async Task<Result<GetUserApplicationsResult>> Handle(GetUserApplicationsRequest request, CancellationToken cancellationToken)
     {
-        var applications = await _context.Clients
+        var clients = await _context.Clients
             .AsNoTracking()
             .Where(c => c.ChatId == request.ChatId)
             .OrderByDescending(c => c.CreatedAt)
+            .Select(c => new
+            {
+                c.Country,
+                c.CountryOther,
+                c.Profession,
+                c.HasPets,
+                c.Term,
+                c.TermOther,
+                c.CreatedAt,
+                c.AdminChatId
+            })
+            .ToListAsync(cancellationToken);
+
+        var adminChatIds = clients.Select(c => c.AdminChatId).Distinct().ToList();
+        var usernames = await _context.TlgUsers
+            .AsNoTracking()
+            .Where(u => adminChatIds.Contains(u.ChatId))
+            .ToDictionaryAsync(u => u.ChatId, u => u.Username, cancellationToken);
+
+        var applications = clients
             .Select(c => new UserApplicationDto
             {
                 Country = c.Country,
@@ -29,12 +49,9 @@ public class GetUserApplicationsHandler : IRequestHandler<GetUserApplicationsReq
                 Term = c.Term,
                 TermOther = c.TermOther,
                 CreatedAt = c.CreatedAt,
-                ManagerUsername = _context.TlgUsers
-                    .Where(u => u.ChatId == c.AdminChatId)
-                    .Select(u => u.Username)
-                    .FirstOrDefault()
+                ManagerUsername = usernames.GetValueOrDefault(c.AdminChatId)
             })
-            .ToListAsync(cancellationToken);
+            .ToList();
 
         return Result<GetUserApplicationsResult>.Success(GetUserApplicationsResult.Success(applications));
     }
