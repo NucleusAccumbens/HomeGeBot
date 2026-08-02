@@ -1,8 +1,6 @@
-using Domain.Common;
-
 namespace Bot.Configuration;
 
 public class AdminNotificationConfiguration
 {
-    public ChatId[] ChatIds { get; set; } = Array.Empty<ChatId>();
+    public long[] ChatIds { get; set; } = Array.Empty<long>();
 }

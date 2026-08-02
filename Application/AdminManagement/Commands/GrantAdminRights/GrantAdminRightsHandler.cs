@@ -35,16 +35,13 @@ public class GrantAdminRightsHandler : IRequestHandler<GrantAdminRightsRequest, 
 
         if (existingAdmin != null)
         {
-            existingAdmin.IsActive = true;
+            existingAdmin.Activate();
         }
         else
         {
             var newAdmin = new Admin
             {
-                ChatId = request.TargetUserChatId,
-                IsActive = true,
-                Clients = new List<Client>(),
-                CreatedAt = DateTime.UtcNow
+                ChatId = request.TargetUserChatId
             };
 
             await _context.Admins.AddAsync(newAdmin, cancellationToken);

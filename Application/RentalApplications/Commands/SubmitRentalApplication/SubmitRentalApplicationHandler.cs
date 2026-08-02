@@ -56,7 +56,7 @@ public class SubmitRentalApplicationHandler : IRequestHandler<SubmitRentalApplic
             AdminChatId = manager.ChatId
         };
 
-        manager.Clients.Add(client);
+        manager.AssignClient(client);
 
         await _context.Clients.AddAsync(client, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);

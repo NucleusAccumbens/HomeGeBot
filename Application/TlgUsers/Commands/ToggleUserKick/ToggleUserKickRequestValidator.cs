@@ -1,3 +1,4 @@
+using Application.Common.Validation;
 using FluentValidation;
 
 namespace Application.TlgUsers.Commands.ToggleUserKick;
@@ -6,6 +7,6 @@ public class ToggleUserKickRequestValidator : AbstractValidator<ToggleUserKickCo
 {
     public ToggleUserKickRequestValidator()
     {
-        RuleFor(x => x.ChatId).GreaterThan(0);
+        RuleFor(x => x.ChatId).MustBeValidChatId();
     }
 }

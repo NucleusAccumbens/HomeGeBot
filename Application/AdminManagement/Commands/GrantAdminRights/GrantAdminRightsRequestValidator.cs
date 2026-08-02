@@ -1,3 +1,4 @@
+using Application.Common.Validation;
 using FluentValidation;
 
 namespace Application.AdminManagement.Commands.GrantAdminRights;
@@ -6,10 +7,7 @@ public class GrantAdminRightsRequestValidator : AbstractValidator<GrantAdminRigh
 {
     public GrantAdminRightsRequestValidator()
     {
-        RuleFor(x => x.SuperAdminChatId)
-            .GreaterThan(0).WithMessage("SuperAdminChatId должен быть больше 0.");
-
-        RuleFor(x => x.TargetUserChatId)
-            .GreaterThan(0).WithMessage("TargetUserChatId должен быть больше 0.");
+        RuleFor(x => x.SuperAdminChatId).MustBeValidChatId();
+        RuleFor(x => x.TargetUserChatId).MustBeValidChatId();
     }
 }

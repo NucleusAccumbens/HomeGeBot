@@ -1,3 +1,4 @@
+using Application.Common.Validation;
 using FluentValidation;
 
 namespace Application.Dashboard.Commands.UpdateFlatComment;
@@ -6,8 +7,7 @@ public class UpdateFlatCommentRequestValidator : AbstractValidator<UpdateFlatCom
 {
     public UpdateFlatCommentRequestValidator()
     {
-        RuleFor(x => x.AdminChatId)
-            .GreaterThan(0).WithMessage("AdminChatId должен быть больше 0.");
+        RuleFor(x => x.AdminChatId).MustBeValidChatId();
         
         RuleFor(x => x.ItemId)
             .NotEmpty().WithMessage("ItemId обязателен.");

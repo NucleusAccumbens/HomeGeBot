@@ -59,7 +59,6 @@ public class SubmitRentalApplicationHandlerTests
         var manager = new Admin
         {
             ChatId = new ChatId(999),
-            IsActive = true,
             Role = AdminRole.Admin
         };
         context.Admins.Add(manager);
@@ -89,7 +88,6 @@ public class SubmitRentalApplicationHandlerTests
         var manager = new Admin
         {
             ChatId = new ChatId(999),
-            IsActive = true,
             Role = AdminRole.Admin
         };
         context.Admins.Add(manager);
@@ -122,18 +120,13 @@ public class SubmitRentalApplicationHandlerTests
         var busyManager = new Admin
         {
             ChatId = new ChatId(1),
-            IsActive = true,
-            Role = AdminRole.Admin,
-            Clients = new List<Client>
-            {
-                new() { ChatId = new ChatId(10), AdminChatId = new ChatId(1) },
-                new() { ChatId = new ChatId(11), AdminChatId = new ChatId(1) }
-            }
+            Role = AdminRole.Admin
         };
+        busyManager.AssignClient(new() { ChatId = new ChatId(10), AdminChatId = new ChatId(1) });
+        busyManager.AssignClient(new() { ChatId = new ChatId(11), AdminChatId = new ChatId(1) });
         var freeManager = new Admin
         {
             ChatId = new ChatId(2),
-            IsActive = true,
             Role = AdminRole.Admin
         };
         context.Admins.AddRange(busyManager, freeManager);

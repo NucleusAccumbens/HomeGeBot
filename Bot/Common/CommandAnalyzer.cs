@@ -69,7 +69,7 @@ public class CommandAnalyzer : ICommandAnalyzer
             _logger.LogError(ex, "Error in AnalyzeCommandsAsync");
             await _exceptionNotification.SendExceptionNotification(client,
                 $"[{ex.GetType().Name}] {ex.Message}",
-                _adminNotifications.ChatIds);
+                _adminNotifications.ChatIds.Select(ChatId.FromLong).ToArray());
         }
     }
 

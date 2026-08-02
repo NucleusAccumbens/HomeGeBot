@@ -27,7 +27,7 @@ public class ManagerNotificationFormatter : IManagerNotificationFormatter
 
     public async Task<(string body, string writeButtonText)> FormatAsync(RentalApplicationDraft draft, long managerChatId, string clientUsername)
     {
-        var managerLang = await _mediator.Send(new GetUserLanguageQuery(managerChatId));
+        var managerLang = await _mediator.Send(new GetUserLanguageQuery(ChatId.FromLong(managerChatId)));
         var managerBody = await _mediator.Send(new GetMessageBodyQuery("managerNotification", managerLang))
             ?? "<b>Страна:</b> {country}\n<b>Деятельность:</b> {profession}\n<b>Домашние животные:</b> {pets}\n<b>Срок аренды:</b> {term}";
 

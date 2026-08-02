@@ -98,7 +98,7 @@ public class AppTextCommand : BaseTextCommand
 
         var result = await _mediator.Send(new SubmitRentalApplicationRequest
         {
-            ChatId = chatId,
+            ChatId = ChatId.FromLong(chatId),
             Country = session.RentalApplication.Country!.Value,
             CountryOther = session.RentalApplication.CountryOther,
             Profession = session.RentalApplication.Profession!,

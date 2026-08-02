@@ -37,7 +37,7 @@ public class RevokeAdminRightsHandler : IRequestHandler<RevokeAdminRightsRequest
             return Result<RevokeAdminRightsResult>.Failure("Нельзя отозвать права супер-администратора.");
         }
 
-        targetAdmin.IsActive = false;
+        targetAdmin.Deactivate();
 
         TlgUser? targetUser = await _context.TlgUsers
             .SingleOrDefaultAsync(u => u.ChatId == request.TargetAdminChatId, cancellationToken);

@@ -2,6 +2,9 @@ namespace Domain.Common;
 
 public record struct ChatId(long Value) : IComparable<ChatId>, IComparable
 {
+    public static ChatId FromLong(long value) => new(value);
+    public long ToLong() => Value;
+
     public static implicit operator long(ChatId chatId) => chatId.Value;
     public static implicit operator ChatId(long value) => new(value);
 

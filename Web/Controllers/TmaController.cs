@@ -48,7 +48,7 @@ public class TmaController : ControllerBase
 
         var session = new BotSession
         {
-            ChatId = userId.Value,
+            ChatId = ChatId.FromLong(userId.Value),
             Step = BotStep.WaitForFlatForward,
             RentalApplication = new RentalApplicationDraft
             {
@@ -110,7 +110,7 @@ public class TmaController : ControllerBase
             return BadRequest("Could not find user ID in initData");
         }
 
-        var result = await _mediator.Send(new GetUserApplicationsRequest { ChatId = userId.Value });
+        var result = await _mediator.Send(new GetUserApplicationsRequest { ChatId = ChatId.FromLong(userId.Value) });
 
         if (result.IsFailure)
         {

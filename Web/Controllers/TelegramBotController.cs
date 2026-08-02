@@ -60,7 +60,7 @@ public class TelegramBotController : ControllerBase
                 await _exceptionNotification.SendExceptionNotification(
                     client,
                     $"[{ex.GetType().Name}] {ex.Message}",
-                    _adminNotifications.ChatIds);
+                    _adminNotifications.ChatIds.Select(Domain.Common.ChatId.FromLong).ToArray());
             }
             catch (Exception notifyEx)
             {

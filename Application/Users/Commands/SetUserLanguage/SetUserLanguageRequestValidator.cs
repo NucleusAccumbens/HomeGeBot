@@ -1,4 +1,5 @@
 using Application.Common.Localization;
+using Application.Common.Validation;
 using FluentValidation;
 
 namespace Application.Users.Commands.SetUserLanguage;
@@ -7,8 +8,7 @@ public class SetUserLanguageRequestValidator : AbstractValidator<SetUserLanguage
 {
     public SetUserLanguageRequestValidator()
     {
-        RuleFor(x => x.ChatId)
-            .GreaterThan(0).WithMessage("ChatId должен быть больше 0.");
+        RuleFor(x => x.ChatId).MustBeValidChatId();
 
         RuleFor(x => x.Language)
             .Must(SupportedLanguages.IsValid).WithMessage("Указан неподдерживаемый язык.");
