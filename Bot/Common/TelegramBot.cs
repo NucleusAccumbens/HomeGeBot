@@ -36,7 +36,7 @@ public class WebhookSetupService : IWebhookSetupService
     }
 }
 
-public class TelegramBot
+public class TelegramBot : ITelegramBotClientProvider
 {
     private readonly TelegramBotConfiguration _botConfig;
     private readonly IWebhookSetupService _webhookSetupService;

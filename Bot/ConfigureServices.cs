@@ -17,6 +17,7 @@ public static class ConfigureService
     {
         services.AddMemoryCache();
         services.AddSingleton<TelegramBot>();
+        services.AddSingleton<ITelegramBotClientProvider, TelegramBot>(s => s.GetRequiredService<TelegramBot>());
         services.AddSingleton<IWebhookSetupService, WebhookSetupService>();
         services.AddScoped<IMessageService, MessageService>();
         services.AddSingleton<IBotI18n, BotI18n>();

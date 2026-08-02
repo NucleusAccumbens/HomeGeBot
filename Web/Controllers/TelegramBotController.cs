@@ -15,13 +15,13 @@ public class TelegramBotController : ControllerBase
     private readonly IExceptionNotification _exceptionNotification;
     private readonly ILogger<TelegramBotController> _logger;
     private readonly ICommandAnalyzer _commandAnalyzer;
-    private readonly TelegramBot _bot;
+    private readonly ITelegramBotClientProvider _bot;
     private readonly AdminNotificationConfiguration _adminNotifications;
     private readonly WebhookConfiguration _webhookConfig;
     private readonly IWebHostEnvironment _environment;
 
     public TelegramBotController(ILogger<TelegramBotController> logger, ICommandAnalyzer commandAnalyzer,
-        TelegramBot bot, IExceptionNotification exceptionNotification,
+        ITelegramBotClientProvider bot, IExceptionNotification exceptionNotification,
         IOptions<AdminNotificationConfiguration> adminNotifications,
         IOptions<WebhookConfiguration> webhookConfig,
         IWebHostEnvironment environment)

@@ -1,4 +1,5 @@
 using Bot.Common;
+using Bot.Common.Interfaces;
 using Bot.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,12 +15,12 @@ namespace Web.Controllers;
 [Authorize(AuthenticationSchemes = "AdminAuth")]
 public class DashboardApiController : ControllerBase
 {
-    private readonly TelegramBot _telegramBot;
+    private readonly ITelegramBotClientProvider _telegramBot;
     private readonly TelegramBotConfiguration _botConfig;
     private readonly ILogger<DashboardApiController> _logger;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public DashboardApiController(TelegramBot telegramBot, IOptions<TelegramBotConfiguration> botConfig,
+    public DashboardApiController(ITelegramBotClientProvider telegramBot, IOptions<TelegramBotConfiguration> botConfig,
         ILogger<DashboardApiController> logger, IHttpClientFactory httpClientFactory)
     {
         _telegramBot = telegramBot;

@@ -6,11 +6,11 @@ namespace Bot.Services;
 
 public class UserNotifier : IUserNotifier
 {
-    private readonly TelegramBot _telegramBot;
+    private readonly ITelegramBotClientProvider _telegramBot;
     private readonly ILogger<UserNotifier> _logger;
     private readonly IMessageService _messageService;
 
-    public UserNotifier(TelegramBot telegramBot, ILogger<UserNotifier> logger, IMessageService messageService)
+    public UserNotifier(ITelegramBotClientProvider telegramBot, ILogger<UserNotifier> logger, IMessageService messageService)
     {
         _telegramBot = telegramBot;
         _logger = logger;
