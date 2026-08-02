@@ -1,20 +1,7 @@
-using Microsoft.Extensions.Configuration;
-
 namespace Infrastructure.Persistence;
 
 public static class ConnectionStringFactory
 {
-    public static string GetConnectionString(IConfiguration? configuration)
-    {
-        string? connectionUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-        if (!string.IsNullOrEmpty(connectionUrl))
-        {
-            return GetNpgsqlConnectionString(connectionUrl);
-        }
-
-        return configuration?.GetConnectionString("DefaultConnection") ?? string.Empty;
-    }
-
     public static string GetNpgsqlConnectionString(string connectionUrl)
     {
         try

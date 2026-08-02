@@ -11,10 +11,14 @@ public static class ConfigureService
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
         services.AddScoped<AuditableEntitySaveChangesInterceptor>();
 
+        var connectionStringProvider = new ConnectionStringProvider(configuration);
+        var connectionString = connectionStringProvider.GetConnectionString();
+
         services.AddDbContext<HomeGeBotDbContext>(options =>
-            options.UseNpgsql(ConnectionStringFactory.GetConnectionString(configuration)));
+            options.UseNpgsql(connectionString));
 
         services.AddScoped<IBotDbContext>(provider => 
             provider.GetRequiredService<HomeGeBotDbContext>());

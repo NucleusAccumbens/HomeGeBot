@@ -11,17 +11,13 @@ public class HomeGeBotDbContext : DbContext, IBotDbContext
     private readonly AuditableEntitySaveChangesInterceptor? _auditableEntitySaveChangesInterceptor;
 
     public DbSet<TlgUser> TlgUsers => Set<TlgUser>();
-
     public DbSet<Client> Clients => Set<Client>();
-
     public DbSet<Admin> Admins => Set<Admin>();
-
     public DbSet<Flat> Flats => Set<Flat>();
-
     public DbSet<Message> Messages => Set<Message>();
 
     public HomeGeBotDbContext(DbContextOptions<HomeGeBotDbContext> options,
-        AuditableEntitySaveChangesInterceptor auditableEntitySaveChangesInterceptor)
+        AuditableEntitySaveChangesInterceptor? auditableEntitySaveChangesInterceptor)
         : base(options)
     {
         _auditableEntitySaveChangesInterceptor = auditableEntitySaveChangesInterceptor;
@@ -29,7 +25,6 @@ public class HomeGeBotDbContext : DbContext, IBotDbContext
 
     public HomeGeBotDbContext()
     {
-        _auditableEntitySaveChangesInterceptor = null;
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -61,15 +56,5 @@ public class HomeGeBotDbContext : DbContext, IBotDbContext
         {
             optionsBuilder.AddInterceptors(_auditableEntitySaveChangesInterceptor);
         }
-
-        if (!optionsBuilder.IsConfigured)
-        {
-            var connectionString = ConnectionStringFactory.GetConnectionString(null!);
-            if (!string.IsNullOrEmpty(connectionString))
-            {
-                optionsBuilder.UseNpgsql(connectionString);
-            }
-        }
     }
-
 }
