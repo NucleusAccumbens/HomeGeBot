@@ -20,15 +20,11 @@ public class GetAdminDashboardResult
         CurrentAdminUsername = currentAdminUsername
     };
 
-    public static GetAdminDashboardResult Failure(string error) => new() { ErrorMessage = error };
-
     public List<ApplicationDto> Applications { get; set; } = new();
 
     public List<FlatDto> Flats { get; set; } = new();
 
     public List<ManagerDto> Managers { get; set; } = new();
-
-    public string? ErrorMessage { get; set; }
 
     public bool IsSuperAdmin { get; set; }
 

@@ -11,13 +11,9 @@ public class SubmitRentalApplicationResult
         ClientUsername = clientUsername
     };
 
-    public static SubmitRentalApplicationResult Failure(string error) => new() { ErrorMessage = error };
-
     public ChatId? AssignedManagerChatId { get; set; }
 
     public string? ManagerUsername { get; set; }
 
     public string? ClientUsername { get; set; }
-
-    public string? ErrorMessage { get; set; }
 }
