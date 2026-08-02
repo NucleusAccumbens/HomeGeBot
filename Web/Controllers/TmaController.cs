@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Application.Common.Localization;
 using Application.RentalApplications.Queries.GetUserApplications;
 using Bot.Session;
 using Domain.Common;
@@ -188,7 +189,7 @@ public class TmaController : ControllerBase
             return BadRequest("Could not find user ID in initData");
         }
 
-        if (string.IsNullOrEmpty(request.Language) || !new[] { "ru", "en", "ka" }.Contains(request.Language))
+        if (!SupportedLanguages.IsValid(request.Language))
         {
             return BadRequest("Invalid language code");
         }

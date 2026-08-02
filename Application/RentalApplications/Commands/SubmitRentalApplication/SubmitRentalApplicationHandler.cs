@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Application.Common.Localization;
 using Application.Common.Results;
 using Application.Users.Queries.GetUserLanguage;
 using Domain.Common;
@@ -9,6 +10,8 @@ namespace Application.RentalApplications.Commands.SubmitRentalApplication;
 
 public class SubmitRentalApplicationHandler : IRequestHandler<SubmitRentalApplicationRequest, Result<SubmitRentalApplicationResult>>
 {
+    private const int MaxApplicationsPerUser = 5;
+
     private readonly IBotDbContext _context;
     private readonly IMediator _mediator;
 
@@ -23,16 +26,10 @@ public class SubmitRentalApplicationHandler : IRequestHandler<SubmitRentalApplic
         var existingCount = await _context.Clients
             .CountAsync(c => c.ChatId == request.ChatId, cancellationToken);
 
-        if (existingCount >= 5)
+        if (existingCount >= MaxApplicationsPerUser)
         {
             var lang = await _mediator.Send(new GetUserLanguageQuery(request.ChatId), cancellationToken);
-            var limitMsg = lang switch
-            {
-                "en" => "You have already submitted 5 applications — this is the maximum.",
-                "ka" => "თქვენ უკვე გაგზავნეთ 5 განაცხადი — ეს მაქსიმალური რაოდენობაა.",
-                _ => "Вы уже отправили 5 заявок — это максимальное количество."
-            };
-            return Result<SubmitRentalApplicationResult>.Failure(limitMsg);
+            return Result<SubmitRentalApplicationResult>.Failure(ApplicationMessages.ApplicationLimitExceeded(lang));
         }
 
         var manager = await _context.Admins
@@ -44,13 +41,7 @@ public class SubmitRentalApplicationHandler : IRequestHandler<SubmitRentalApplic
         if (manager == null)
         {
             var lang = await _mediator.Send(new GetUserLanguageQuery(request.ChatId), cancellationToken);
-            var noManagerMsg = lang switch
-            {
-                "en" => "No active managers available.",
-                "ka" => "აქტიური მენეჯერები არ არის.",
-                _ => "Нет активных менеджеров"
-            };
-            return Result<SubmitRentalApplicationResult>.Failure(noManagerMsg);
+            return Result<SubmitRentalApplicationResult>.Failure(ApplicationMessages.NoActiveManagers(lang));
         }
 
         var client = new Client
