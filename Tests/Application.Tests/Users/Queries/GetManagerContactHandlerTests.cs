@@ -23,7 +23,7 @@ public class GetManagerContactHandlerTests
     {
         var context = CreateContext();
         context.Admins.Add(new Admin { ChatId = new ChatId(1), Role = AdminRole.SuperAdmin });
-        context.TlgUsers.Add(new TlgUser { ChatId = new ChatId(1), Username = "super_admin" });
+        context.TlgUsers.Add(new TlgUser(new ChatId(1), username: "super_admin"));
         await context.SaveChangesAsync();
 
         var handler = new GetManagerContactHandler(context);

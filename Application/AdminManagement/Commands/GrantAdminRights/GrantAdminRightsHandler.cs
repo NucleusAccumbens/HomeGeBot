@@ -47,7 +47,7 @@ public class GrantAdminRightsHandler : IRequestHandler<GrantAdminRightsRequest, 
             await _context.Admins.AddAsync(newAdmin, cancellationToken);
         }
 
-        targetUser.IsAdmin = true;
+        targetUser.SetAdmin(true);
 
         await _context.SaveChangesAsync(cancellationToken);
 

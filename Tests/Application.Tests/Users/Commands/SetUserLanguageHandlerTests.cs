@@ -22,7 +22,7 @@ public class SetUserLanguageHandlerTests
     public async Task Handle_UserExists_UpdatesLanguage()
     {
         var context = CreateContext();
-        context.TlgUsers.Add(new TlgUser { ChatId = new ChatId(100), Username = "user", Language = "ru" });
+        context.TlgUsers.Add(new TlgUser(new ChatId(100), username: "user", language: "ru"));
         await context.SaveChangesAsync();
 
         var handler = new SetUserLanguageHandler(context);

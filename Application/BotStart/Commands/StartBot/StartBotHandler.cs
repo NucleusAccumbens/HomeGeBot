@@ -20,39 +20,26 @@ public class StartBotHandler : IRequestHandler<StartBotRequest, Result<StartBotR
 
         if (user == null)
         {
-            user = new TlgUser()
-            {
-                ChatId = request.ChatId,
-                Username = request.Username,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                IsAdmin = false,
-                IsKicked = false,
-            };
+            user = new TlgUser(
+                chatId: request.ChatId,
+                username: request.Username,
+                firstName: request.FirstName,
+                lastName: request.LastName);
 
             await _context.TlgUsers.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
         }
         else
         {
-            var changed = false;
-            if (user.Username != request.Username && request.Username != null)
+            var newUsername = request.Username ?? user.Username;
+            var newFirstName = request.FirstName ?? user.FirstName;
+            var newLastName = request.LastName ?? user.LastName;
+
+            if (newUsername != user.Username ||
+                newFirstName != user.FirstName ||
+                newLastName != user.LastName)
             {
-                user.Username = request.Username;
-                changed = true;
-            }
-            if (user.FirstName != request.FirstName && request.FirstName != null)
-            {
-                user.FirstName = request.FirstName;
-                changed = true;
-            }
-            if (user.LastName != request.LastName && request.LastName != null)
-            {
-                user.LastName = request.LastName;
-                changed = true;
-            }
-            if (changed)
-            {
+                user.UpdateProfile(newUsername, newFirstName, newLastName);
                 await _context.SaveChangesAsync(cancellationToken);
             }
         }
@@ -62,7 +49,7 @@ public class StartBotHandler : IRequestHandler<StartBotRequest, Result<StartBotR
 
         if (admin != null && !user.IsAdmin)
         {
-            user.IsAdmin = true;
+            user.SetAdmin(true);
             await _context.SaveChangesAsync(cancellationToken);
         }
 

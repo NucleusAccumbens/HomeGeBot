@@ -24,7 +24,7 @@ public class CloseRequestHandler : IRequestHandler<CloseRequestRequest, Result<C
             return Result<CloseRequestResult>.Failure("Заявка не найдена.");
         }
 
-        client.IsCompleted = true;
+        client.Complete();
 
         await _context.SaveChangesAsync(cancellationToken);
 

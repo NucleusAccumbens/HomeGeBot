@@ -24,7 +24,7 @@ public class SetUserLanguageHandler : IRequestHandler<SetUserLanguageRequest, Re
             return Result<SetUserLanguageResult>.Failure("Пользователь не найден.");
         }
 
-        user.Language = request.Language;
+        user.SetLanguage(request.Language);
         await _context.SaveChangesAsync(cancellationToken);
 
         return Result<SetUserLanguageResult>.Success(SetUserLanguageResult.Success());

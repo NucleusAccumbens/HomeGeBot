@@ -24,7 +24,7 @@ public class ToggleUserKickHandler : IRequestHandler<ToggleUserKickCommand, Resu
             return Result<ToggleUserKickResult>.Failure("Пользователь не найден.");
         }
 
-        tlgUser.IsKicked = !tlgUser.IsKicked;
+        tlgUser.SetKicked(!tlgUser.IsKicked);
         await _context.SaveChangesAsync(cancellationToken);
 
         return Result<ToggleUserKickResult>.Success(ToggleUserKickResult.Success(tlgUser.IsKicked));

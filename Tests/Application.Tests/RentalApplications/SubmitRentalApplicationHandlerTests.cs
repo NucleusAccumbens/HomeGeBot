@@ -62,8 +62,8 @@ public class SubmitRentalApplicationHandlerTests
             Role = AdminRole.Admin
         };
         context.Admins.Add(manager);
-        context.TlgUsers.Add(new TlgUser { ChatId = new ChatId(100), Username = "client_user" });
-        context.TlgUsers.Add(new TlgUser { ChatId = new ChatId(999), Username = "manager_user" });
+        context.TlgUsers.Add(new TlgUser(new ChatId(100), username: "client_user"));
+        context.TlgUsers.Add(new TlgUser(new ChatId(999), username: "manager_user"));
         await context.SaveChangesAsync();
 
         var mediator = Substitute.For<IMediator>();
@@ -93,11 +93,15 @@ public class SubmitRentalApplicationHandlerTests
         context.Admins.Add(manager);
         for (int i = 0; i < 5; i++)
         {
-            context.Clients.Add(new Client
-            {
-                ChatId = new ChatId(100),
-                AdminChatId = new ChatId(999)
-            });
+            context.Clients.Add(new Client(
+                new ChatId(100),
+                country: null,
+                countryOther: null,
+                profession: null,
+                hasPets: null,
+                term: null,
+                termOther: null,
+                adminChatId: new ChatId(999)));
         }
         await context.SaveChangesAsync();
 
@@ -122,8 +126,8 @@ public class SubmitRentalApplicationHandlerTests
             ChatId = new ChatId(1),
             Role = AdminRole.Admin
         };
-        busyManager.AssignClient(new() { ChatId = new ChatId(10), AdminChatId = new ChatId(1) });
-        busyManager.AssignClient(new() { ChatId = new ChatId(11), AdminChatId = new ChatId(1) });
+        busyManager.AssignClient(new Client(new ChatId(10), country: null, countryOther: null, profession: null, hasPets: null, term: null, termOther: null, adminChatId: new ChatId(1)));
+        busyManager.AssignClient(new Client(new ChatId(11), country: null, countryOther: null, profession: null, hasPets: null, term: null, termOther: null, adminChatId: new ChatId(1)));
         var freeManager = new Admin
         {
             ChatId = new ChatId(2),

@@ -10,12 +10,12 @@ public class FlatMappingExtensionsTests
     [Fact]
     public void ToDto_MapsAllFields()
     {
-        var flat = new Flat
+        var flat = new Flat(
+            itemId: "abc123",
+            link: "https://example.com/flat",
+            ownerNumber: "+995555123456",
+            comment: "Хорошая квартира")
         {
-            ItemId = "abc123",
-            Link = "https://example.com/flat",
-            OwnerNumber = "+995555123456",
-            Comment = "Хорошая квартира",
             CreatedAt = new DateTime(2026, 7, 15)
         };
 
@@ -31,12 +31,8 @@ public class FlatMappingExtensionsTests
     [Fact]
     public void ToDto_NullFields_DefaultsToEmptyStrings()
     {
-        var flat = new Flat
+        var flat = new Flat(null, null, null, null)
         {
-            ItemId = null,
-            Link = null,
-            OwnerNumber = null,
-            Comment = null,
             CreatedAt = new DateTime(2026, 7, 15)
         };
 

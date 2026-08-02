@@ -44,7 +44,7 @@ public class RevokeAdminRightsHandler : IRequestHandler<RevokeAdminRightsRequest
 
         if (targetUser != null)
         {
-            targetUser.IsAdmin = false;
+            targetUser.SetAdmin(false);
         }
 
         /* Redistribute non-completed requests to other active admins (including superadmin) */
@@ -65,7 +65,7 @@ public class RevokeAdminRightsHandler : IRequestHandler<RevokeAdminRightsRequest
                 for (int i = 0; i < openClients.Count; i++)
                 {
                     var adminChatId = activeAdminChatIds[i % activeAdminChatIds.Count];
-                    openClients[i].AdminChatId = adminChatId;
+                    openClients[i].ChangeManager(adminChatId);
                 }
             }
         }

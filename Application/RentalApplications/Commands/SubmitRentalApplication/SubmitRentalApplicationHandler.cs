@@ -44,17 +44,15 @@ public class SubmitRentalApplicationHandler : IRequestHandler<SubmitRentalApplic
             return Result<SubmitRentalApplicationResult>.Failure(ApplicationMessages.NoActiveManagers(lang));
         }
 
-        var client = new Client
-        {
-            ChatId = request.ChatId,
-            Country = request.Country,
-            CountryOther = request.CountryOther,
-            Profession = request.Profession,
-            HasPets = request.HasPets,
-            Term = request.Term,
-            TermOther = request.TermOther,
-            AdminChatId = manager.ChatId
-        };
+        var client = new Client(
+            chatId: request.ChatId,
+            country: request.Country,
+            countryOther: request.CountryOther,
+            profession: request.Profession,
+            hasPets: request.HasPets,
+            term: request.Term,
+            termOther: request.TermOther,
+            adminChatId: manager.ChatId);
 
         manager.AssignClient(client);
 

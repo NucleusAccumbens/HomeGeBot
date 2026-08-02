@@ -25,7 +25,7 @@ public class UpdateFlatCommentHandler : IRequestHandler<UpdateFlatCommentRequest
             return Result<UpdateFlatCommentResult>.Failure("Квартира не найдена.");
         }
 
-        flat.Comment = request.Comment;
+        flat.UpdateComment(request.Comment);
         await _context.SaveChangesAsync(cancellationToken);
 
         var flatDto = flat.ToDto();
