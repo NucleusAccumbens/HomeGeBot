@@ -287,6 +287,21 @@ dotnet run --project Web
 
 ---
 
+## 🩺 Актуальный аудит и план рефакторинга (2026-08-02)
+
+Последнее комплексное ревью показало, что проект успешно собирается (`dotnet build`) и все существующие тесты проходят (`dotnet test` — 40 тестов). Архитектура в целом здорова, однако выявлен ряд проблем, которые отражены в [`REFACTORING_PLAN.md`](./REFACTORING_PLAN.md) и [`Application/ARCHITECTURE_AUDIT.md`](./Application/ARCHITECTURE_AUDIT.md):
+
+- **Безопасность**: `TmaController` и `Login.cshtml.cs` отключают antiforgery; `DashboardApiController` возвращает URL с токеном бота; webhook пропускает запросы без `SecretToken`.
+- **Архитектура**: `TmaController` напрямую использует `IBotDbContext`, обходя слой Application.
+- **OOP/SOLID**: сущности Domain не инкапсулируют инварианты; `ChatId` имеет неявные преобразования, сводящие на нет типобезопасность; `CommandAnalyzer` и `AppTextCommand` берут на себя слишком много ответственности.
+- **Производительность**: N+1-запрос в `GetUserApplicationsHandler`.
+- **Тесты**: покрытие низкое (~5%), присутствуют пустые `UnitTest1.cs`.
+
+Ключевые рекомендации: убрать прямую работу Web с `IBotDbContext`, добавить Application use-cases для TMA, закрыть CSRF-уязвимости, вынести локализацию из контроллеров/команд, усилить инкапсуляцию сущностей и расширить тестовое покрытие.
+
+---
+
 ## 📚 Документация
 
-- [`REFACTORING_PLAN.md`](./REFACTORING_PLAN.md) — отчёт код-ревью на соответствие OOP/SOLID и пошаговый план рефакторинга.
+- [`REFACTORING_PLAN.md`](./REFACTORING_PLAN.md) — актуальный отчёт код-ревью на соответствие OOP/SOLID и пошаговый план рефакторинга.
+- [`Application/ARCHITECTURE_AUDIT.md`](./Application/ARCHITECTURE_AUDIT.md) — аудит слоя Application.
