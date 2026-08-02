@@ -25,16 +25,16 @@ public class GrantAdminRightsHandler : IRequestHandler<GrantAdminRightsRequest, 
             return Result<GrantAdminRightsResult>.Failure("Пользователь не найден.");
         }
 
-        if (targetUser.IsAdmin)
-        {
-            return Result<GrantAdminRightsResult>.Failure("Пользователь уже является администратором.");
-        }
-
         var existingAdmin = await _context.Admins
             .SingleOrDefaultAsync(a => a.ChatId == request.TargetUserChatId, cancellationToken);
 
         if (existingAdmin != null)
         {
+            if (existingAdmin.IsActive)
+            {
+                return Result<GrantAdminRightsResult>.Failure("Пользователь уже является администратором.");
+            }
+
             existingAdmin.Activate();
         }
         else
@@ -46,8 +46,6 @@ public class GrantAdminRightsHandler : IRequestHandler<GrantAdminRightsRequest, 
 
             await _context.Admins.AddAsync(newAdmin, cancellationToken);
         }
-
-        targetUser.SetAdmin(true);
 
         await _context.SaveChangesAsync(cancellationToken);
 

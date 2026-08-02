@@ -39,14 +39,6 @@ public class RevokeAdminRightsHandler : IRequestHandler<RevokeAdminRightsRequest
 
         targetAdmin.Deactivate();
 
-        TlgUser? targetUser = await _context.TlgUsers
-            .SingleOrDefaultAsync(u => u.ChatId == request.TargetAdminChatId, cancellationToken);
-
-        if (targetUser != null)
-        {
-            targetUser.SetAdmin(false);
-        }
-
         /* Redistribute non-completed requests to other active admins (including superadmin) */
         var openClients = await _context.Clients
             .Where(c => c.AdminChatId == request.TargetAdminChatId && !c.IsCompleted)

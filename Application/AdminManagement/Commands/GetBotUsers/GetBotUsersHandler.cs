@@ -41,7 +41,7 @@ public class GetBotUsersHandler : IRequestHandler<GetBotUsersRequest, Result<Get
                 ChatId = u.ChatId,
                 Username = u.Username,
                 Name = (u.FirstName != null ? u.FirstName : "") + (u.LastName != null ? " " + u.LastName : ""),
-                IsAdmin = u.IsAdmin,
+                IsAdmin = false,
                 IsKicked = u.IsKicked,
                 CreatedAt = u.CreatedAt
             })

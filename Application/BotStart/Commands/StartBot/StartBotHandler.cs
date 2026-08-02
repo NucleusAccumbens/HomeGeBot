@@ -47,12 +47,6 @@ public class StartBotHandler : IRequestHandler<StartBotRequest, Result<StartBotR
         var admin = await _context.Admins
             .FirstOrDefaultAsync(a => a.ChatId == request.ChatId && a.IsActive, cancellationToken);
 
-        if (admin != null && !user.IsAdmin)
-        {
-            user.SetAdmin(true);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
-
         return Result<StartBotResult>.Success(StartBotResult.Create(
             isAdmin: admin != null,
             isSuperAdmin: admin != null && admin.Role == Domain.Enums.AdminRole.SuperAdmin,
