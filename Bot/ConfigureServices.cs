@@ -22,8 +22,8 @@ public static class ConfigureService
         services.AddSingleton<IBotI18n, BotI18n>();
         services.AddScoped<IBotSessionStore, DistributedBotSessionStore>();
         services.AddScoped<ICommandAnalyzer, CommandAnalyzer>();
-        services.AddSingleton<IExceptionNotification, ExceptionNotification>();
-        services.AddSingleton<IUserNotifier, UserNotifier>();
+        services.AddScoped<IExceptionNotification, ExceptionNotification>();
+        services.AddScoped<IUserNotifier, UserNotifier>();
         services.AddScoped<IManagerNotificationFormatter, ManagerNotificationFormatter>();
 
         AddMessages(services);
