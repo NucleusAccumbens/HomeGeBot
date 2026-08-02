@@ -1,5 +1,8 @@
 ﻿using Application.Common.Interfaces;
 using Bot.Common;
+using Bot.Common.Interfaces;
+using Bot.Routers;
+using Bot.UpdateHandlers;
 using Microsoft.Extensions.DependencyInjection;
 using Bot.Commands.GeneralCommands.TextCommands;
 using Bot.Common.Abstractions;
@@ -27,6 +30,18 @@ public static class ConfigureService
         services.AddScoped<IUserNotifier, UserNotifier>();
         services.AddScoped<IManagerNotificationFormatter, ManagerNotificationFormatter>();
 
+        // Update handlers
+        services.AddScoped<IUpdateHandler, MyChatMemberUpdateHandler>();
+        services.AddScoped<IUpdateHandler, MessageUpdateHandler>();
+        services.AddScoped<IUpdateHandler, CallbackQueryUpdateHandler>();
+
+        // Routers and helpers
+        services.AddScoped<IUserStatusChecker, UserStatusChecker>();
+        services.AddScoped<ITextCommandRouter, TextCommandRouter>();
+        services.AddScoped<ICallbackCommandRouter, CallbackCommandRouter>();
+        services.AddScoped<ILocalizedMessageResolver, LocalizedMessageResolver>();
+        services.AddScoped<IRentalApplicationForwardProcessor, RentalApplicationForwardProcessor>();
+
         AddMessages(services);
         AddTextCommands(services);
         AddCallbackCommands(services);
@@ -47,7 +62,6 @@ public static class ConfigureService
     {
         services.AddScoped<BaseTextCommand, StartTextCommand>();
         services.AddScoped<BaseTextCommand, AppTextCommand>();
-        // AddAdminTextCommand и RemoveAdminTextCommand удалены — управление администраторами через веб-панель
     }
 
     private static void AddCallbackCommands(IServiceCollection services)
