@@ -1,6 +1,6 @@
 namespace Bot.Services;
 
-public static class BotI18n
+public class BotI18n : IBotI18n
 {
     private static readonly Dictionary<string, Dictionary<string, string>> _translations = new()
     {
@@ -30,7 +30,7 @@ public static class BotI18n
         }
     };
 
-    public static string T(string key, string language = "ru")
+    public string T(string key, string language = "ru")
     {
         if (_translations.TryGetValue(language, out var lang) && lang.TryGetValue(key, out var value))
             return value;

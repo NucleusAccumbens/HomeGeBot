@@ -8,11 +8,13 @@ public class UserNotifier : IUserNotifier
 {
     private readonly TelegramBot _telegramBot;
     private readonly ILogger<UserNotifier> _logger;
+    private readonly IMessageService _messageService;
 
-    public UserNotifier(TelegramBot telegramBot, ILogger<UserNotifier> logger)
+    public UserNotifier(TelegramBot telegramBot, ILogger<UserNotifier> logger, IMessageService messageService)
     {
         _telegramBot = telegramBot;
         _logger = logger;
+        _messageService = messageService;
     }
 
     public async Task SendNotificationAsync(Domain.Common.ChatId chatId, string message)
@@ -20,7 +22,7 @@ public class UserNotifier : IUserNotifier
         try
         {
             var client = await _telegramBot.GetBot();
-            await MessageService.SendMessage(chatId, client, message, null);
+            await _messageService.SendMessage(chatId, client, message, null);
         }
         catch (Exception ex)
         {

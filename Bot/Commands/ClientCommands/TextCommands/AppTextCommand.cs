@@ -16,18 +16,22 @@ namespace Bot.Commands.ClientCommands.TextCommands;
 public class AppTextCommand : BaseTextCommand
 {
     private readonly IBotSessionStore _sessionStore;
-
     private readonly IMediator _mediator;
-
     private readonly BotConfiguration _botConfig;
+    private readonly IMessageService _messageService;
+    private readonly IBotI18n _i18n;
 
     public AppTextCommand(IBotSessionStore sessionStore,
         IMediator mediator,
-        IOptions<BotConfiguration> botConfigOptions)
+        IOptions<BotConfiguration> botConfigOptions,
+        IMessageService messageService,
+        IBotI18n i18n)
     {
         _sessionStore = sessionStore;
         _mediator = mediator;
         _botConfig = botConfigOptions.Value;
+        _messageService = messageService;
+        _i18n = i18n;
     }
 
     public override string Name => "app";
@@ -53,7 +57,7 @@ public class AppTextCommand : BaseTextCommand
                             var lang = await _mediator.Send(new GetUserLanguageQuery(chatId));
                             var body = await _mediator.Send(new GetMessageBodyQuery("channelError", lang)) ?? "Перешлите пост из канала @propertyintbilisi";
 
-                            await MessageService.SendMessage(chatId, client, body, null);
+                            await _messageService.SendMessage(chatId, client, body, null);
 
                             return;
                         }
@@ -62,7 +66,7 @@ public class AppTextCommand : BaseTextCommand
                     if (update.Message.ForwardFromChat.Id == _botConfig.SourceChannelId)
                     {
                         if (hasContent)
-                        {                          
+                        {
                             var session = await _sessionStore.GetAsync(chatId);
                             if (session?.RentalApplication == null)
                                 throw new SessionExpiredException();
@@ -80,7 +84,7 @@ public class AppTextCommand : BaseTextCommand
 
                             if (result.IsFailure)
                             {
-                                await MessageService.SendMessage(chatId, client, result.Error!, null);
+                                await _messageService.SendMessage(chatId, client, result.Error!, null);
                                 return;
                             }
 
@@ -92,45 +96,45 @@ public class AppTextCommand : BaseTextCommand
                                 ?? "<b>Страна:</b> {country}\n<b>Деятельность:</b> {profession}\n<b>Домашние животные:</b> {pets}\n<b>Срок аренды:</b> {term}";
 
                             var countryDisplay = session.RentalApplication.Country == Domain.Enums.Country.Other && !string.IsNullOrWhiteSpace(session.RentalApplication.CountryOther)
-                                ? MessageService.Escape(session.RentalApplication.CountryOther) : session.RentalApplication.Country?.GetDisplayName();
+                                ? _messageService.Escape(session.RentalApplication.CountryOther) : session.RentalApplication.Country?.GetDisplayName();
                             var termDisplay = session.RentalApplication.Term == Domain.Enums.Term.Other && !string.IsNullOrWhiteSpace(session.RentalApplication.TermOther)
-                                ? MessageService.Escape(session.RentalApplication.TermOther) : session.RentalApplication.Term?.GetDisplayName();
+                                ? _messageService.Escape(session.RentalApplication.TermOther) : session.RentalApplication.Term?.GetDisplayName();
                             var petsDisplay = session.RentalApplication.HasPets.Value
                                 ? (managerLang == "en" ? "Yes" : managerLang == "ka" ? "დიახ" : "Да")
                                 : (managerLang == "en" ? "No" : managerLang == "ka" ? "არა" : "Нет");
 
                             managerBody = managerBody
                                 .Replace("{country}", countryDisplay ?? "—")
-                                .Replace("{profession}", MessageService.Escape(session.RentalApplication.Profession) ?? "—")
+                                .Replace("{profession}", _messageService.Escape(session.RentalApplication.Profession) ?? "—")
                                 .Replace("{pets}", petsDisplay)
                                 .Replace("{term}", termDisplay ?? "—");
 
-                            await MessageService.SendMessage(managerChatId, client, managerBody,
+                            await _messageService.SendMessage(managerChatId, client, managerBody,
                                 new(new[]
                                 {
                                     new[]
                                     {
-                                        InlineKeyboardButton.WithUrl(text: BotI18n.T("btn.write", managerLang), url: $"https://t.me/{update.Message.Chat.Username}"),
+                                        InlineKeyboardButton.WithUrl(text: _i18n.T("btn.write", managerLang), url: $"https://t.me/{update.Message.Chat.Username}"),
                                     },
                                 }));
 
                             if (session.MessageId.HasValue)
                             {
-                                await MessageService.DeleteMessage(chatId, session.MessageId.Value, client);
+                                await _messageService.DeleteMessage(chatId, session.MessageId.Value, client);
                             }
-                            
+
                             var appLang = await _mediator.Send(new GetUserLanguageQuery(chatId));
                             var appBody = await _mediator.Send(new GetMessageBodyQuery("app", appLang)) ?? "Заявка принята! Менеджер скоро свяжется с вами.";
-                            
+
                             var appKeyboard = new InlineKeyboardMarkup(new[]
                             {
                                 new[]
                                 {
-                                    InlineKeyboardButton.WithWebApp(text: BotI18n.T("btn.openApplication", appLang), webAppInfo: new WebAppInfo { Url = _botConfig.WebAppUrl }),
+                                    InlineKeyboardButton.WithWebApp(text: _i18n.T("btn.openApplication", appLang), webAppInfo: new WebAppInfo { Url = _botConfig.WebAppUrl }),
                                 },
                             });
-                            
-                            await MessageService.SendMessage(chatId, client, appBody, appKeyboard);
+
+                            await _messageService.SendMessage(chatId, client, appBody, appKeyboard);
 
                             await _sessionStore.ClearAsync(chatId);
 
@@ -143,17 +147,17 @@ public class AppTextCommand : BaseTextCommand
                     var errLang = await _mediator.Send(new GetUserLanguageQuery(chatId));
                     var channelErrBody = await _mediator.Send(new GetMessageBodyQuery("channelError", errLang)) ?? "Перешлите пост из канала @propertyintbilisi";
 
-                    await MessageService.SendMessage(chatId, client, channelErrBody, null);
+                    await _messageService.SendMessage(chatId, client, channelErrBody, null);
                 }
             }
             catch (SessionExpiredException)
             {
-                await MessageService.SendMessage(chatId, client, SessionExpiredException.MessageText, null);
+                await _messageService.SendMessage(chatId, client, SessionExpiredException.MessageText, null);
             }
             catch (ValidationException ex)
             {
                 var msg = string.Join("\n", ex.Errors.Select(e => e.ErrorMessage));
-                await MessageService.SendMessage(chatId, client, msg, null);
+                await _messageService.SendMessage(chatId, client, msg, null);
             }
         }
     }

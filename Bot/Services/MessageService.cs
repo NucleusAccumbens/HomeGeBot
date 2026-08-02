@@ -4,9 +4,16 @@ using MediatR;
 
 namespace Bot.Services;
 
-public static class MessageService
+public class MessageService : IMessageService
 {
-    public static Task SendMessage(long chatId, ITelegramBotClient client, string text,
+    private readonly IMediator _mediator;
+
+    public MessageService(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
+
+    public Task SendMessage(long chatId, ITelegramBotClient client, string text,
         InlineKeyboardMarkup? inlineKeyboardMarkup)
     {
         return client.SendTextMessageAsync(
@@ -17,7 +24,7 @@ public static class MessageService
             replyMarkup: inlineKeyboardMarkup);
     }
 
-    public static Task SendMessage(long chatId, ITelegramBotClient client, string caption, string? path,
+    public Task SendMessage(long chatId, ITelegramBotClient client, string caption, string? path,
         InlineKeyboardMarkup? inlineKeyboardMarkup)
     {
         if (path != null)
@@ -33,7 +40,7 @@ public static class MessageService
         return Task.CompletedTask;
     }
 
-    public static Task EditMessage(long chatId, int messageId, ITelegramBotClient client,
+    public Task EditMessage(long chatId, int messageId, ITelegramBotClient client,
         string text, InlineKeyboardMarkup? inlineKeyboardMarkup)
     {
         return client.EditMessageTextAsync(
@@ -45,12 +52,12 @@ public static class MessageService
             replyMarkup: inlineKeyboardMarkup);
     }
 
-    public static Task EditMediaMessage(long chatId, int messageId, ITelegramBotClient client,
-        string? captcha, string path, InlineKeyboardMarkup? inlineKeyboardMarkup)
+    public Task EditMediaMessage(long chatId, int messageId, ITelegramBotClient client,
+        string? caption, string path, InlineKeyboardMarkup? inlineKeyboardMarkup)
     {
         var media = new InputMediaPhoto(new InputMedia(path));
 
-        media.Caption = captcha;
+        media.Caption = caption;
 
         media.ParseMode = ParseMode.Html;
 
@@ -61,14 +68,14 @@ public static class MessageService
             replyMarkup: inlineKeyboardMarkup);
     }
 
-    public static Task DeleteMessage(long chatId, int messageId, ITelegramBotClient client)
+    public Task DeleteMessage(long chatId, int messageId, ITelegramBotClient client)
     {
         return client.DeleteMessageAsync(
             chatId: chatId,
             messageId: messageId);
     }
 
-    public static Task ShowAllert(string callbackQueryId, ITelegramBotClient client, string message)
+    public Task ShowAlert(string callbackQueryId, ITelegramBotClient client, string message)
     {
         return client.AnswerCallbackQueryAsync(
                 callbackQueryId: callbackQueryId,
@@ -76,21 +83,21 @@ public static class MessageService
                 showAlert: true);
     }
 
-    public static async Task<string> GetMessageText(IMediator mediator, string name, string language = "ru")
+    public async Task<string> GetMessageText(string name, string language = "ru")
     {
-        var messageText = await mediator.Send(new GetMessageBodyQuery(name, language));
+        var messageText = await _mediator.Send(new GetMessageBodyQuery(name, language));
 
         if (!string.IsNullOrEmpty(messageText)) return messageText;
 
         else return "Сообщение с таким именем не найдено";
     }
 
-    public static Task<string?> GetMessagePathToPhoto(IMediator mediator, string name)
+    public Task<string?> GetMessagePathToPhoto(string name)
     {
-        return mediator.Send(new GetMessagePathToPhotoQuery(name));
+        return _mediator.Send(new GetMessagePathToPhotoQuery(name));
     }
 
-    public static string Escape(string? text)
+    public string Escape(string? text)
     {
         if (string.IsNullOrEmpty(text)) return string.Empty;
         return System.Net.WebUtility.HtmlEncode(text);
