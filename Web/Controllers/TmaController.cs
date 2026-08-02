@@ -9,6 +9,7 @@ using Domain.Common;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Web.Filters;
 using Web.Models;
 using Web.Services;
 
@@ -17,17 +18,19 @@ namespace Web.Controllers;
 [ApiController]
 [Route("api/tma")]
 [IgnoreAntiforgeryToken]
-public class TmaController : ControllerBase
+public class TmaController : TmaControllerBase
 {
-    private readonly ITmaValidationService _tmaValidation;
     private readonly IBotSessionStore _sessionStore;
     private readonly IUserNotifier _notifier;
     private readonly IMediator _mediator;
     private readonly ITmaLabelProvider _tmaLabels;
 
-    public TmaController(ITmaValidationService tmaValidation, IBotSessionStore sessionStore, IUserNotifier notifier, IMediator mediator, ITmaLabelProvider tmaLabels)
+    public TmaController(
+        IBotSessionStore sessionStore,
+        IUserNotifier notifier,
+        IMediator mediator,
+        ITmaLabelProvider tmaLabels)
     {
-        _tmaValidation = tmaValidation;
         _sessionStore = sessionStore;
         _notifier = notifier;
         _mediator = mediator;
@@ -35,22 +38,14 @@ public class TmaController : ControllerBase
     }
 
     [HttpPost("submit-application")]
+    [ValidateTmaInitData]
     public async Task<IActionResult> SubmitApplication([FromBody] TmaApplicationRequest request)
     {
-        if (!_tmaValidation.ValidateInitData(request.InitData))
-        {
-            return Unauthorized("Invalid initData");
-        }
-
-        var userId = _tmaValidation.GetUserId(request.InitData);
-        if (userId == null)
-        {
-            return BadRequest("Could not find user ID in initData");
-        }
+        var userId = TmaUserId;
 
         var session = new BotSession
         {
-            ChatId = ChatId.FromLong(userId.Value),
+            ChatId = ChatId.FromLong(userId),
             Step = BotStep.WaitForFlatForward,
             RentalApplication = new RentalApplicationDraft
             {
@@ -70,7 +65,7 @@ public class TmaController : ControllerBase
         var termDisplay = request.Term == Term.Other && !string.IsNullOrWhiteSpace(request.TermOther)
             ? request.TermOther : request.Term.GetDisplayName();
 
-        var user = await _mediator.Send(new GetUserLanguageQuery(new ChatId(userId.Value)));
+        var user = await _mediator.Send(new GetUserLanguageQuery(new ChatId(userId)));
         var labels = _tmaLabels.GetSubmitApplicationLabels(user);
 
         var message = $"{labels.Title}\n\n" +
@@ -80,26 +75,16 @@ public class TmaController : ControllerBase
             $"{labels.Term}: {termDisplay}\n\n" +
             $"{labels.Footer}";
 
-        await _notifier.SendNotificationAsync(userId.Value, message);
+        await _notifier.SendNotificationAsync(userId, message);
 
         return Ok(new { countryDisplay, termDisplay });
     }
 
     [HttpGet("applications")]
+    [ValidateTmaInitData]
     public async Task<IActionResult> GetApplications([FromQuery] string initData)
     {
-        if (!_tmaValidation.ValidateInitData(initData))
-        {
-            return Unauthorized("Invalid initData");
-        }
-
-        var userId = _tmaValidation.GetUserId(initData);
-        if (userId == null)
-        {
-            return BadRequest("Could not find user ID in initData");
-        }
-
-        var result = await _mediator.Send(new GetUserApplicationsRequest { ChatId = ChatId.FromLong(userId.Value) });
+        var result = await _mediator.Send(new GetUserApplicationsRequest { ChatId = ChatId.FromLong(TmaUserId) });
 
         if (result.IsFailure)
         {
@@ -110,13 +95,9 @@ public class TmaController : ControllerBase
     }
 
     [HttpGet("manager")]
+    [ValidateTmaInitData]
     public async Task<IActionResult> GetManager([FromQuery] string initData)
     {
-        if (!_tmaValidation.ValidateInitData(initData))
-        {
-            return Unauthorized("Invalid initData");
-        }
-
         var result = await _mediator.Send(new GetManagerContactQuery());
 
         if (result.IsFailure)
@@ -128,18 +109,10 @@ public class TmaController : ControllerBase
     }
 
     [HttpGet("profile")]
+    [ValidateTmaInitData]
     public IActionResult GetProfile([FromQuery] string initData)
     {
-        if (!_tmaValidation.ValidateInitData(initData))
-        {
-            return Unauthorized("Invalid initData");
-        }
-
-        var userData = _tmaValidation.GetUserData(initData);
-        if (userData == null)
-        {
-            return BadRequest("Could not extract user data from initData");
-        }
+        var userData = TmaUserData;
 
         return Ok(new
         {
@@ -152,20 +125,10 @@ public class TmaController : ControllerBase
     }
 
     [HttpPost("set-language")]
+    [ValidateTmaInitData]
     public async Task<IActionResult> SetLanguage([FromBody] TmaSetLanguageRequest request)
     {
-        if (!_tmaValidation.ValidateInitData(request.InitData))
-        {
-            return Unauthorized("Invalid initData");
-        }
-
-        var userId = _tmaValidation.GetUserId(request.InitData);
-        if (userId == null)
-        {
-            return BadRequest("Could not find user ID in initData");
-        }
-
-        var result = await _mediator.Send(new SetUserLanguageRequest(new ChatId(userId.Value), request.Language));
+        var result = await _mediator.Send(new SetUserLanguageRequest(new ChatId(TmaUserId), request.Language));
 
         if (result.IsFailure)
         {

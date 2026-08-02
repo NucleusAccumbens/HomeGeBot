@@ -2,6 +2,7 @@ using Application.AdminManagement.Queries.CheckAdminStatus;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Web.Filters;
 using Web.Services;
 
 namespace Web.Controllers;
@@ -9,17 +10,17 @@ namespace Web.Controllers;
 [ApiController]
 [Route("api/admin")]
 [IgnoreAntiforgeryToken]
-public class AdminAuthController : ControllerBase
+public class AdminAuthController : TmaControllerBase
 {
-    private readonly ITmaValidationService _tmaValidation;
     private readonly IMediator _mediator;
     private readonly IWebHostEnvironment _environment;
     private readonly IAdminClaimsFactory _claimsFactory;
 
-    public AdminAuthController(ITmaValidationService tmaValidation, IMediator mediator,
-        IWebHostEnvironment environment, IAdminClaimsFactory claimsFactory)
+    public AdminAuthController(
+        IMediator mediator,
+        IWebHostEnvironment environment,
+        IAdminClaimsFactory claimsFactory)
     {
-        _tmaValidation = tmaValidation;
         _mediator = mediator;
         _environment = environment;
         _claimsFactory = claimsFactory;
@@ -46,27 +47,17 @@ public class AdminAuthController : ControllerBase
     }
 
     [HttpPost("auth")]
+    [ValidateTmaInitData]
     public async Task<IActionResult> Auth([FromBody] AdminAuthRequest request)
     {
-        if (!_tmaValidation.ValidateInitData(request.InitData))
-        {
-            return Unauthorized("Invalid initData");
-        }
-
-        var userId = _tmaValidation.GetUserId(request.InitData);
-        if (userId == null)
-        {
-            return BadRequest("Could not find user ID in initData");
-        }
-
-        var isAdmin = await _mediator.Send(new CheckAdminStatusQuery(userId.Value));
+        var isAdmin = await _mediator.Send(new CheckAdminStatusQuery(TmaUserId));
         if (!isAdmin)
         {
             return StatusCode(StatusCodes.Status403Forbidden, "Access denied. You are not an administrator.");
         }
 
-        var username = _tmaValidation.GetUsername(request.InitData) ?? "Admin";
-        var principal = _claimsFactory.CreatePrincipal(userId.Value, username);
+        var username = TmaUserData.Username ?? TmaUserData.FirstName ?? "Admin";
+        var principal = _claimsFactory.CreatePrincipal(TmaUserId, username);
         await HttpContext.SignInAsync("AdminAuth", principal, new AuthenticationProperties { IsPersistent = true });
 
         return Ok();
