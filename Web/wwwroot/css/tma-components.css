@@ -1,0 +1,410 @@
+/* ===== TMA Components =====
+ * Tab bar, profile section, and modal dialog styles.
+ * Single responsibility: UI component styles specific to the TMA client interface.
+ */
+
+/* ===== Bottom Tab Bar — Sticky at bottom like a mobile app (matches admin dashboard) ===== */
+.tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: #2A2A2A;
+    border-radius: 40px 40px 0 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 32px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    z-index: 50;
+    align-items: center;
+}
+
+/* ===== Form Nav Bar — replaces the tab bar when the Application form is active ===== */
+.form-nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: #2A2A2A;
+    border-radius: 40px 40px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 32px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    z-index: 50;
+}
+
+/* Small icon button (left side, outside nav buttons) — navigates to "My Applications" */
+.form-nav-icon {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    color: rgba(255, 244, 244, 0.6);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.form-nav-icon:hover {
+    color: #FFD7D7;
+}
+
+.form-nav-icon:active {
+    opacity: 0.5;
+}
+
+/* Container for step nav buttons (takes remaining space) */
+.form-nav-buttons {
+    flex: 1;
+}
+
+/* Override button-group margin so buttons sit flush in the nav bar */
+.form-nav-buttons .button-group {
+    margin-top: 0;
+}
+
+.tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    background: transparent;
+    border: none;
+    border-radius: 16px;
+    padding: 12px 8px;
+    height: 80px;
+    color: rgba(255, 244, 244, 0.6);
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: opacity 0.2s, background 0.2s, color 0.2s;
+}
+
+.tab-btn.active {
+    opacity: 1;
+    color: #FFD7D7;
+    background: transparent;
+}
+
+.tab-btn:hover:not(.active) {
+    opacity: 0.8;
+}
+
+/* ===== Tailwind-equivalent utility classes (admin uses Tailwind CDN; TMA defines them locally) ===== */
+.w-8 {
+    width: 2rem;
+    flex: none;
+}
+
+.h-8 {
+    height: 2rem;
+    flex: none;
+}
+
+.mb-1 {
+    margin-bottom: 0.25rem;
+}
+
+/* ===== View fade-in animation (matches admin tab-content) ===== */
+.view.active {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Profile / My Page ===== */
+.profile-card {
+    border: none;
+    border-radius: 24px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+}
+
+.profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #EEF7BE;
+    background-size: cover;
+    background-position: center;
+    background-clip: padding-box;
+    border: 5px solid #EEF7BE;
+    box-shadow: inset 0 0 0 1px #EEF7BE;
+    outline: none;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--foreground);
+    font-family: var(--font-display);
+    overflow: hidden;
+}
+
+.profile-avatar svg {
+    width: 40px;
+    height: 40px;
+    opacity: 0.5;
+}
+
+.channel-link {
+    color: #717FFE;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.channel-link:hover {
+    text-decoration: underline;
+}
+
+.profile-name {
+    font-size: 18px;
+    font-weight: 800;
+    font-family: var(--font-display);
+    color: var(--foreground);
+    margin-bottom: 4px;
+}
+
+.profile-username {
+    font-size: 14px;
+    color: var(--muted-foreground);
+}
+
+.profile-stats {
+    margin-bottom: 1rem;
+}
+
+.profile-stat-card {
+    border: none;
+    border-radius: 24px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+}
+
+.profile-stat-value {
+    display: block;
+    font-size: 32px;
+    font-weight: 800;
+    font-family: var(--font-display);
+    color: var(--foreground);
+}
+
+.profile-stat-label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted-foreground);
+    margin-top: 4px;
+}
+
+.profile-dark-card {
+    border: none;
+    border-radius: 24px;
+    padding: 1.5rem;
+    color: #1E1E1E;
+    box-shadow: var(--shadow-md);
+}
+
+.profile-dark-title {
+    font-size: 18px;
+    font-weight: 800;
+    font-family: var(--font-display);
+    margin-bottom: 8px;
+}
+
+.profile-dark-text {
+    font-size: 14px;
+    color: rgba(30, 30, 30, 0.7);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.profile-dark-card .button-group {
+    margin-top: 0;
+}
+
+.profile-dark-card .btn-primary {
+    background-color: #717FFE;
+    color: #FFFFFF;
+    flex: none;
+    height: auto;
+    padding: 10pt;
+    border-radius: 12pt;
+    font-size: 12pt;
+    font-weight: 600;
+}
+
+/* ===== Top Bar (step counter + help + language dropdown) ===== */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 20px 24px 8px;
+    background-color: var(--background);
+    pointer-events: none;
+}
+
+.top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    pointer-events: auto;
+    line-height: 1;
+}
+
+.lang-dropdown {
+    position: relative;
+}
+
+.lang-dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    color: rgba(54, 54, 54, 0.6);
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: opacity 0.2s;
+}
+
+.lang-dropdown-toggle:hover {
+    opacity: 0.85;
+}
+
+.lang-flag {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.lang-chevron {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.2s;
+}
+
+.lang-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 140px;
+    background: #EEF7BE;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    padding: 8px;
+    z-index: 46;
+}
+
+.lang-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--foreground);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font-body);
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: left;
+}
+
+.lang-dropdown-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* ===== Modal / Confirmation Popup ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(54, 54, 54, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: var(--modal-background);
+    border-radius: var(--radius-lg);
+    padding: 24px 20px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.modal-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--foreground);
+    margin: 0 0 28px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 14px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    height: 50px;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    transition: opacity .2s;
+}
+
+.modal-buttons button:active {
+    opacity: .7;
+}
+
+.modal-confirm {
+    background: #1E1E1E;
+    color: #ffffff;
+}
+
+.modal-cancel {
+    background: rgba(30, 30, 30, 0.1);
+    color: var(--foreground);
+}

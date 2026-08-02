@@ -1,5 +1,6 @@
-﻿using Application.Messages.Interfaces;
-using Bot.Common.Services;
+﻿using Bot.Services;
+using MediatR;
+using Application.Users.Queries.GetUserLanguage;
 
 namespace Bot.Common.Abstractions;
 
@@ -7,66 +8,55 @@ public abstract class BaseMessage
 {
     private readonly string _messageName;
 
-    private readonly IGetMessageQuery _getMessageQuery;
+    private readonly IMediator _mediator;
 
-    public BaseMessage(string messageName, IGetMessageQuery getMessageQuery)
+    public BaseMessage(string messageName, IMediator mediator)
     {
         _messageName = messageName;
-        _getMessageQuery = getMessageQuery;
+        _mediator = mediator;
     }
 
-    public virtual InlineKeyboardMarkup? InlineKeyboardMarkup { get; }
+    public virtual InlineKeyboardMarkup? GetInlineKeyboardMarkup(string language) => null;
 
     public virtual async Task SendMessage(long chatId, ITelegramBotClient client)
     {
+        var language = await _mediator.Send(new GetUserLanguageQuery(chatId));
         await MessageService
-            .SendMessage(chatId, client, await GetMessageBody(), InlineKeyboardMarkup);
+            .SendMessage(chatId, client, await GetMessageBody(chatId), GetInlineKeyboardMarkup(language));
     }
 
     public virtual async Task SendPhoto(long chatId, ITelegramBotClient client)
     {
+        var language = await _mediator.Send(new GetUserLanguageQuery(chatId));
         await MessageService
-            .SendMessage(chatId, client, await GetMessageBody(),
-            await GetMessagePathToPhoto(), InlineKeyboardMarkup);
-    }
-
-    public virtual async Task SendWelcomeMessage(long chatId, ITelegramBotClient client, string username)
-    {
-        string messageBody = $"Привет, <b>{username}</b>!\n\n" + await GetMessageBody();
-
-
-        await MessageService
-            .SendMessage(chatId, client, messageBody, InlineKeyboardMarkup);
+            .SendMessage(chatId, client, await GetMessageBody(chatId),
+            await GetMessagePathToPhoto(), GetInlineKeyboardMarkup(language));
     }
 
     public virtual async Task EditMessage(long chatId, int messageId, ITelegramBotClient client)
     {
+        var language = await _mediator.Send(new GetUserLanguageQuery(chatId));
         await MessageService
-            .EditMessage(chatId, messageId, client, await GetMessageBody(), InlineKeyboardMarkup);
+            .EditMessage(chatId, messageId, client, await GetMessageBody(chatId), GetInlineKeyboardMarkup(language));
     }
 
     public virtual async Task EditMessage(long chatId, int messageId, ITelegramBotClient client, string message)
     {
-        string messageBody = await GetMessageBody();
+        var language = await _mediator.Send(new GetUserLanguageQuery(chatId));
+        string messageBody = await GetMessageBody(chatId);
 
         await MessageService
-            .EditMessage(chatId, messageId, client, $"{message}\n\n{messageBody}", InlineKeyboardMarkup);
+            .EditMessage(chatId, messageId, client, $"{message}\n\n{messageBody}", GetInlineKeyboardMarkup(language));
     }
 
-    public virtual async Task EditMediaMessage(long chatId, int messageId, ITelegramBotClient client)
+    private async Task<string> GetMessageBody(long chatId)
     {
-        await MessageService
-            .EditMediaMessage(chatId, messageId, client, await GetMessageBody(),
-            await GetMessagePathToPhoto(), InlineKeyboardMarkup);
+        var language = await _mediator.Send(new GetUserLanguageQuery(chatId));
+        return await MessageService.GetMessageText(_mediator, _messageName, language);
     }
 
-    private async Task<string> GetMessageBody()
+    private async Task<string?> GetMessagePathToPhoto()
     {
-        return await MessageService.GetMessageText(_getMessageQuery, _messageName);
-    }
-
-    private async Task<string> GetMessagePathToPhoto()
-    {
-        return await MessageService.GetMessagePathToPhoto(_getMessageQuery, _messageName);
+        return await MessageService.GetMessagePathToPhoto(_mediator, _messageName);
     }
 }

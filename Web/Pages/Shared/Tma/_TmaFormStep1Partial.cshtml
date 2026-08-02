@@ -1,0 +1,25 @@
+@*
+    TMA Application Form — Step 1: Country of origin
+    Renders the country select + conditional "other" text input.
+    Navigation buttons are rendered in the bottom form nav bar (_TmaFormNavBarPartial).
+*@
+<div id="step1" class="step">
+    <h2 data-i18n="form.step1.title">Откуда вы?</h2>
+    <div class="form-group">
+        <select id="country" name="country" onchange="toggleOther('country', 'countryOtherWrap')">
+            <option value="0" data-i18n="form.country.russia">Россия</option>
+            <option value="1" data-i18n="form.country.belarus">Беларусь</option>
+            <option value="2" data-i18n="form.country.ukraine">Украина</option>
+            <option value="3" data-i18n="form.country.other">Другое</option>
+        </select>
+    </div>
+    @await Html.PartialAsync("Tma/_TmaOtherInputPartial", new _TmaOtherInput
+    {
+        WrapId = "countryOtherWrap",
+        InputId = "countryOther",
+        InputName = "countryOther",
+        Placeholder = "Укажите страну",
+        I18nKey = "form.countryOther.placeholder"
+    })
+    <div id="summary1" class="summary"></div>
+</div>

@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 using Bot.Common.Interfaces;
 using Bot.Common;
 using Bot.Configuration;
-using Logger.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Web.Controllers;
@@ -13,13 +13,13 @@ namespace Web.Controllers;
 public class TelegramBotController : ControllerBase
 {
     private readonly IExceptionNotification _exceptionNotification;
-    private readonly ICustomLogger _logger;
+    private readonly ILogger<TelegramBotController> _logger;
     private readonly ICommandAnalyzer _commandAnalyzer;
     private readonly TelegramBot _bot;
     private readonly AdminNotificationConfiguration _adminNotifications;
     private readonly WebhookConfiguration _webhookConfig;
 
-    public TelegramBotController(ICustomLogger logger, ICommandAnalyzer commandAnalyzer,
+    public TelegramBotController(ILogger<TelegramBotController> logger, ICommandAnalyzer commandAnalyzer,
         TelegramBot bot, IExceptionNotification exceptionNotification,
         IOptions<AdminNotificationConfiguration> adminNotifications,
         IOptions<WebhookConfiguration> webhookConfig)
@@ -37,19 +37,19 @@ public class TelegramBotController : ControllerBase
     {
         if (!ValidateWebhookRequest())
         {
-            _logger.LogAction("Unauthorized webhook request rejected");
+            _logger.LogWarning("Unauthorized webhook request rejected");
             return Unauthorized();
         }
 
         try
         {
-            _logger.LogAction($"Получен Update.");
+            _logger.LogInformation("Получен Update.");
             await _commandAnalyzer.AnalyzeCommandsAsync(await _bot.GetBot(),
                 update);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex);
+            _logger.LogError(ex, "Error processing Telegram update");
 
             try
             {
@@ -76,7 +76,7 @@ public class TelegramBotController : ControllerBase
 
         if (string.IsNullOrEmpty(webhookSecret))
         {
-            _logger.LogAction("Warning: Webhook SecretToken not configured, skipping validation");
+            _logger.LogWarning("Webhook SecretToken not configured, skipping validation");
             return true;
         }
 

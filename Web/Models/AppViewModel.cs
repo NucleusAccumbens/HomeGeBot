@@ -3,12 +3,15 @@
 namespace Web.Models;
 
 public class AppViewModel
-{   
-    public string Username { get; set; }
-    public string Country { get; set; }
-    public string Profession { get; set; }
-    public string HasPets { get; set; }
-    public string Term { get; set; }
-    public string ManagerUsername { get; set; }
-
+{
+    public long Id { get; set; }
+    public long ClientChatId { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string Country { get; set; } = string.Empty;
+    public string Profession { get; set; } = string.Empty;
+    public string HasPets { get; set; } = string.Empty;
+    public string  Term { get; set; } = string.Empty;
+    public string ManagerUsername { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public bool IsCompleted { get; set; }
 }

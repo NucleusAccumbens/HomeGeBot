@@ -1,0 +1,28 @@
+@*
+    TMA Navigation Buttons Partial
+    Reusable button group for wizard step navigation.
+    Used by: step1-step4 (back/next), step4 (submit), review (done).
+    Model: _TmaNavButtons (PrevStep, NextStep, IsSubmit, IsDone)
+*@
+@model Web.Pages.Shared._TmaNavButtons
+<div class="button-group">
+    @if (Model.IsDone)
+    {
+        <button class="btn-primary" onclick="doneCloseApp()" data-i18n="nav.done">Готово</button>
+    }
+    else
+    {
+        if (!string.IsNullOrEmpty(Model.PrevStep))
+        {
+            <button class="btn-secondary" onclick="prevStep(@Model.PrevStep)" data-i18n="nav.back">Назад</button>
+        }
+        if (Model.IsSubmit)
+        {
+            <button class="btn-primary btn-submit" onclick="submitForm()" data-i18n="nav.submit">Отправить</button>
+        }
+        else if (!string.IsNullOrEmpty(Model.NextStep))
+        {
+            <button class="btn-primary" onclick="nextStep(@Model.NextStep)" data-i18n="nav.next">Далее</button>
+        }
+    }
+</div>

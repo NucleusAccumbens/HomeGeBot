@@ -1,0 +1,71 @@
+/* ===== Tab bar — Sticky at bottom like a mobile app ===== */
+.tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: #2A2A2A;
+    border-radius: 40px 40px 0 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 32px;
+    z-index: 50;
+    align-items: center;
+}
+
+.tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    background: transparent;
+    border: none;
+    border-radius: 16px;
+    padding: 12px 8px;
+    height: 80px;
+    color: rgba(255, 244, 244, 0.6);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s, background 0.2s, color 0.2s;
+}
+
+.tab-btn.active {
+    opacity: 1;
+    color: #FFD7D7;
+    background: transparent;
+}
+
+.tab-btn:hover:not(.active) {
+    opacity: 0.8;
+}
+
+/* ===== Tab content ===== */
+.tab-content {
+    display: none;
+    padding: 16px 16px 140px;
+    max-width: 80rem;
+    margin: 0 auto;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Keyboard handling ===== */
+body.keyboard-open .tab-bar {
+    display: none;
+}
+
+body.keyboard-open .tab-content {
+    padding-bottom: 16px;
+}

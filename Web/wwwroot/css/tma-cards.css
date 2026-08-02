@@ -1,0 +1,197 @@
+/* ===== TMA Cards =====
+ * Card component styles shared with the dashboard design system.
+ * Single responsibility: card layout, light/dark variants, grid items, badges, contact button.
+ */
+
+/* ===== Card List ===== */
+.card-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+/* ===== Item Cards ===== */
+.item-card {
+    border: none;
+    border-radius: 24px;
+    padding: 1.5rem;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.light-card {
+    background-color: #FFE6E6;
+    color: #1E1E1E;
+}
+
+.dark-card {
+    background-color: #C4F4E6;
+    color: #1E1E1E;
+}
+
+.third-card {
+    background-color: #EEF7BE;
+    color: #1E1E1E;
+}
+
+/* ===== Card Header ===== */
+.item-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-subtitle {
+    font-family: var(--font-display) !important;
+    font-size: 12pt;
+    font-weight: 700;
+    color: rgba(30, 30, 30, 0.6);
+}
+
+.card-subtitle-bold {
+    font-family: var(--font-display) !important;
+    font-size: 12pt;
+    font-weight: 800;
+    color: rgba(30, 30, 30);
+}
+
+.light-card .card-subtitle-bold {
+    color: rgba(30, 30, 30);
+}
+
+.dark-card .card-subtitle-bold,
+.third-card .card-subtitle-bold {
+    color: rgba(30, 30, 30);
+}
+
+.light-card .card-subtitle {
+    color: rgba(30, 30, 30, 0.6);
+}
+
+.dark-card .card-subtitle,
+.third-card .card-subtitle {
+    color: rgba(30, 30, 30, 0.6);
+}
+
+/* ===== User Pill ===== */
+.user-pill {
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 500;
+    background-color: rgba(113, 127, 254, 0.2);
+}
+
+.light-card .user-pill {
+    color: rgba(28, 28, 28, 0.6);
+}
+
+.dark-card .user-pill,
+.third-card .user-pill {
+    color: rgba(28, 28, 28, 0.6);
+    background-color: rgba(113, 127, 254, 0.2);
+}
+
+/* ===== Card Divider ===== */
+.card-divider {
+    height: 1.5px;
+    background-color: rgba(28, 28, 28, 0.05);
+    margin: 0.75rem 0;
+}
+
+.dark-card .card-divider,
+.third-card .card-divider {
+    background-color: rgba(28, 28, 28, 0.05);
+}
+
+/* ===== Card Grid ===== */
+.item-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.grid-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.grid-item .grid-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.grid-item .text {
+    font-size: 0.8rem;
+    line-height: 1.3;
+}
+
+.light-card .grid-item .text {
+    color: rgba(30, 30, 30, 0.8);
+}
+
+.dark-card .grid-item .text,
+.third-card .grid-item .text {
+    color: rgba(30, 30, 30, 0.8);
+}
+
+.light-card .grid-item .grid-icon,
+.dark-card .grid-item .grid-icon,
+.third-card .grid-item .grid-icon {
+    color: rgba(30, 30, 30, 0.8);
+}
+
+/* ===== Contact Button ===== */
+.contact-btn {
+    width: 100%;
+    background-color: #717FFE;
+    color: #FFFFFF;
+    padding: 10pt;
+    border: none;
+    border-radius: 12pt;
+    font-size: 12pt;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    flex: none;
+}
+
+.contact-btn:hover {
+    opacity: 0.9;
+}
+
+.contact-btn:active {
+    transform: scale(0.98);
+}
+
+/* ===== Badges ===== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge.active { background-color: #EEF7BE; color: #1E1E1E; }
+.badge.muted { background-color: rgba(0,0,0,0.05); color: rgba(54,54,54,0.6); }
+
+.dark-card .badge.muted,
+.third-card .badge.muted {
+    background-color: rgba(0,0,0,0.05);
+    color: rgba(54,54,54,0.6);
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted-foreground);
+    font-family: var(--font-body);
+}

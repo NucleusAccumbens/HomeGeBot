@@ -1,0 +1,11 @@
+@*
+    TMA "Other" Text Input Partial
+    Reusable conditional text field shown when a <select> has the "Другое" option selected.
+    Used by: step1 (country), step4 (term).
+    Model: _TmaOtherInput (WrapId, InputId, InputName, Placeholder)
+*@
+@model Web.Pages.Shared._TmaOtherInput
+<div id="@Model.WrapId" class="form-group" style="display:none;">
+    <input type="text" id="@Model.InputId" name="@Model.InputName" data-i18n-placeholder="@Model.I18nKey" placeholder="@Model.Placeholder"
+           maxlength="100" onkeydown="blockNewline(event)" oninput="stripNewlines(this)" />
+</div>

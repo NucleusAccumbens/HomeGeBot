@@ -1,0 +1,24 @@
+@*
+    TMA Application Form — Step 4: Rental term
+    Renders the term select + conditional "other" text input.
+    Navigation buttons are rendered in the bottom form nav bar (_TmaFormNavBarPartial).
+*@
+<div id="step4" class="step">
+    <h2 data-i18n="form.step4.title">На какой срок вы планируете снять жилье?</h2>
+    <div class="form-group">
+        <select id="term" name="term" onchange="toggleOther('term', 'termOtherWrap')">
+            <option value="0" data-i18n="form.term.6months">6 месяцев</option>
+            <option value="1" data-i18n="form.term.1year">1 год</option>
+            <option value="2" data-i18n="form.term.other">Другое</option>
+        </select>
+    </div>
+    @await Html.PartialAsync("Tma/_TmaOtherInputPartial", new _TmaOtherInput
+    {
+        WrapId = "termOtherWrap",
+        InputId = "termOther",
+        InputName = "termOther",
+        Placeholder = "Укажите срок",
+        I18nKey = "form.termOther.placeholder"
+    })
+    <div id="summary4" class="summary"></div>
+</div>

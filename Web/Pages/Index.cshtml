@@ -1,39 +1,74 @@
-﻿@page 
+﻿@page
 @model Web.Pages.IndexModel
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgery
 
+@Html.AntiForgeryToken()
 
-<body>
+<div class="tab-bar" data-active-tab="@Model.Tab">
+    <button class="tab-btn" data-tab="applications" onclick="openTab(event, 'applications')" id="defaultOpen">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01" />
+        </svg>
+        <span>Заявки</span>
+    </button>
+    @if (Model.IsSuperAdmin && !Model.ViewManager.HasValue)
+    {
+        <button class="tab-btn" data-tab="managers" onclick="openTab(event, 'managers')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+            <span>Менеджеры</span>
+        </button>
+        <button class="tab-btn" data-tab="users" onclick="openTab(event, 'users')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <span>Пользователи</span>
+        </button>
+    }
+    else if (!Model.IsSuperAdmin)
+    {
+        <button class="tab-btn" data-tab="profile" onclick="openTab(event, 'profile')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span>Моя страница</span>
+        </button>
+    }
+</div>
 
-    @Html.AntiForgeryToken()
+@{
+    var appViewData = new ViewDataDictionary(ViewData)
+    {
+        { "IsSuperAdmin", Model.IsSuperAdmin },
+        { "Managers", Model.Managers }
+    };
+}
+@await Html.PartialAsync("Dashboard/_AppTablePartial", Model.Applications, appViewData)
 
-    <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'applications')" id="defaultOpen">Заявки</button>
-        <button class="tablinks" onclick="openTab(event, 'apartments')">Квартиры</button>
-        <button class="tablinks" onclick="openTab(event, 'managers')">Менеджеры</button>
+@if (Model.IsSuperAdmin && !Model.ViewManager.HasValue)
+{
+    @await Html.PartialAsync("Dashboard/_ManagersTablePartial", Model.Managers)
+
+    <div id="users" class="tab-content">
+        @await Html.PartialAsync("Dashboard/_UsersTablePartial", Model.BotUsers)
     </div>
+}
+else
+{
+    @await Html.PartialAsync("Dashboard/_ManagerProfilePartial", Model.ManagerProfile, new ViewDataDictionary(ViewData) { { "IsSuperAdmin", Model.IsSuperAdmin } })
+}
 
-    @await Html.PartialAsync("_AppTablePartial", Model.Applications)
-
-    <div id="apartments" class="tabcontent">
-        <h3>Квартиры</h3>
-        <table>
-            <tr>
-                <th>Дата публикации</th>
-                <th>Ссылка</th>
-                <th>Номер владельца</th>
-                <th>Комментарий</th>
-                <th></th>
-            </tr>
-
-            @foreach (var flat in @Model.Flats)
-            {
-                @await Html.PartialAsync("_FlatRowPartial", flat)
-            }
-        </table>
+<div id="modal-overlay" class="modal-overlay">
+    <div class="modal">
+        <p id="modal-text" class="modal-text"></p>
+        <div class="modal-buttons">
+            <button class="modal-cancel" onclick="closeModal()">Отмена</button>
+            <button id="modal-confirm-btn" class="modal-confirm" onclick="confirmModal()">OK</button>
+        </div>
     </div>
+</div>
 
-    @await Html.PartialAsync("_ManagersTablePartial", Model.Managers)
-
-</body>
-
+<div id="loading-overlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+</div>

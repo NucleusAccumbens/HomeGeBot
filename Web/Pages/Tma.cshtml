@@ -1,0 +1,60 @@
+@page
+@model Web.Pages.TmaModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Property In Tbilisi - Заявка</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="~/css/tma-base.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tma-cards.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tma-components.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="top-bar">
+        <div id="step-counter" class="step-counter"></div>
+        <div id="top-bar-title" class="top-bar-title"></div>
+        <div class="top-bar-right">
+            <div class="lang-dropdown" id="lang-dropdown">
+                <button class="lang-dropdown-toggle" id="lang-dropdown-toggle" type="button">
+                    <span class="lang-flag" id="lang-current-flag">🇷🇺</span>
+                    <span class="lang-label" id="lang-current-label">RU</span>
+                    <svg class="lang-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="lang-dropdown-menu" id="lang-dropdown-menu" style="display:none;">
+                    <button class="lang-dropdown-item" data-lang="ru"><span class="lang-flag">🇷🇺</span><span>Русский</span></button>
+                    <button class="lang-dropdown-item" data-lang="en"><span class="lang-flag">🇬🇧</span><span>English</span></button>
+                    <button class="lang-dropdown-item" data-lang="ka"><span class="lang-flag">🇬🇪</span><span>ქართული</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container" id="app">
+        @await Html.PartialAsync("Tma/_TmaApplicationFormPartial")
+        @await Html.PartialAsync("Tma/_TmaApplicationsPartial")
+        @await Html.PartialAsync("Tma/_TmaProfilePartial")
+    </div>
+
+    @await Html.PartialAsync("Tma/_TmaTabBarPartial")
+    @await Html.PartialAsync("Tma/_TmaFormNavBarPartial")
+    @await Html.PartialAsync("Tma/_TmaModalPartial")
+
+    <script src="~/js/tma-i18n.js" asp-append-version="true"></script>
+    <script src="~/js/tma-utils.js" asp-append-version="true"></script>
+    <script src="~/js/tma-modal.js" asp-append-version="true"></script>
+    <script src="~/js/tma-form.js" asp-append-version="true"></script>
+    <script src="~/js/tma-apps.js" asp-append-version="true"></script>
+    <script src="~/js/tma-profile.js" asp-append-version="true"></script>
+    <script src="~/js/tma.js" asp-append-version="true"></script>
+    <script>
+        initTma();
+    </script>
+</body>
+</html>

@@ -3,4 +3,6 @@ global using Telegram.Bot.Types.ReplyMarkups;
 global using Telegram.Bot.Types;
 global using Telegram.Bot.Types.Enums;
 global using Bot.Common.Interfaces;
+global using ChatId = Domain.Common.ChatId;
+
 

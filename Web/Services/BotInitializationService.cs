@@ -14,7 +14,15 @@ public class BotInitializationService : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await _bot.GetBot();
+        try
+        {
+            await _bot.GetBot();
+        }
+        catch (Exception)
+        {
+            // Bot initialization failed (e.g. Telegram API unreachable).
+            // The web app should still start so the UI is accessible.
+        }
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;

@@ -1,9 +1,8 @@
-﻿using Bot.Common.Services;
+﻿using Application.Common.Interfaces;
 using Bot.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Bot.Commands.GeneralCommands.TextCommands;
 using Bot.Common.Abstractions;
-using Bot.Commands.ClientCommands.CallbackCommands;
 using Bot.Messages.ClientMessages;
 using Bot.Commands.ClientCommands.TextCommands;
 using Bot.Messages.GeneralMessages;
@@ -18,9 +17,10 @@ public static class ConfigureService
     {
         services.AddMemoryCache();
         services.AddSingleton<TelegramBot>();
-        services.AddScoped<IBotSessionStore, MemoryBotSessionStore>();
+        services.AddScoped<IBotSessionStore, DistributedBotSessionStore>();
         services.AddScoped<ICommandAnalyzer, CommandAnalyzer>();
         services.AddSingleton<IExceptionNotification, ExceptionNotification>();
+        services.AddSingleton<IUserNotifier, UserNotifier>();
 
         AddMessages(services);
         AddTextCommands(services);
@@ -32,27 +32,20 @@ public static class ConfigureService
 
     private static void AddMessages(IServiceCollection services)
     {
-        services.AddScoped<CountryMessage>();
-        services.AddScoped<ProfessionMessage>();
-        services.AddScoped<HasPetsMessage>();
-        services.AddScoped<TermMessage>();
+        services.AddScoped<ClientStartMessage>();
         services.AddScoped<FlatMessage>();
         services.AddScoped<AdminStartMessage>();
+        services.AddScoped<ManagerStartMessage>();
     }
 
     private static void AddTextCommands(IServiceCollection services)
     {
         services.AddScoped<BaseTextCommand, StartTextCommand>();
-        services.AddScoped<BaseTextCommand, ProfessionTextCommand>();
         services.AddScoped<BaseTextCommand, AppTextCommand>();
         // AddAdminTextCommand и RemoveAdminTextCommand удалены — управление администраторами через веб-панель
     }
 
     private static void AddCallbackCommands(IServiceCollection services)
     {
-        services.AddScoped<BaseCallbackCommand, CountryCallbackCommand>();
-        services.AddScoped<BaseCallbackCommand, HasPetsCallbackCommand>();
-        services.AddScoped<BaseCallbackCommand, TermCallbackCommand>();
-        services.AddScoped<BaseCallbackCommand, FlatCallbackCommand>();
     }
 }

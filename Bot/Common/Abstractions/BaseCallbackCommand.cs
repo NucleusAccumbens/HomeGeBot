@@ -11,7 +11,7 @@ public abstract class BaseCallbackCommand
         if (callbackQuery == null || callbackQuery.Data == null)
             return false;
 
-        char code = callbackQuery.Data.ToString().FirstOrDefault();
+        char code = callbackQuery.Data.FirstOrDefault();
 
         if (code != CallbackDataCode)
             return false;

@@ -1,47 +1,51 @@
-﻿using Application.Messages.Interfaces;
+﻿using Application.Messages.Queries.GetMessageBody;
+using Application.Messages.Queries.GetMessagePathToPhoto;
+using MediatR;
 
-namespace Bot.Common.Services;
+namespace Bot.Services;
 
-public class MessageService
+public static class MessageService
 {
-    public static async Task SendMessage(long chatId, ITelegramBotClient client, string text,
+    public static Task SendMessage(long chatId, ITelegramBotClient client, string text,
         InlineKeyboardMarkup? inlineKeyboardMarkup)
     {
-        await client.SendTextMessageAsync(
+        return client.SendTextMessageAsync(
             chatId: chatId,
             text: text,
             parseMode: ParseMode.Html,
-            replyMarkup: inlineKeyboardMarkup,
-            disableWebPagePreview: true);
+            disableWebPagePreview: true,
+            replyMarkup: inlineKeyboardMarkup);
     }
 
-    public static async Task SendMessage(long chatId, ITelegramBotClient client, string caption, string? path,
+    public static Task SendMessage(long chatId, ITelegramBotClient client, string caption, string? path,
         InlineKeyboardMarkup? inlineKeyboardMarkup)
     {
         if (path != null)
         {
-            await client.SendPhotoAsync(
+            return client.SendPhotoAsync(
                 chatId: chatId,
                 photo: path,
                 caption: caption,
                 parseMode: ParseMode.Html,
                 replyMarkup: inlineKeyboardMarkup);
         }
+
+        return Task.CompletedTask;
     }
 
-    public static async Task EditMessage(long chatId, int messageId, ITelegramBotClient client,
+    public static Task EditMessage(long chatId, int messageId, ITelegramBotClient client,
         string text, InlineKeyboardMarkup? inlineKeyboardMarkup)
     {
-        await client.EditMessageTextAsync(
+        return client.EditMessageTextAsync(
             chatId: chatId,
             messageId: messageId,
             text: text,
             parseMode: ParseMode.Html,
-            replyMarkup: inlineKeyboardMarkup,
-            disableWebPagePreview: true);
+            disableWebPagePreview: true,
+            replyMarkup: inlineKeyboardMarkup);
     }
 
-    public static async Task EditMediaMessage(long chatId, int messageId, ITelegramBotClient client,
+    public static Task EditMediaMessage(long chatId, int messageId, ITelegramBotClient client,
         string? captcha, string path, InlineKeyboardMarkup? inlineKeyboardMarkup)
     {
         var media = new InputMediaPhoto(new InputMedia(path));
@@ -50,39 +54,45 @@ public class MessageService
 
         media.ParseMode = ParseMode.Html;
 
-        await client.EditMessageMediaAsync(
+        return client.EditMessageMediaAsync(
             chatId: chatId,
             messageId: messageId,
             media: media,
             replyMarkup: inlineKeyboardMarkup);
     }
 
-    public static async Task DeleteMessage(long chatId, int messageId, ITelegramBotClient client)
+    public static Task DeleteMessage(long chatId, int messageId, ITelegramBotClient client)
     {
-        await client.DeleteMessageAsync(
+        return client.DeleteMessageAsync(
             chatId: chatId,
             messageId: messageId);
     }
 
-    public static async Task ShowAllert(string callbackQueryId, ITelegramBotClient client, string message)
+    public static Task ShowAllert(string callbackQueryId, ITelegramBotClient client, string message)
     {
-        await client.AnswerCallbackQueryAsync(
+        return client.AnswerCallbackQueryAsync(
                 callbackQueryId: callbackQueryId,
                 text: message,
                 showAlert: true);
     }
 
-    public static async Task<string> GetMessageText(IGetMessageQuery getMessageQuery, string name)
+    public static async Task<string> GetMessageText(IMediator mediator, string name, string language = "ru")
     {
-        var messageText = await getMessageQuery.GetMessageBodyAsync(name);
+        var messageText = await mediator.Send(new GetMessageBodyQuery(name, language));
 
-        if (messageText != null && messageText != String.Empty) return messageText;
+        if (!string.IsNullOrEmpty(messageText)) return messageText;
 
         else return "Сообщение с таким именем не найдено";
     }
 
-    public static async Task<string> GetMessagePathToPhoto(IGetMessageQuery getMessageQuery, string name)
+    public static Task<string?> GetMessagePathToPhoto(IMediator mediator, string name)
     {
-        return await getMessageQuery.GetMessagePathToPhotoAsync(name) ?? string.Empty;
+        return mediator.Send(new GetMessagePathToPhotoQuery(name));
+    }
+
+    public static string Escape(string? text)
+    {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
+        return System.Net.WebUtility.HtmlEncode(text);
     }
 }

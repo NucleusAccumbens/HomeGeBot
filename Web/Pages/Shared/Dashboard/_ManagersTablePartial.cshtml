@@ -1,0 +1,45 @@
+﻿@model List<Web.Models.ManagerViewModel>
+
+<div id="managers" class="tab-content">
+    <h3 class="section-title">Менеджеры</h3>
+    <div class="card-list">
+        @for (int i = 0, displayIndex = 0; i < Model.Count; i++)
+        {
+            var manager = Model[i];
+            if (manager.IsSuperAdmin) continue;
+            var cardColor = displayIndex % 3 == 0 ? "light-card" : displayIndex % 3 == 1 ? "dark-card" : "third-card";
+            displayIndex++;
+            <div class="item-card @cardColor">
+                <div class="item-card-header" style="margin-bottom: 1rem; align-items: flex-start;">
+                    <div class="card-title-group">
+                        <span class="card-subtitle">Менеджер:</span>
+                        <div class="card-subtitle-bold">@(string.IsNullOrWhiteSpace(manager.Name) ? manager.Username : manager.Name)</div>
+                    </div>
+                    @if (manager.ApplicationCount != 0)
+                    {
+                        <span class="badge counter" style="text-transform: none; letter-spacing: normal;">@manager.ApplicationCount заявок</span>
+                    }
+                    else
+                    {
+                        <span class="badge muted" style="text-transform: none; letter-spacing: normal;">Свободен</span>
+                    }
+                </div>
+
+                <div class="item-card-grid" style="grid-template-columns: 1fr 2fr; margin-bottom: 0;">
+                    <button class="contact-btn" style="padding: 8pt; font-size: 10pt;" onclick="confirmAndOpenTelegramProfile('@manager.Username')">
+                        Связаться
+                    </button>
+                    <form method="post" asp-page-handler="RevokeAdmin" asp-route-chatId="@manager.ChatId" asp-route-tab="managers" data-confirm="Отозвать права администратора у этого пользователя?">
+                        <button type="submit" class="act-btn danger" style="padding: 8pt; font-size: 10pt; border-radius: 12pt;">
+                            Отозвать права
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="empty-state">Менеджеры не назначены</div>
+        }
+    </div>
+</div>

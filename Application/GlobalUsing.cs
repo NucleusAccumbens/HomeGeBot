@@ -1,7 +1,4 @@
-﻿global using Application.Common.Interfaces;
-global using Microsoft.EntityFrameworkCore;
-global using Application.TlgUsers.Interfaces;
-global using Application.TlgUsers.Commands;
-global using Application.Messages.Interfaces;
+﻿global using Application.Common.Authorization;
+global using Application.Common.Interfaces;
 global using Domain.Entities;
-
+global using Microsoft.EntityFrameworkCore;

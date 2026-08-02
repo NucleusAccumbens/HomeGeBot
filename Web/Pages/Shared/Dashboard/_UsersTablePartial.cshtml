@@ -1,0 +1,57 @@
+@model List<Application.AdminManagement.Dtos.BotUserDto>
+
+<h3 class="section-title">Пользователи</h3>
+
+<div class="mb-6">
+    <input type="text" id="user-search-input" class="search-input !mb-0" placeholder="Поиск по имени или username" autocomplete="off" />
+</div>
+
+<div id="user-search-empty" class="empty-state" style="display:none;">Пользователи не найдены</div>
+
+<div class="card-list" id="user-card-list">
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        var user = Model[i];
+        var cardColor = i % 3 == 0 ? "light-card" : i % 3 == 1 ? "dark-card" : "third-card";
+        <div class="item-card @cardColor user-row" data-search="@(user.Username?.ToLower()) @(user.Name?.ToLower())">
+            <div class="item-card-header" style="margin-bottom: 0.5rem;">
+                <div class="card-title-group">
+                    <div class="card-subtitle-bold">@(user.Username ?? "Без username")</div>
+                </div>
+                <span class="badge @(user.IsKicked ? "kicked" : "active")" style="text-transform: none; letter-spacing: normal;">@(user.IsKicked ? "Блок" : "Активен")</span>
+            </div>
+            
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex flex-col gap-0.5" style="font-family: var(--font-body);">
+                    @if (!string.IsNullOrWhiteSpace(user.Name))
+                    {
+                        <span class="text-sm opacity-60">@user.Name</span>
+                    }
+                    <span class="text-sm opacity-60">ID: @user.ChatId</span>
+                </div>
+                <span class="badge @(user.IsAdmin ? "admin" : "muted")" style="text-transform: none; letter-spacing: normal;">@(user.IsAdmin ? "Админ" : "Пользователь")</span>
+            </div>
+
+            <div class="mt-auto">
+                @if (user.IsAdmin)
+                {
+                    <form method="post" asp-page-handler="RevokeAdmin" asp-route-chatId="@user.ChatId" asp-route-tab="users" data-confirm="Отозвать права администратора у этого пользователя?">
+                        <button type="submit" class="act-btn danger" style="padding: 10pt; font-size: 12pt; border-radius: 12pt;">
+                            Отозвать права
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <form method="post" asp-page-handler="GrantAdmin" asp-route-chatId="@user.ChatId" asp-route-tab="users" data-confirm="Назначить этого пользователя администратором?">
+                        <button type="submit" class="act-btn @(user.IsKicked ? "" : "success")" 
+                                style="padding: 10pt; font-size: 12pt; border-radius: 12pt; @(user.IsKicked ? "opacity: 0.5; cursor: not-allowed; background-color: #A0A0A0; color: white;" : "")"
+                                @(user.IsKicked ? "disabled" : "")>
+                            Назначить админом
+                        </button>
+                    </form>
+                }
+            </div>
+        </div>
+    }
+</div>

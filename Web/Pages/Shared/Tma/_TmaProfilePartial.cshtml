@@ -1,0 +1,18 @@
+@*
+    TMA Profile Partial
+    "My Page" view — user profile card, application count stat, and help card.
+    Rendered inside #app container in Tma.cshtml.
+*@
+<div id="view-profile" class="view">
+    <div id="profile-info" class="profile-card item-card light-card">
+        <div class="profile-avatar" id="profile-avatar"></div>
+        <div class="profile-name" id="profile-name"></div>
+        <div class="profile-username" id="profile-username"></div>
+    </div>
+    <div class="profile-stats">
+        <div class="profile-stat-card item-card light-card">
+            <span class="profile-stat-value" id="stat-applications">0</span>
+            <span class="profile-stat-label" data-i18n="profile.stat.applications">Заявок</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+@model Web.Models.ManagerProfileViewModel
+
+<div id="profile" class="tab-content active">
+    @if (ViewData["IsSuperAdmin"] as bool? == true)
+    {
+        <div style="margin-bottom: 1rem;">
+            <button class="act-btn" style="width: auto; padding: 8px 20px; font-size: 14px; background: rgba(0,0,0,0.06); color: #1E1E1E;" onclick="window.location.href='?tab=managers'">← Назад к менеджерам</button>
+        </div>
+    }
+    <h3 class="section-title">Моя страница</h3>
+    <div class="profile-card item-card light-card">
+        <div class="profile-avatar" id="manager-profile-avatar" data-chat-id="@Model.ChatId">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+        </div>
+        <div class="profile-name">@(string.IsNullOrWhiteSpace(Model.Name) ? "Менеджер" : Model.Name)</div>
+        <div class="profile-username">@@@Model.Username</div>
+    </div>
+    <div class="profile-stats">
+        <div class="profile-stat-card item-card light-card">
+            <span class="profile-stat-value">@Model.ApplicationCount</span>
+            <span class="profile-stat-label">Заявок обработано</span>
+        </div>
+    </div>
+</div>

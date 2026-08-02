@@ -1,0 +1,15 @@
+@*
+    TMA Application Form — Step 3: Pets
+    Renders the pets yes/no select.
+    Navigation buttons are rendered in the bottom form nav bar (_TmaFormNavBarPartial).
+*@
+<div id="step3" class="step">
+    <h2 data-i18n="form.step3.title">Есть ли у вас домашние животные?</h2>
+    <div class="form-group">
+        <select id="hasPets" name="hasPets">
+            <option value="true" data-i18n="form.pets.yes">Да</option>
+            <option value="false" data-i18n="form.pets.no">Нет</option>
+        </select>
+    </div>
+    <div id="summary3" class="summary"></div>
+</div>

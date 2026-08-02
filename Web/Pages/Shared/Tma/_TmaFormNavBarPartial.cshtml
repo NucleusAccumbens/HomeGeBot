@@ -1,0 +1,61 @@
+@*
+    TMA Form Nav Bar Partial
+    Bottom bar shown when the user is on the Application (submit request) tab.
+    Replaces the standard tab bar (_TmaTabBarPartial) while the form is active.
+
+    Layout:
+      [📋 icon]  [step nav buttons]
+       ^small      ^toggled by JS based on current step
+        icon       (one of 5 sets, only the active step's set is visible)
+        (outside
+         nav buttons)
+
+    The small icon navigates to the "My Applications" tab.
+    When the user leaves the Application tab, the standard tab bar is restored
+    by NavigationController in tma.js.
+
+    Each nav button set is rendered server-side via _TmaNavButtonsPartial.
+    JS toggles visibility via the data-nav-step attribute.
+*@
+<div id="form-nav-bar" class="form-nav-bar" style="display:none;">
+    <button class="form-nav-icon" onclick="switchToApplicationsView()" title="Мои заявки" aria-label="Мои заявки">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+    </button>
+    <div class="form-nav-buttons">
+        <div class="nav-buttons-set" data-nav-step="1">
+            @await Html.PartialAsync("Tma/_TmaNavButtonsPartial", new _TmaNavButtons
+            {
+                NextStep = "2"
+            })
+        </div>
+        <div class="nav-buttons-set" data-nav-step="2" style="display:none;">
+            @await Html.PartialAsync("Tma/_TmaNavButtonsPartial", new _TmaNavButtons
+            {
+                PrevStep = "1",
+                NextStep = "3"
+            })
+        </div>
+        <div class="nav-buttons-set" data-nav-step="3" style="display:none;">
+            @await Html.PartialAsync("Tma/_TmaNavButtonsPartial", new _TmaNavButtons
+            {
+                PrevStep = "2",
+                NextStep = "4"
+            })
+        </div>
+        <div class="nav-buttons-set" data-nav-step="4" style="display:none;">
+            @await Html.PartialAsync("Tma/_TmaNavButtonsPartial", new _TmaNavButtons
+            {
+                PrevStep = "3",
+                IsSubmit = true
+            })
+        </div>
+        <div class="nav-buttons-set" data-nav-step="review" style="display:none;">
+            @await Html.PartialAsync("Tma/_TmaNavButtonsPartial", new _TmaNavButtons
+            {
+                IsDone = true
+            })
+        </div>
+    </div>
+</div>

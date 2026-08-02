@@ -1,0 +1,59 @@
+@page
+@model Web.Pages.LoginModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Вход в панель управления</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                    },
+                    fontFamily: {
+                        rubik: ['Rubik', 'sans-serif'],
+                        nunito: ['Nunito', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+</head>
+<body class="bg-[#D9D9D9] text-neutral-900 flex items-center justify-center min-h-screen">
+    <div class="max-w-md w-full p-8 text-center bg-white rounded-2xl border border-neutral-200 shadow-2xl">
+        <div class="mb-6 flex justify-center">
+            <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+        </div>
+        <h2 class="text-2xl font-bold mb-2 tracking-tight">Панель управления</h2>
+        <p class="text-neutral-500 text-sm mb-8 font-light">Вход через Telegram</p>
+        
+        <div class="flex justify-center mb-6">
+            <div id="spinner" class="spinner"></div>
+        </div>
+        
+        <p id="status" class="text-neutral-400 text-sm">Проверка авторизации...</p>
+    </div>
+
+    <script src="~/js/login.js" asp-append-version="true"></script>
+    <script>
+        const returnUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ReturnUrl ?? "/"));
+        initLogin(returnUrl);
+    </script>
+</body>
+</html>

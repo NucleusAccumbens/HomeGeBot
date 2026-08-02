@@ -1,0 +1,14 @@
+@*
+    TMA Modal Partial
+    Confirmation modal overlay used for Telegram link confirmations.
+    Controlled by ModalController in tma-modal.js.
+*@
+<div id="modal-overlay" class="modal-overlay">
+    <div class="modal">
+        <p id="modal-text" class="modal-text"></p>
+        <div class="modal-buttons">
+            <button class="modal-cancel" onclick="closeModal()" data-i18n="modal.cancel">Отмена</button>
+            <button id="modal-confirm-btn" class="modal-confirm" onclick="confirmModal()" data-i18n="modal.confirm">Открыть</button>
+        </div>
+    </div>
+</div>

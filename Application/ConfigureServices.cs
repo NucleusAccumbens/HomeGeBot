@@ -1,10 +1,7 @@
-﻿using Application.AdminManagement;
-using Application.BotStart;
-using Application.Dashboard;
-using Application.Messages.Queries;
-using Application.RentalApplications;
-using Application.TlgUsers.Commands;
-using Application.TlgUsers.Interfaces;
+﻿using Application.Common.Behaviors;
+using FluentValidation;
+using MediatR;
+using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -12,20 +9,23 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Команды, используемые напрямую из Bot-слоя
-        services.AddScoped<IKickTlgUserCommand, KickTlgUserCommand>();
-        services.AddScoped<IUpdateTlgUserCommand, UpdateTlgUserCommand>();
-        services.AddScoped<IGetMessageQuery, GetMessageQuery>();
+        // MediatR - все use cases (автоматически регистрирует все Handlers)
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
 
-        // Use Cases
-        services.AddScoped<IStartBotUseCase, StartBotUseCase>();
-        services.AddScoped<ISubmitRentalApplicationUseCase, SubmitRentalApplicationUseCase>();
-        services.AddScoped<IGetBotUsersUseCase, GetBotUsersUseCase>();
-        services.AddScoped<IGrantAdminRightsUseCase, GrantAdminRightsUseCase>();
-        services.AddScoped<IRevokeAdminRightsUseCase, RevokeAdminRightsUseCase>();
-        services.AddScoped<IGetAdminDashboardUseCase, GetAdminDashboardUseCase>();
-        services.AddScoped<IUpdateFlatCommentUseCase, UpdateFlatCommentUseCase>();
-        services.AddScoped<IDeleteFlatUseCase, DeleteFlatUseCase>();
+            // Validation behaviors (выполняются первыми)
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ResultValidationBehavior<,>));
+
+            // Authorization behaviors
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ResultAuthorizationBehavior<,>));
+
+            // SuperAdmin authorization behaviors
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ResultSuperAdminAuthorizationBehavior<,>));
+        });
+
+        // FluentValidation
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         return services;
     }

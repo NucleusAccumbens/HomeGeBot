@@ -1,10 +1,12 @@
+using Domain.Common;
+
 namespace Bot.Session;
 
 public interface IBotSessionStore
 {
-    Task<BotSession?> GetAsync(long chatId);
+    Task<BotSession?> GetAsync(ChatId chatId);
 
     Task SaveAsync(BotSession session);
 
-    Task ClearAsync(long chatId);
+    Task ClearAsync(ChatId chatId);
 }

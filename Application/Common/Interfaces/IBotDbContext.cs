@@ -7,8 +7,8 @@ public interface IBotDbContext
 {
     DbSet<TlgUser> TlgUsers { get; }
     DbSet<Client> Clients { get; }
-    DbSet<Admin> Admins { get; }      
+    DbSet<Admin> Admins { get; }
     DbSet<Flat> Flats { get; }
     DbSet<Message> Messages { get; }
-    Task SaveChangesAsync();
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

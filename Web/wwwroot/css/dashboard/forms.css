@@ -1,0 +1,88 @@
+/* ===== Inputs ===== */
+.search-input {
+    width: 100%;
+    background-color: #FFE4E4;
+    border: none;
+    border-radius: 2rem;
+    padding: 1rem 1.5rem;
+    color: #363636;
+    caret-color: #1E1E1E;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    transition: box-shadow 0.2s;
+}
+
+.search-input::placeholder {
+    color: rgba(54, 54, 54, 0.4);
+}
+
+.search-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(238, 247, 190, 0.5);
+}
+
+/* ===== Buttons ===== */
+.act-btn {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 1.5rem;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-size: 1rem;
+}
+
+.act-btn:active { transform: scale(0.98); }
+
+.act-btn.success { background-color: #768BFF; color: var(--white); }
+.act-btn.success:hover { background-color: #6177e6; }
+
+.act-btn.danger { background-color: #BBAFC9; color: var(--white); }
+.act-btn.danger:hover { background-color: #a89dbc; }
+
+/* ===== Manager Select (Reassignment) ===== */
+.manager-select {
+    padding: 0 38px 0 12px;
+    height: 36px;
+    line-height: 36px;
+    border: none;
+    border-radius: 20px;
+    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
+    background-color: rgba(0, 0, 0, 0.05);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M11.5 5L7 9.5L2.5 5' stroke='%231E1E1E' stroke-opacity='0.8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    color: #1E1E1E;
+    outline: none;
+    cursor: pointer;
+    width: fit-content;
+    max-width: 160px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    transition: opacity .2s;
+}
+
+.manager-select:focus {
+    opacity: 0.85;
+}
+
+.manager-select:hover {
+    opacity: 0.9;
+}
+
+.manager-label {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
+    background-color: rgba(0,0,0,0.05);
+    color: rgba(30, 30, 30, 0.7);
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

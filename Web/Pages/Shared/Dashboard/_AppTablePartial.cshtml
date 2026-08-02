@@ -1,0 +1,105 @@
+﻿@using System.Globalization
+@model List<Web.Models.AppViewModel>
+
+@{
+    var isSuperAdmin = ViewData["IsSuperAdmin"] as bool? ?? false;
+    var managers = ViewData["Managers"] as List<Web.Models.ManagerViewModel> ?? new List<Web.Models.ManagerViewModel>();
+}
+
+<div id="applications" class="tab-content">
+    <h3 class="section-title">Заявки</h3>
+    <div class="card-list">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var app = Model[i];
+            var cardColor = i % 3 == 0 ? "light-card" : i % 3 == 1 ? "dark-card" : "third-card";
+            <div class="item-card @cardColor">
+                <div class="item-card-header">
+                @if (isSuperAdmin)
+                {
+                    <div class="card-title-group">
+                        <span class="card-subtitle">Менеджер:</span>
+                        <div class="card-subtitle-bold">@app.Name</div>
+                    </div>
+                    @if (app.IsCompleted)
+                    {
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="manager-label">@app.ManagerUsername</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="Reassign" asp-route-tab="applications" class="reassign-form" data-confirm="Передать заявку другому менеджеру?">
+                            <input type="hidden" name="clientChatId" value="@app.ClientChatId" />
+                            <select name="newManagerChatId" class="manager-select" onchange="if(this.value) { this.form.requestSubmit(); }">
+                                <option value="">@app.ManagerUsername</option>
+                                @foreach (var m in managers)
+                                {
+                                    <option value="@m.ChatId">@(m.Username ?? "—") (@m.ApplicationCount)</option>
+                                }
+                            </select>
+                        </form>
+                    }
+                }
+                else
+                {
+                    <div class="card-title-group">
+                        <div class="card-subtitle-bold">@app.Username</div>
+                    </div>
+                    @if (app.IsCompleted)
+                    {
+                        <span class="badge muted" style="text-transform: none; letter-spacing: normal;">Закрыта</span>
+                    }
+                }
+            </div>
+                
+                <div class="card-divider"></div>
+
+                <div class="item-card-grid">
+                    <div class="grid-item">
+                        <svg class="grid-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        <span class="text">@app.Country</span>
+                    </div>
+                    <div class="grid-item">
+                        <svg class="grid-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+                        <span class="text">@app.Profession</span>
+                    </div>
+                    <div class="grid-item">
+                        <svg class="grid-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="4" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M7 20a4 4 0 0 0 8 0M12 12a4 4 0 0 0 4 4M8 16a4 4 0 0 0 4-4M12 6v6"/></svg>
+                        <span class="text">@(app.HasPets.ToLower().Contains("да") || app.HasPets.ToLower().Contains("true") ? "Есть животные" : "Нет животных")</span>
+                    </div>
+                    <div class="grid-item">
+                        <svg class="grid-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                        <span class="text">@app.Term</span>
+                    </div>
+                </div>
+
+                @if (!app.IsCompleted)
+                {
+                    <div class="item-card-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0; margin-top: 1rem;">
+                        <button class="contact-btn compact" onclick="confirmAndOpenTelegramProfile('@app.Username')">
+                            Связаться
+                        </button>
+                        <form method="post" asp-page-handler="CloseRequest" asp-route-tab="applications" data-confirm="Закрыть эту заявку?">
+                            <input type="hidden" name="clientId" value="@app.Id" />
+                            <input type="hidden" name="clientChatId" value="@app.ClientChatId" />
+                            <button type="submit" class="act-btn danger" style="padding: 8pt; font-size: 10pt; border-radius: 12pt;">
+                                Закрыть заявку
+                            </button>
+                        </form>
+                    </div>
+                }
+                else
+                {
+                    <button class="contact-btn" style="margin-top: 1rem;" onclick="confirmAndOpenTelegramProfile('@app.Username')">
+                        Связаться
+                    </button>
+                }
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <div class="empty-state">Нет активных заявок</div>
+        }
+    </div>
+</div>

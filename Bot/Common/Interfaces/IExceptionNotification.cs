@@ -1,6 +1,8 @@
-﻿namespace Bot.Common.Interfaces;
+﻿using Domain.Common;
+
+namespace Bot.Common.Interfaces;
 
 public interface IExceptionNotification
 {
-    Task SendExceptionNotification(ITelegramBotClient client, string message, params long[] chatIds);
+    Task SendExceptionNotification(ITelegramBotClient client, string message, params ChatId[] chatIds);
 }

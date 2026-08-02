@@ -1,122 +1,180 @@
-using Application.Common.Interfaces;
-using Application.Dashboard;
+using Application.Common.Results;
+using Application.Dashboard.Commands.GetAdminDashboard;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Web.Models;
 
+using Microsoft.AspNetCore.Authorization;
+
+using Application.AdminManagement.Commands.CloseRequest;
+using Application.AdminManagement.Commands.GetBotUsers;
+using Application.AdminManagement.Commands.GrantAdminRights;
+using Application.AdminManagement.Commands.ReassignClient;
+using Application.AdminManagement.Commands.RevokeAdminRights;
+using Application.AdminManagement.Dtos;
+
+using Domain.Common;
+using Domain.Enums;
+
 namespace Web.Pages;
 
+[Authorize(AuthenticationSchemes = "AdminAuth")]
 public class IndexModel : PageModel
 {
-    private readonly IGetAdminDashboardUseCase _getDashboardUseCase;
-    private readonly IUpdateFlatCommentUseCase _updateFlatCommentUseCase;
-    private readonly IDeleteFlatUseCase _deleteFlatUseCase;
+    private readonly IMediator _mediator;
 
-    public IndexModel(
-        IGetAdminDashboardUseCase getDashboardUseCase,
-        IUpdateFlatCommentUseCase updateFlatCommentUseCase,
-        IDeleteFlatUseCase deleteFlatUseCase)
+    public IndexModel(IMediator mediator)
     {
-        _getDashboardUseCase = getDashboardUseCase;
-        _updateFlatCommentUseCase = updateFlatCommentUseCase;
-        _deleteFlatUseCase = deleteFlatUseCase;
+        _mediator = mediator;
     }
 
     public List<AppViewModel> Applications { get; set; } = new();
 
-    public List<FlatViewModel> Flats { get; set; } = new();
-
     public List<ManagerViewModel> Managers { get; set; } = new();
+
+    public List<BotUserDto> BotUsers { get; set; } = new();
+
+    public bool IsSuperAdmin { get; set; }
+
+    public ManagerProfileViewModel ManagerProfile { get; set; } = new();
+
+    [BindProperty(SupportsGet = true)]
+    public string? Tab { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public long? ViewManager { get; set; }
 
 
     public async Task OnGetAsync()
     {
         var adminChatId = GetCurrentAdminChatId();
 
-        var result = await _getDashboardUseCase.ExecuteAsync(new GetAdminDashboardRequest
+        var result = await _mediator.Send(new GetAdminDashboardRequest
         {
             AdminChatId = adminChatId
         });
 
-        if (result.Success)
+        if (result.IsSuccess)
         {
-            Applications = result.Applications.Select(a => new AppViewModel
+            IsSuperAdmin = result.Value!.IsSuperAdmin;
+
+            Applications = result.Value.Applications.Select(a => new AppViewModel
             {
+                Id = a.Id,
+                ClientChatId = a.ChatId,
                 Username = a.Username ?? "",
-                Country = a.Country?.ToString() ?? "",
+                Country = a.Country == Domain.Enums.Country.Other && !string.IsNullOrWhiteSpace(a.CountryOther)
+                    ? a.CountryOther : a.Country?.GetDisplayName() ?? "",
                 Profession = a.Profession ?? "",
                 HasPets = a.HasPets ?? "",
-                Term = a.Term?.ToString() ?? "",
-                ManagerUsername = a.ManagerUsername ?? ""
+                Term = a.Term == Domain.Enums.Term.Other && !string.IsNullOrWhiteSpace(a.TermOther)
+                    ? a.TermOther : a.Term?.GetDisplayName() ?? "",
+                ManagerUsername = a.ManagerUsername ?? "",
+                Name = a.ManagerName ?? "",
+                IsCompleted = a.IsCompleted
             }).ToList();
 
-            Flats = result.Flats.Select(f => new FlatViewModel
+            Managers = result.Value.Managers.Select(m => new ManagerViewModel
             {
-                ItemId = f.ItemId,
-                PublicationDate = f.PublicationDate,
-                Link = f.Link,
-                OwnerNumber = f.OwnerNumber,
-                Comment = f.Comment
-            }).ToList();
-
-            Managers = result.Managers.Select(m => new ManagerViewModel
-            {
+                ChatId = m.ChatId,
                 Username = m.Username,
-                ClientUsernames = new List<string>()
+                Name = m.Name,
+                ApplicationCount = m.ApplicationCount,
+                IsSuperAdmin = m.IsSuperAdmin
             }).ToList();
+
+            ManagerProfile = new ManagerProfileViewModel
+            {
+                ChatId = adminChatId,
+                Name = result.Value.CurrentAdminName ?? "",
+                Username = result.Value.CurrentAdminUsername ?? "",
+                ApplicationCount = result.Value.Applications.Count(a => !a.IsCompleted)
+            };
+
+            if (ViewManager.HasValue && ViewManager.Value > 0)
+            {
+                var mgr = Managers.FirstOrDefault(m => m.ChatId == ViewManager.Value);
+                if (mgr != null)
+                {
+                    ManagerProfile = new ManagerProfileViewModel
+                    {
+                        ChatId = mgr.ChatId,
+                        Name = mgr.Name ?? "",
+                        Username = mgr.Username ?? "",
+                        ApplicationCount = mgr.ApplicationCount
+                    };
+                }
+            }
+        }
+
+        if (IsSuperAdmin)
+        {
+            var usersResult = await _mediator.Send(new GetBotUsersRequest
+            {
+                SuperAdminChatId = adminChatId
+            });
+
+            if (usersResult.IsSuccess)
+            {
+                BotUsers = usersResult.Value!.Users;
+            }
         }
     }
 
-    public async Task<IActionResult> OnPostUpdateCommentAsync(string itemId, string comment)
+    public async Task<IActionResult> OnPostGrantAdminAsync(long chatId, string? tab)
     {
         var adminChatId = GetCurrentAdminChatId();
-
-        var result = await _updateFlatCommentUseCase.ExecuteAsync(new UpdateFlatCommentRequest
+        var result = await _mediator.Send(new GrantAdminRightsRequest
         {
-            AdminChatId = adminChatId,
-            ItemId = itemId,
-            Comment = comment
+            SuperAdminChatId = adminChatId,
+            TargetUserChatId = chatId
         });
 
-        if (!result.Success || result.UpdatedFlat == null)
-        {
-            return BadRequest(result.ErrorMessage);
-        }
-
-        var updatedFlat = new FlatViewModel
-        {
-            ItemId = result.UpdatedFlat.ItemId,
-            PublicationDate = result.UpdatedFlat.PublicationDate,
-            Link = result.UpdatedFlat.Link,
-            OwnerNumber = result.UpdatedFlat.OwnerNumber,
-            Comment = result.UpdatedFlat.Comment
-        };
-
-        return Partial("_FlatRowPartial", updatedFlat);
+        return RedirectToPage(new { tab });
     }
 
-    public async Task<IActionResult> OnPostRemoveFlatAsync(string itemId)
+    public async Task<IActionResult> OnPostRevokeAdminAsync(long chatId, string? tab)
     {
         var adminChatId = GetCurrentAdminChatId();
-
-        var result = await _deleteFlatUseCase.ExecuteAsync(new DeleteFlatRequest
+        var result = await _mediator.Send(new RevokeAdminRightsRequest
         {
-            AdminChatId = adminChatId,
-            ItemId = itemId
+            SuperAdminChatId = adminChatId,
+            TargetAdminChatId = chatId
         });
 
-        if (!result.Success)
-        {
-            return BadRequest(result.ErrorMessage);
-        }
+        return RedirectToPage(new { tab });
+    }
 
-        return RedirectToPage();
+    public async Task<IActionResult> OnPostReassignAsync(long clientChatId, long newManagerChatId, string? tab)
+    {
+        var adminChatId = GetCurrentAdminChatId();
+        var result = await _mediator.Send(new ReassignClientRequest
+        {
+            SuperAdminChatId = adminChatId,
+            ClientChatId = clientChatId,
+            NewManagerChatId = newManagerChatId
+        });
+
+        return RedirectToPage(new { tab });
+    }
+
+    public async Task<IActionResult> OnPostCloseRequestAsync(long clientId, long clientChatId, string? tab)
+    {
+        var adminChatId = GetCurrentAdminChatId();
+        var result = await _mediator.Send(new CloseRequestRequest
+        {
+            AdminChatId = adminChatId,
+            ClientChatId = clientChatId,
+            ClientId = clientId
+        });
+
+        return RedirectToPage(new { tab });
     }
 
     private long GetCurrentAdminChatId()
     {
-        // TODO: Получить chatId текущего залогиненного админа из сессии/claims
-        // Временно возвращаем 0, нужно будет добавить аутентификацию
-        return 0;
+        var chatIdClaim = User.FindFirst("ChatId")?.Value;
+        return long.TryParse(chatIdClaim, out var chatId) ? chatId : 0;
     }
 }

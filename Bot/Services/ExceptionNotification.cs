@@ -1,10 +1,11 @@
-﻿using Bot.Common.Services;
+﻿using Bot.Services;
+using Domain.Common;
 
 namespace Bot.Services;
 
 public class ExceptionNotification : IExceptionNotification
 {
-    public async Task SendExceptionNotification(ITelegramBotClient client, string message, params long[] chatIds)
+    public async Task SendExceptionNotification(ITelegramBotClient client, string message, params ChatId[] chatIds)
     {
         foreach (var chatId in chatIds) 
         { 

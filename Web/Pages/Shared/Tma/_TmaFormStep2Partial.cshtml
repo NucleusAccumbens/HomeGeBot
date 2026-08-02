@@ -1,0 +1,13 @@
+@*
+    TMA Application Form — Step 2: Profession
+    Renders the profession text input.
+    Navigation buttons are rendered in the bottom form nav bar (_TmaFormNavBarPartial).
+*@
+<div id="step2" class="step">
+    <h2 data-i18n="form.step2.title">Чем занимаетесь?</h2>
+    <div class="form-group">
+        <input type="text" id="profession" name="profession" data-i18n-placeholder="form.profession.placeholder" placeholder="Напр. IT-специалист"
+               maxlength="100" onkeydown="blockNewline(event)" oninput="stripNewlines(this)" />
+    </div>
+    <div id="summary2" class="summary"></div>
+</div>

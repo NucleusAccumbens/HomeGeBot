@@ -1,0 +1,16 @@
+@*
+    TMA Application Form Partial
+    Multi-step rental application wizard (loading + step1-4 + review).
+    Rendered inside #view-application in Tma.cshtml.
+    Each step is a separate partial; shared sub-partials handle the
+    "other" text input and navigation button group to eliminate duplication.
+    The step counter is pinned to the top and updated by ApplicationForm.showStep().
+*@
+<div id="view-application" class="view active">
+    @await Html.PartialAsync("Tma/_TmaFormLoadingPartial")
+    @await Html.PartialAsync("Tma/_TmaFormStep1Partial")
+    @await Html.PartialAsync("Tma/_TmaFormStep2Partial")
+    @await Html.PartialAsync("Tma/_TmaFormStep3Partial")
+    @await Html.PartialAsync("Tma/_TmaFormStep4Partial")
+    @await Html.PartialAsync("Tma/_TmaFormReviewPartial")
+</div>

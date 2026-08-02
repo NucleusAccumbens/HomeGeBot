@@ -1,0 +1,44 @@
+:root {
+    --primary: #717FFE;
+    --primary-dark: #717FFE;
+    --neutral-900: #2A2A2A;
+    --neutral-850: #1c1c1e;
+    --neutral-800: #262626;
+    --white: #ffffff;
+    --gray-400: #a3a3a3;
+    --gray-500: #737373;
+    --gray-600: #525252;
+    
+    --font-display: 'Rubik', sans-serif;
+    --font-body: 'Nunito', sans-serif;
+}
+
+/* ===== Base Reset ===== */
+* {
+    font-family: var(--font-body);
+    font-weight: 400;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6, .section-title {
+    font-family: var(--font-display) !important;
+    font-weight: 800 !important;
+    font-size: 14pt;
+    color: var(--neutral-900);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.card-subtitle, .subheading {
+    font-weight: 600 !important;
+}
+
+body {
+    background-color: #D9D9D9;
+    color: var(--neutral-900);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}

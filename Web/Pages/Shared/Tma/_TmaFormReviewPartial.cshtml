@@ -1,0 +1,12 @@
+@*
+    TMA Application Form — Review (post-submit confirmation)
+    Renders the success message + review summary + forward instructions.
+    Navigation buttons are rendered in the bottom form nav bar (_TmaFormNavBarPartial).
+*@
+<div id="review" class="step">
+    <h2 data-i18n="form.review.title">Заявка отправлена!</h2>
+    <div id="review-summary" class="summary review-summary"></div>
+    <div class="forward-instructions">
+        <p id="review-instructions">Чтобы завершить заявку, перешлите пост с квартирой из канала <a href="https://t.me/propertyintbilisi" onclick="confirmOpenChannel(event)">@@propertyintbilisi</a> в чат с ботом.</p>
+    </div>
+</div>
