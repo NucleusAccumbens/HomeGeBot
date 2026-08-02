@@ -23,13 +23,15 @@ public class TmaController : ControllerBase
     private readonly IBotSessionStore _sessionStore;
     private readonly IUserNotifier _notifier;
     private readonly IMediator _mediator;
+    private readonly ITmaLabelProvider _tmaLabels;
 
-    public TmaController(ITmaValidationService tmaValidation, IBotSessionStore sessionStore, IUserNotifier notifier, IMediator mediator)
+    public TmaController(ITmaValidationService tmaValidation, IBotSessionStore sessionStore, IUserNotifier notifier, IMediator mediator, ITmaLabelProvider tmaLabels)
     {
         _tmaValidation = tmaValidation;
         _sessionStore = sessionStore;
         _notifier = notifier;
         _mediator = mediator;
+        _tmaLabels = tmaLabels;
     }
 
     [HttpPost("submit-application")]
@@ -69,25 +71,12 @@ public class TmaController : ControllerBase
             ? request.TermOther : request.Term.GetDisplayName();
 
         var user = await _mediator.Send(new GetUserLanguageQuery(new ChatId(userId.Value)));
-
-        var (petsYes, petsNo) = user switch
-        {
-            "en" => ("Yes", "No"),
-            "ka" => ("დიახ", "არა"),
-            _ => ("Да", "Нет")
-        };
-
-        var labels = user switch
-        {
-            "en" => new { Title = "Application data received!", Country = "Country", Profession = "Profession", Pets = "Pets", Term = "Rental term", Footer = "To complete the application, forward a property post from the @propertyintbilisi channel to this chat." },
-            "ka" => new { Title = "განაცხადის მონაცემები მიღებულია!", Country = "ქვეყანა", Profession = "საქმიანობა", Pets = "შინაური ცხოველები", Term = "იჯარის ვადა", Footer = "განაცხადის დასასრულებლად, გადააგზავნეთ ბინის პოსტი @propertyintbilisi არხიდან ამ ჩატში." },
-            _ => new { Title = "Данные заявки получены!", Country = "Страна", Profession = "Деятельность", Pets = "Домашние животные", Term = "Срок аренды", Footer = "Чтобы завершить заявку, перешлите пост с квартирой из канала @propertyintbilisi в этот чат." }
-        };
+        var labels = _tmaLabels.GetSubmitApplicationLabels(user);
 
         var message = $"{labels.Title}\n\n" +
             $"{labels.Country}: {countryDisplay}\n" +
             $"{labels.Profession}: {request.Profession}\n" +
-            $"{labels.Pets}: {(request.HasPets ? petsYes : petsNo)}\n" +
+            $"{labels.Pets}: {(request.HasPets ? labels.PetsYes : labels.PetsNo)}\n" +
             $"{labels.Term}: {termDisplay}\n\n" +
             $"{labels.Footer}";
 

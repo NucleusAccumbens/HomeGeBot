@@ -1,4 +1,5 @@
 ﻿using Application.Common.Behaviors;
+using Application.Common.Localization;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,8 @@ public static class ConfigureServices
 
         // FluentValidation
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+        services.AddSingleton<ITmaLabelProvider, TmaLabelProvider>();
 
         return services;
     }
