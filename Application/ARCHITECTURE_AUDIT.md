@@ -1,369 +1,131 @@
 # Архитектурный аудит проекта Property In Tbilisi Bot
 
-## 1. Общие сведения, технологический стек и функциональность
+Дата аудита: 2026-08-02
+Целевая платформа: .NET 10.0
+Тип приложения: ASP.NET Core веб-приложение + Telegram-бот (webhook) с админ-панелью и Telegram Mini App (TMA).
+Состояние сборки: `dotnet build` — 0 ошибок, 0 предупреждений. `dotnet test` — 42/42 тестов пройдено (33 `Application.Tests`, 9 `Bot.Tests`).
 
-**Дата аудита:** 2026-08-02  
-**Целевая платформа:** .NET 10.0  
-**Тип приложения:** ASP.NET Core веб-приложение + Telegram-бот (webhook) с админ-панелью и Telegram Mini App (TMA).
+Документ описывает **текущее** состояние кодовой базы по файлам и слоям. Приоритизированный план действий — в [`REFACTORING_PLAN.md`](../REFACTORING_PLAN.md).
 
-### 1.1. Стек
+---
+
+## 1. Стек и архитектура
 
 | Слой / аспект | Технологии |
 |---------------|------------|
-| Платформа | .NET 10.0, ASP.NET Core, Razor Pages, Minimal APIs / Controllers |
+| Платформа | .NET 10.0, ASP.NET Core, Razor Pages, MVC-контроллеры |
 | Архитектура | Clean Architecture, CQRS (MediatR 12.0), Result Pattern |
 | Валидация | FluentValidation 11.5 |
 | БД | PostgreSQL, EF Core 10.0, Npgsql 10.0 |
 | Бот | Telegram.Bot 18.0 (webhook) |
-| Веб-UI | Razor Pages, Telegram WebApp SDK, JavaScript (tma-i18n.js) |
+| Веб-UI | Razor Pages, Telegram WebApp SDK, JavaScript |
 | Сериализация | Newtonsoft.Json |
-| API-документация | Swashbuckle Swagger |
-| Кэш / сессии | `IDistributedCache`, `IMemoryCache` (TTL 1 день) |
+| API-документация | Swashbuckle Swagger (Development) |
+| Кэш / сессии | `IDistributedCache` (сессии бота, TTL 1 день), `IMemoryCache` (кэш локализованных сообщений) |
 
-### 1.2. Слои и направление зависимостей
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│ Web (Razor Pages + API Controllers + Middleware + TMA)       │
-└───────────────┬──────────────────────────────┬───────────────┘
-                │                              │
-        ┌───────▼───────┐              ┌───────▼───────┐
-        │ Bot           │              │ Infrastructure│
-        │ (Telegram)    │              │ (EF Core, PG) │
-        └───────┬───────┘              └───────┬───────┘
-                │                              │
-                └──────────────┬───────────────┘
-                               │
-                       ┌───────▼───────┐
-                       │ Application   │
-                       │ (MediatR,     │
-                       │  Validators)  │
-                       └───────┬───────┘
-                               │
-                       ┌───────▼───────┐
-                       │ Domain        │
-                       │ (Entities,    │
-                       │  Value Objects│
-                       └───────────────┘
-```
-
-- **Domain** — чистые сущности, value objects, enum'ы; ссылка только на `Microsoft.Extensions.Configuration` (`EnumExtensions`).
-- **Application** — CQRS use-cases (MediatR), pipeline behaviors, Result Pattern, FluentValidation, порты (`IBotDbContext`, `IDateTime`, `IUserNotifier`).
-- **Infrastructure** — реализация `DbContext` (PostgreSQL), конфигурации EF Core, миграции, `DateTimeService`, `AuditableEntitySaveChangesInterceptor`.
-- **Bot** — инициализация Telegram-бота, приём Updates, роутинг команд, сессии, локализация, уведомления.
-- **Web** — `Program.cs`, Razor Pages, API-контроллеры, middleware, валидация TMA `initData`, cookie-аутентификация.
-
-### 1.3. Функциональность
-
-**Пользовательский поток (TMA + Bot):**
-1. Пользователь запускает `/start` в боте.
-2. Бот приветствует и предлагает открыть TMA (Telegram Mini App) для заполнения анкеты.
-3. В TMA собираются данные: страна, профессия, наличие животных, срок аренды.
-4. Пользователь возвращается в чат и пересылает пост из канала с объектом (`app`-команда / `WaitForFlatForward`).
-5. Система сохраняет заявку (`Client`), привязывает `Flat`, автоматически назначает активного менеджера с наименьшей загрузкой.
-6. Менеджер получает уведомление с анкетой и данными объекта.
-
-**Административные сценарии:**
-- Просмотр дашборда всех заявок, менеджеров, объектов.
-- Закрытие заявок, переназначение клиентов, удаление объектов, редактирование комментариев.
-- Управление администраторами: повышение/отзыв прав (SuperAdmin/Admin).
-- Профиль менеджера и получение фото пользователя через Telegram API.
+Направление зависимостей: `Web` → `Bot`/`Infrastructure` → `Application` → `Domain`. Domain не имеет внешних зависимостей, кроме `System.ComponentModel.DataAnnotations` (атрибут `Display` для локализации enum'ов).
 
 ---
 
 ## 2. Пофайловый обзор
 
-### 2.1. Domain
-
-| Файл | Назначение | Ключевые типы | Замечания |
-|------|------------|---------------|-----------|
-| `Common/BaseEntity.cs` | Базовый идентификатор | `BaseEntity` (`Id`) | Все свойства `public set`; стоит убрать `set` для `Id`. |
-| `Common/BaseAuditableEntity.cs` | Аудит `CreatedAt` / `LastModified` | `BaseAuditableEntity : BaseEntity` | Те же `public set` — аудит устанавливается вне сущности. |
-| `Common/ChatId.cs` | Value Object для Telegram chat id | `record struct ChatId` | ✅ Неявные преобразования в `long`, `IComparable`, `ToString`. |
-| `Common/EnumExtensions.cs` | `DisplayAttribute → localized name` | `EnumExtensions` | ⚠️ Зависит от `System.ComponentModel.DataAnnotations` в Domain. |
-| `Entities/Admin.cs` | Администратор | `Admin` | ✅ Методы `Activate/Deactivate/AssignClient/RemoveClient`. `Role` имеет `public set`. |
-| `Entities/Client.cs` | Заявка клиента | `Client` | ✅ `ChangeManager`, `Complete`, `UpdateDetails`; `Admin` инициализируется `= null!`. |
-| `Entities/Flat.cs` | Объект недвижимости | `Flat` | ✅ `UpdateComment`, `UpdateDetails`; минимальная валидация. |
-| `Entities/Message.cs` | Сообщение (мультиязычное) | `Message` | ⚠️ `BodyEn/BodyKa` — OCP-проблема при добавлении языков. |
-| `Entities/TlgUser.cs` | Пользователь Telegram | `TlgUser` | ✅ `UpdateProfile/SetLanguage/SetKicked`; `Language` default = "ru". |
-| `Enums/AdminRole.cs` | Роли | `AdminRole` | `Admin`, `SuperAdmin`. |
-| `Enums/Country.cs` | Страны | `Country` | `Other` — UI-концерн в доменном enum. |
-| `Enums/Term.cs` | Сроки аренды | `Term` | `Other` — UI-концерн в доменном enum. |
-
-### 2.2. Infrastructure
-
-| Файл | Назначение | Ключевые типы | Замечания |
-|------|------------|---------------|-----------|
-| `ConfigureServices.cs` | Регистрация DI | `ConfigureService` | ⚠️ Прямое `new ConnectionStringProvider` вместо DI. |
-| `Persistence/HomeGeBotDbContext.cs` | EF Core контекст | `HomeGeBotDbContext : DbContext, IBotDbContext` | ✅ Приватный `ChatIdConverter` для value object. Пустой конструктор `HomeGeBotDbContext()` стоит сделать `protected`. |
-| `Persistence/IConnectionStringProvider.cs` | Порт строки подключения | `IConnectionStringProvider` | ✅ Узкий интерфейс. |
-| `Persistence/ConnectionStringProvider.cs` | Реализация провайдера | `ConnectionStringProvider` | ⚠️ `DefaultConnection` magic string; `string.Empty` вместо исключения. |
-| `Persistence/ConnectionStringFactory.cs` | Парсинг `DATABASE_URL` | `static ConnectionStringFactory` | ⚠️ `catch (Exception)`, hardcoded SSL, статичность — сложно тестировать. |
-| `Persistence/DesignTimeDbContextFactory.cs` | Фабрика для миграций | `DesignTimeDbContextFactory` | ⚠️ Дублирование логики `ConnectionStringProvider`. |
-| `Persistence/Configurations/*Configuration.cs` | EF конфигурации | 5 пустых `IEntityTypeConfiguration<>` | ⚠️ Содержат только `ToTable`/`HasKey` — не настроены индексы/связи. |
-| `Persistence/Interceptors/AuditableEntitySaveChangesInterceptor.cs` | Аудит | `AuditableEntitySaveChangesInterceptor` | ✅ `IDateTime` через DI; `UpdateEntities` лучше сделать `private`. |
-| `Persistence/Interceptors/EntityEntryExtensions.cs` | Owned entities check | `EntityEntryExtensions` | ✅ Полезный `HasChangedOwnedEntities`. |
-| `Services/DateTimeService.cs` | Время | `DateTimeService : IDateTime` | ✅ `Now` = `DateTime.UtcNow`. |
-
-### 2.3. Application
-
-**Общие инфраструктурные файлы:**
+### 2.1 Domain
 
 | Файл | Назначение | Замечания |
 |------|------------|-----------|
-| `GlobalUsing.cs` | Глобальные using | ⚠️ `global using Microsoft.EntityFrameworkCore` в Application нарушает Clean Architecture. |
-| `ConfigureServices.cs` | Регистрация MediatR, FluentValidation, behaviors | ✅ Корректно. |
-| `Common/Results/Result.cs` | Result Pattern | ✅ `Success/Fail`, `Match`, фабрика. |
-| `Common/Behaviors/ResultValidationBehavior.cs` | Pipeline валидации | ✅ Автоматический `IValidator<TRequest>`. |
-| `Common/Behaviors/ResultAuthorizationBehavior.cs` | Admin-авторизация | ✅ Маркер `IAdminCommand`. |
-| `Common/Behaviors/ResultSuperAdminAuthorizationBehavior.cs` | SuperAdmin-авторизация | ✅ Маркер `ISuperAdminCommand`. |
-| `Common/Interfaces/IBotDbContext.cs` | Порт БД | ⚠️ `DbSet<T>` возвращает `DbSet<T>` — тянет EF. |
-| `Common/Interfaces/IDateTime.cs` | Порт времени | ✅ Используется в Infrastructure. Почти не используется в Application (например, `GrantAdminRightsHandler` использует `DateTime.UtcNow`). |
-| `Common/Interfaces/IUserNotifier.cs` | Порт уведомлений | ✅ Реализован в `Bot.Services.UserNotifier`. |
-| `Common/Extensions/UserExtensions.cs` | ФИО форматирование | ✅ Тестируется. |
-| `Common/Localization/ApplicationMessages.cs` | Жёстко зашитые строки ошибок | ⚠️ OCP-нарушение: добавление языка/сообщения требует правки кода. |
-| `Common/Localization/SupportedLanguages.cs` | Языки | ✅ `ru`, `en`, `ka`; статичность. |
-| `Common/Validation/ChatIdValidationExtensions.cs` | Валидация `ChatId` | ✅ `.MustBeValidChatId()`. |
+| `Common/BaseEntity.cs` | Базовый класс с `Id` | `Id` имеет `public set` — сущность может быть переприсвоена извне после создания. |
+| `Common/BaseAuditableEntity.cs` | `CreatedAt`/`LastModified` | Публичные сеттеры; фактически заполняются только через `AuditableEntitySaveChangesInterceptor`, но ничего не мешает произвольному коду в Application изменить их напрямую. |
+| `Common/ChatId.cs` | Value Object для Telegram chat id (`record struct`) | Неявные преобразования в/из `long`, `IComparable`. Обеспечивает базовую типобезопасность в сигнатурах, но неявные операторы позволяют случайно передать произвольный `long` без валидации. |
+| `Common/EnumExtensions.cs` | `DisplayAttribute → localized name` через рефлексию с кэшированием | Приемлемо, но привязывает Domain к `System.ComponentModel.DataAnnotations`. |
+| `Entities/Admin.cs` | Администратор/менеджер | Методы `Activate/Deactivate/AssignClient/RemoveClient` инкапсулируют переходы состояния. `Role` имеет `public set` — можно обойти доменную логику. |
+| `Entities/Client.cs` | Заявка клиента | Методы `ChangeManager/Complete/UpdateDetails`. Конструктор принимает 8 параметров. `UpdateDetails` обновляет не все изменяемые поля (частичное покрытие). Нет валидации «`CountryOther` обязателен, если `Country == Other`» на уровне сущности. |
+| `Entities/Flat.cs` | Объект недвижимости | `UpdateComment`/`UpdateDetails`; все поля nullable без валидации формата (`Link`, `OwnerNumber`). |
+| `Entities/Message.cs` | Локализуемый шаблон сообщения | Поля `Body`/`BodyEn`/`BodyKa` — жёстко заданный набор языков в самой сущности (см. D5 в плане рефакторинга). |
+| `Entities/TlgUser.cs` | Пользователь Telegram | `UpdateProfile/SetLanguage/SetKicked`; `Language` по умолчанию `"ru"`, входные данные не валидируются (например, произвольный код языка можно установить). |
+| `Enums/AdminRole.cs` | `Admin`, `SuperAdmin` | Без замечаний. |
+| `Enums/Country.cs`, `Enums/Term.cs` | Enum'ы с `DisplayAttribute` | Значение `Other` в доменном enum — UI-концерн (нужен для варианта «свой вариант» в форме), формально смешивает домен и представление. |
 
-**Feature-группы и use-cases:**
+### 2.2 Application
 
-| Группа | Use-case | Авторизация | Валидатор | Примечания |
-|--------|----------|-------------|-----------|------------|
-| `AdminManagement` | `CloseRequest` | `IAdminCommand` | ✅ | Закрытие заявки. |
-| | `GetBotUsers` | `ISuperAdminCommand` | ✅ | Список пользователей, исключая активных админов. |
-| | `GrantAdminRights` | `ISuperAdminCommand` | ✅ | Использует `DateTime.UtcNow` вместо `IDateTime`. |
-| | `ReassignClient` | `ISuperAdminCommand` | ✅ | Переназначение активных заявок. |
-| | `RevokeAdminRights` | `ISuperAdminCommand` | ✅ | Запрет само-отзыва / отзыва SuperAdmin; перераспределение. |
-| | `CheckAdminStatus` | ❌ | ❌ | Query возвращает `bool`, а не `Result<bool>`. |
-| `BotStart` | `StartBot` | — | ✅ | Upsert `TlgUser`, синхронизация с `Admins`. |
-| `Dashboard` | `GetAdminDashboard` | `IAdminCommand` | ✅ | Самый сложный handler; 3 приватных метода — SRP-риск. |
-| | `DeleteFlat` | `IAdminCommand` | ✅ | Удаление объекта. |
-| | `UpdateFlatComment` | `IAdminCommand` | ✅ | Изменение комментария. |
-| `Messages` | `GetMessageBody`, `GetMessagePathToPhoto` | — | ❌ | Query без `Result<T>`. |
-| `RentalApplications` | `SubmitRentalApplication` | — | ✅ | Выбор менеджера с min load, лимит 5. |
-| | `GetUserApplications` | — | — | N+1 подзапрос `ManagerUsername` (проверить в текущей версии). |
-| `TlgUsers` | `ToggleUserKick` | — | ✅ | Корректно не требует админ-прав (собственный chat id). |
-| | `CheckUserStatus` | — | ❌ | Query без `Result<T>`. |
-| `Users` | `SetUserLanguage` | — | ✅ | Изменение языка. |
-| | `GetManagerContact` | — | — | Query возвращает `Result<ManagerDto>`. |
+Слой построен на MediatR (команды/запросы в отдельных папках-фичах: `AdminManagement`, `BotStart`, `Dashboard`, `Messages`, `RentalApplications`, `TlgUsers`, `Users`), каждый use case — `Request/Command` + `Handler` + (опционально) `Validator` + `Result`.
 
-### 2.4. Bot
+| Компонент | Замечания |
+|-----------|-----------|
+| `Common/Behaviors/ResultValidationBehavior.cs` | Централизованная FluentValidation-валидация в pipeline. Работает только для запросов, для которых зарегистрирован `IValidator<T>` — часть query (`GetMessageBody`, `GetUserLanguage`, `CheckAdminStatus`) валидаторов не имеет. |
+| `Common/Behaviors/ResultAuthorizationBehavior.cs` / `ResultSuperAdminAuthorizationBehavior.cs` | Дублирующие друг друга по структуре behavior'ы для `IAdminCommand`/`ISuperAdminCommand`. Разумно объединить через общий базовый класс/стратегию с параметром роли. |
+| `Common/Interfaces/IDateTime.cs` | Используется **только** в `AuditableEntitySaveChangesInterceptor` (Infrastructure). Ни один Application-хендлер не обращается к `IDateTime` напрямую — там, где нужна текущая дата (например, фильтрация по времени), это пока не требовалось, но абстракция уже готова для будущего использования. |
+| `Common/Localization/TmaLabelProvider.cs`, `ApplicationMessages.cs` | Переводы захардкожены как `switch`/словари внутри классов — добавление языка требует правки кода (OCP). В `TmaLabelProvider` для русского языка используются значения по умолчанию из `TmaSubmitApplicationLabels`, а не отдельная ветка словаря. |
+| `Dashboard/Commands/GetAdminDashboard/GetAdminDashboardHandler.cs` | Самый крупный handler в проекте (~175 строк): в одном методе выполняется авторизация, выборка Clients/Flats/Admins и маппинг в 2 похожих DTO-блока. Кандидат на декомпозицию по CQRS (`GetApplicationsQuery`, `GetManagersQuery` и т.д.). |
+| `AdminManagement/Commands/RevokeAdminRights/RevokeAdminRightsHandler.cs` | Помимо отзыва прав, содержит логику перераспределения клиентов уволенного менеджера между оставшимися активными менеджерами — стоит вынести в отдельный доменный/прикладной сервис, т.к. похожая логика выбора «менее загруженного менеджера» дублируется в `SubmitRentalApplicationHandler`. |
+| `AdminManagement/Queries/CheckAdminStatus/CheckAdminStatusHandler.cs`, `TlgUsers/Queries/CheckUserStatus/CheckUserStatusHandler.cs`, `Users/Queries/GetUserLanguage/GetUserLanguageHandler.cs` | Возвращают примитивы (`bool`/`string`) вместо `Result<T>` — единообразие CQRS-паттерна в проекте нарушено (часть query следует Result Pattern, часть — нет). |
+| Локализация сообщений в handler'ах | Часть сообщений об ошибках берётся из `ApplicationMessages` (локализовано), часть — захардкожена на русском прямо в handler'ах/валидаторах (`DeleteFlatHandler`, `ReassignClientHandler`, `SetUserLanguageHandler` и др.). Непоследовательно. |
+| `RentalApplications/Queries/GetUserApplications`, `Users/Queries/GetManagerContact`, `Users/Queries/GetUserLanguage` | Запросы не помечены `IAdminCommand`/`ISuperAdminCommand` — доступ к данным ограничивается только тем, что вызывающий код (TMA-контроллеры) всегда подставляет `ChatId` из проверенного `initData` текущего пользователя. Сам use case не имеет встроенной защиты «пользователь может запросить только свои данные», это ответственность вызывающей стороны — стоит явно задокументировать или добавить проверку на уровне handler'а. |
+| `AdminManagement/Dtos/BotUserDto.cs` | Свойство `IsAdmin` в `GetBotUsersHandler` всегда устанавливается в `false` — фактически неиспользуемое/вводящее в заблуждение поле. |
+| `AdminManagement/Commands/CloseRequest/CloseRequestRequest.cs` | Свойство `ClientChatId` объявлено, но не используется в `CloseRequestHandler`. |
+| Именование | `ToggleUserKickCommand`/`ToggleUserKickRequestValidator` — единственное место, где команда называется `...Command`, а не `...Request`, при этом валидатор всё равно `...RequestValidator`. |
 
-| Файл / группа | Назначение | Замечания |
-|---------------|------------|-----------|
-| `Common/TelegramBot.cs` | `ITelegramBotClientProvider` + `WebhookSetupService` | ⚠️ Два класса в одном файле; `SemaphoreSlim` double-check locking; `TelegramBot` зависит от `TelegramBotConfiguration`. |
-| `Common/CommandAnalyzer.cs` | Диспетчер `Update` | ⚠️ SRP: выбор handler + обработка исключений. |
-| `Common/Abstractions/BaseTextCommand.cs` | Базовый класс текстовых команд | ✅ Простой, чистый. |
-| `Common/Abstractions/BaseCallbackCommand.cs` | Базовый класс callback-команд | ⚠️ Проверка первого символа может привести к коллизиям. |
-| `Common/Abstractions/BaseMessage.cs` | Базовый класс сообщений | ⚠️ SRP: язык, текст, отправка, inline keyboard в одном. |
-| `Routers/TextCommandRouter.cs` | Маршрутизация текстовых команд | ⚠️ `IEnumerable` + линейный поиск; fallback внутри роутера. |
-| `Routers/CallbackCommandRouter.cs` | Маршрутизация callback | ⚠️ Выполняет **все** подходящие команды, а не первую. |
-| `UpdateHandlers/*UpdateHandler.cs` | Обработчики `UpdateType` | ✅ `CanHandle/HandleAsync`, `IUpdateHandler`. |
-| `Services/MessageService.cs` | Отправка/редактирование сообщений | ⚠️ `IMessageService` слишком широк (7 методов — ISP). Silent fail в `SendMessage` если путь null. |
-| `Services/BotI18n.cs` | Локализация бота | ⚠️ Словарь захардкожен в коде; OCP-нарушение при добавлении языков. |
-| `Services/LocalizedMessageResolver.cs` | Резолвер сообщений из БД | ✅ Тонкий шлюз в Application. |
-| `Services/ManagerNotificationFormatter.cs` | Форматирование уведомлений | ⚠️ Вложенные тернарные операторы, хардкод Yes/No. |
-| `Services/RentalApplicationForwardProcessor.cs` | Форвард заявки менеджеру | ⚠️ Длинный метод; смешивает CQRS, пересылку, форматирование, очистку сессии. |
-| `Services/UserNotifier.cs` | Отправка уведомлений пользователям | ✅ Корректно. |
-| `Services/UserStatusChecker.cs` | Проверка `IsKicked` | ✅ Корректно. |
-| `Session/BotSession.cs` | Сессия пользователя | ⚠️ Все свойства `public set`; нет валидации. |
-| `Session/DistributedBotSessionStore.cs` | Хранилище в `IDistributedCache` | ⚠️ Hardcoded TTL 1 день, прямая зависимость от Newtonsoft.Json. |
-| `Session/MemoryBotSessionStore.cs` | Хранилище в памяти | ✅ Альтернативная реализация. |
-| `Session/IBotSessionStore.cs` | Порт хранилища | ✅ Узкий интерфейс. |
-| `Configuration/*Configuration.cs` | Конфигурации | ⚠️ Нет валидации; пустые значения по умолчанию. |
-| `Exceptions/*Exception.cs` | Свои исключения | ✅ Простые. `SessionExpiredException` — русский текст захардкожен. |
+### 2.3 Infrastructure
 
-### 2.5. Web
+| Файл | Назначение | Замечания |
+|------|------------|-----------|
+| `ConfigureServices.cs` | Регистрация DI | Строка подключения получается через прямое `new ConnectionStringProvider(configuration)` внутри метода регистрации сервисов, а не через DI-контейнер — рабочий, но нечистый паттерн (смешивает конфигурацию контейнера и runtime-логику). Также сам класс называется `ConfigureService` (в единственном числе), что расходится с остальными проектами (`Application.ConfigureServices`, `Bot.ConfigureServices` — тоже в ед. числе, то есть на самом деле единообразно в рамках проекта, но не по общепринятой .NET-конвенции). |
+| `Persistence/HomeGeBotDbContext.cs` | EF Core `DbContext` | Реализует `IBotDbContext`; приватный `ChatIdConverter` для `ChatId`; `AuditableEntitySaveChangesInterceptor` подключается опционально через конструктор. Пустой конструктор для design-time не документирован. |
+| `Persistence/ConnectionStringProvider.cs` | Возвращает строку подключения (приоритет `DATABASE_URL`, иначе `appsettings`) | При отсутствии обоих источников возвращает `string.Empty` вместо явного исключения — ошибка конфигурации будет обнаружена только при первом обращении к БД с непонятным сообщением от Npgsql. |
+| `Persistence/ConnectionStringFactory.cs` | Парсинг `DATABASE_URL` (Heroku/Railway-формат) в Npgsql connection string | `catch (Exception)` слишком широкий; `uri.UserInfo.Split(':')` не проверяется на длину (упадёт с `IndexOutOfRangeException`, если пароль отсутствует); SSL-параметры (`SSL Mode=Require;Trust Server Certificate=true`) захардкожены. |
+| `Persistence/DesignTimeDbContextFactory.cs` | Фабрика для `dotnet ef` | Дублирует логику получения `DATABASE_URL` из `ConnectionStringProvider`; при отсутствии — пустая строка, миграции упадут с неинформативной ошибкой. |
+| `Persistence/Configurations/*Configuration.cs` (Admin, Client, Flat, Message, TlgUser) | `IEntityTypeConfiguration<>` | **Все 5 файлов** содержат только `ToTable(...)` и `HasKey(...)`. Отсутствуют: индексы (`ChatId`, `AdminId`, `Message.Name`), ограничения длины строк, явные конфигурации связей и cascade-поведения (сейчас cascade delete для `Client → Admin` задан миграцией `UnifyClientAdminRelationship`, но не отражён в `IEntityTypeConfiguration`, то есть источник истины для схемы — миграция, а не конфигурация, что противоречит EF Core best practices). |
+| `Persistence/Interceptors/AuditableEntitySaveChangesInterceptor.cs` | Автозаполнение `CreatedAt`/`LastModified` через `IDateTime` | Реализован корректно (sync/async), использует `EntityEntryExtensions` для owned-типов. |
+| `Services/DateTimeService.cs` | Реализация `IDateTime` через `DateTime.UtcNow` | Без замечаний. |
+| `Migrations/` (14 файлов + snapshot) | История схемы | `20260730184210_UpdateChatIdToValueObject.cs` — **пустая миграция** (`Up`/`Down` без тела), оставшийся артефакт после рефакторинга `ChatId`; безопасна для применения, но не несёт смысла и создаёт путаницу в истории. `20260501180626_Init.cs` создаёт таблицу `HasPets`, немедленно удаляемую следующей миграцией — признак незафиксированной на момент разработки модели, актуальному состоянию БД не мешает. |
 
-| Файл / группа | Назначение | Замечания |
-|---------------|------------|-----------|
-| `Program.cs` | DI, middleware pipeline | ✅ Стандартная конфигурация. Дублирование `CookieSecurePolicy`. |
-| `Controllers/TelegramBotController.cs` | Webhook endpoint | ⚠️ Валидация SecretToken внутри контроллера, а не middleware; `catch` внутри action. |
-| `Controllers/TmaController.cs` | TMA API | 🔴 Массовое дублирование валидации `initData` (5 методов); `GetManager` не проверяет `userId`. |
-| `Controllers/AdminAuthController.cs` | Аутентификация админов | ⚠️ `AdminAuthRequest` в том же файле; `AuthDebug` доступен в коде. |
-| `Controllers/DashboardApiController.cs` | API дашборда | ⚠️ `GetUserPhoto` делает слишком много: API, скачивание, файл; ручной `try-catch` при наличии middleware. |
-| `Middleware/GlobalExceptionMiddleware.cs` | Глобальная обработка ошибок | ⚠️ Switch expression для 3 типов исключений — OCP-нарушение. |
-| `Pages/Index.cshtml.cs` | Razor Page дашборда | 🔴 God object: 5 POST-действий + ручной маппинг; `GetCurrentAdminChatId` возвращает `0` при отсутствии claim. |
-| `Pages/Login.cshtml.cs` | Страница входа | ✅ Простая. |
-| `Pages/Tma.cshtml.cs` | TMA PageModel | ✅ Пустая, можно убрать code-behind. |
-| `Pages/Shared/Tma/_TmaPartialsModels.cs` | Модели partials | ⚠️ Имена с `_` в начале — нарушение C# naming. |
-| `Models/*.cs` | DTO ViewModel | ✅ Простые; лучше использовать `record` и Data Annotations. |
-| `Models/Validators/TmaApplicationRequestValidator.cs` | Валидация TMA | ✅ FluentValidation. |
-| `Services/TmaValidationService.cs` | Валидация и парсинг `initData` | 🔴 SRP + ISP: валидация, парсинг, извлечение `userId/username/userdata` в одном сервисе. |
-| `Services/BotInitializationService.cs` | IHostedService инициализации | ✅ Корректно. |
-| `Services/AdminClaimsFactory.cs` | ClaimsPrincipal | ✅ Чистая фабрика; magic strings. |
+### 2.4 Bot
 
-### 2.6. Tests
+| Файл / область | Замечания |
+|------|-----------|
+| `Common/TelegramBot.cs` | В одном файле объявлены `ITelegramBotClientProvider`/`TelegramBot`, а также `IWebhookSetupService`/`WebhookSetupService` — нарушение принятого в проекте соглашения «один интерфейс/класс — один файл» (см. `Common/Interfaces/*`). `SemaphoreSlim` в `TelegramBot` не освобождается (класс не реализует `IDisposable`). |
+| `Common/CommandAnalyzer.cs` | Диспетчер обновлений: определяет тип Update, проверяет статус пользователя, маршрутизирует в `IUpdateHandler`. Ловит исключения на верхнем уровне, логирует и уведомляет админов через `IExceptionNotification` — неплохой единый error boundary, но совмещает в одном классе роутинг + обработку ошибок. |
+| `Common/Abstractions/BaseMessage.cs` | Методы `SendMessage`, `SendMessageWithPhoto` и т.п. каждый раз independently запрашивают язык пользователя через `IMediator.Send(GetUserLanguageQuery)` — если метод вызывает несколько операций подряд, язык запрашивается повторно вместо переиспользования результата. |
+| `Services/BotI18n.cs` | Переводы UI-текстов бота захардкожены в статическом `Dictionary` внутри класса — добавление языка требует изменения кода и пересборки; потенциальный конкурентный доступ к статическому полю не защищён (на практике `Dictionary` только читается после инициализации, поэтому в реальности не проблема, но неявно). |
+| `Services/RentalApplicationForwardProcessor.cs` | Основной сценарий «клиент переслал пост → создание заявки»: 6 внедрённых зависимостей, обработка форварда, формирование уведомления менеджеру, создание клавиатуры, очистка сессии — несколько ответственностей в одном сервисе. |
+| `Session/BotSession.cs`, `RentalApplicationDraft.cs` | POCO с полностью открытыми `public` сеттерами и без валидации — состояние многошаговой формы можно перевести в противоречивое состояние из любого места кода, имеющего ссылку на объект. |
+| `Session/MemoryBotSessionStore.cs` | Реализует `IBotSessionStore`, но **не зарегистрирован в DI** (`Bot/ConfigureServices.cs` регистрирует только `DistributedBotSessionStore`) — на практике мёртвый код, оставшийся, вероятно, как альтернативная реализация для локальной разработки без Redis/`IDistributedCache`. |
+| `ConfigureServices.cs` | Метод `AddCallbackCommands` не регистрирует ни одной реализации `BaseCallbackCommand` — на данный момент в проекте нет callback-команд (только `dCancel`, обрабатываемый иначе), поэтому `CallbackCommandRouter` существует, но не имеет зарегистрированных обработчиков. Это не баг (пока нет callback-команд), но стоит иметь в виду при добавлении новых inline-кнопок. |
+| Локализация ошибок | `SessionExpiredException`, `ExceptionNotification` содержат захардкоженные русскоязычные строки — не проходят через `IBotI18n`. |
 
-| Проект / файл | Что тестируется | Замечания |
-|---------------|-----------------|-----------|
-| `Application.Tests/Common/TestDbContext.cs` | In-memory `IBotDbContext` | ✅ Удобный тестовый контекст. |
-| `Application.Tests/Extensions/UserExtensionsTests.cs` | `GetFullName` | ✅ Параметризованные; хорошее покрытие. |
-| `Application.Tests/Localization/*` | `ApplicationMessages`, `SupportedLanguages` | ✅ Theory. Хардкод строк — хрупко. |
-| `Application.Tests/Mappings/FlatMappingExtensionsTests.cs` | `Flat → FlatDto` | ✅ Граничные случаи. |
-| `Application.Tests/RentalApplications/SubmitRentalApplicationHandlerTests.cs` | Главный use-case | ✅ In-memory + NSubstitute. Недостаточно edge cases. |
-| `Application.Tests/Users/*` | `SetUserLanguage`, `GetManagerContact` | ✅ Базовые сценарии. |
-| `Bot.Tests/Services/BotI18nTests.cs` | Локализация | ✅ Fallback. Хардкод строк. |
+### 2.5 Web
 
-**Проблема покрытия:** нет `Domain.Tests`, `Infrastructure.Tests`, `Web.Tests`, тестов на `Bot` handlers/routers.
+| Файл / область | Замечания |
+|------|-----------|
+| `Program.cs` | DI, middleware pipeline, cookie-аутентификация (`HttpOnly`, `SecurePolicy = Always` в Production, `SameSite = Lax`). Собран по стандартным для ASP.NET Core 10 конвенциям, замечаний нет. |
+| `Controllers/TelegramBotController.cs` | Webhook-эндпоинт делегирует в `ICommandAnalyzer` — не обращается к БД напрямую. Хорошее соответствие Clean Architecture. |
+| `Controllers/TmaController.cs` | Все методы защищены `[ValidateTmaInitData]`. `SubmitApplication` формирует `BotSession`/`RentalApplicationDraft` и сохраняет их напрямую через `IBotSessionStore`, а также сам вызывает `IUserNotifier.SendNotificationAsync` — часть бизнес-логики (какой менеджер уведомляется, в каком формате) фактически находится в Web-контроллере, а не в Application/Bot. К БД напрямую не обращается (использует MediatR для остальных операций). |
+| `Controllers/AdminAuthController.cs` | Эндпоинт `auth-debug` доступен только при `IsDevelopment()`, но не выполняет проверку `initData` — предназначен исключительно для локальной отладки без Telegram-клиента; важно, чтобы `ASPNETCORE_ENVIRONMENT` в production никогда не был `Development`. Контроллер помечен `[IgnoreAntiforgeryToken]` — CSRF-защита для admin-auth не задействована (частично компенсируется тем, что аутентификация опирается на HMAC-подпись `initData`, а не на cookie/форму). |
+| `Services/TmaInitDataValidator.cs` | Реализация HMAC-SHA256 проверки `initData` соответствует официальной спецификации Telegram (secret_key = HMAC-SHA256("WebAppData", bot_token); hash = HMAC-SHA256(secret_key, data_check_string)) — корректна. Проверка `auth_date` (защита от replay-атак повторного использования старого `initData`) отсутствует. |
+| `Middleware/ValidateTelegramWebhookMiddleware.cs` | В Production при отсутствии настроенного `SecretToken` запрос отклоняется (401) — корректно. В Development при отсутствии `SecretToken` валидация пропускается с предупреждением в лог — осознанное упрощение для локальной разработки без публичного HTTPS-домена. |
+| `Pages/Index.cshtml.cs` | PageModel дашборда админки (~150 строк): `OnGet` + 4 POST-обработчика (`GrantAdmin`, `RevokeAdmin`, `Reassign`, `CloseRequest`). Каждый обработчик тонкий (делегирует в MediatR), но сама модель страницы отвечает за все административные действия дашборда — кандидат на разделение по вкладкам/партиалам с собственными handler'ами. |
+| `Filters/ValidateTmaInitDataAttribute.cs` | Достаёт свойство `InitData` из тела запроса через рефлексию по имени свойства — работает, но неявно требует от каждого DTO конкретного имени свойства; при рефакторинге DTO легко сломать без ошибки компиляции. |
+| XSS/HTML | `@Html.Raw` с пользовательскими данными не встречается ни в одном `.cshtml`; клиентский код (`tma-utils.js`) последовательно применяет `escapeHtml` перед вставкой пользовательских строк в DOM. |
+| `wwwroot/appsettings.example.json` | Содержит только плейсхолдеры (`YOUR_BOT_TOKEN`, `RANDOM_SECURE_STRING`) — реальных секретов в репозитории нет. |
+
+### 2.6 Tests
+
+| Проект | Покрытие |
+|--------|----------|
+| `Tests/Application.Tests` | 33 теста: `UserExtensions`, `ApplicationMessages`, `SupportedLanguages`, `FlatMappingExtensions`, `SubmitRentalApplicationHandler`, `SetUserLanguageHandler`, `GetManagerContactHandler`. Использует `TestDbContext` (in-memory) из `Tests/Application.Tests/Common`. |
+| `Tests/Bot.Tests` | 9 тестов: `BotI18n`. |
+| Не покрыты тестами | `Domain` (инварианты сущностей, `ChatId`), `Infrastructure` (`ConnectionStringFactory`, `AuditableEntitySaveChangesInterceptor`), большая часть `Application` (behaviors, остальные handler'ы), весь `Bot` кроме `BotI18n` (`CommandAnalyzer`, роутеры, `RentalApplicationForwardProcessor`), весь `Web` (контроллеры, `TmaInitDataValidator`, middleware). |
 
 ---
 
-## 3. ООП и SOLID — итоговая оценка
+## 3. Итоговая оценка по слоям
 
-### 3.1. ООП
+| Слой | Состояние |
+|------|-----------|
+| Domain | Инкапсуляция от умеренной до хорошей (методы для переходов состояния есть), но базовые классы (`BaseEntity`, `BaseAuditableEntity`) и часть свойств (`Admin.Role`) оставляют публичные сеттеры. Нет валидации доменных инвариантов (Country/Term "Other"). |
+| Application | Чистая CQRS-структура, Result Pattern, pipeline behaviors для валидации/авторизации. Технический долг: непоследовательные возвращаемые типы у query, дублирование поведений авторизации, смешение локализованных и захардкоженных сообщений об ошибках, один разросшийся handler (`GetAdminDashboardHandler`). |
+| Infrastructure | DbContext и interceptor реализованы аккуратно. Главный пробел — минимальные `IEntityTypeConfiguration<>` (нет индексов/ограничений) и хрупкая обработка отсутствующей строки подключения. |
+| Bot | Хорошее разделение на роутеры/хендлеры/сообщения через интерфейсы. Есть смешение интерфейс+реализация в одном файле, нехватка диспозинга `SemaphoreSlim`/`TelegramBotClient`, захардкоженная статическая локализация, неиспользуемый `MemoryBotSessionStore`. |
+| Web | Хорошая изоляция от БД (весь доступ к данным — через MediatR), корректная HMAC-проверка `initData`, отсутствие `@Html.Raw`-уязвимостей. Технический долг сосредоточен в `Index.cshtml.cs` (слишком много обязанностей) и частичной бизнес-логике в `TmaController.SubmitApplication`. |
+| Tests | Низкое покрытие вне `Application.Tests`/`Bot.Tests`; отсутствуют тесты для Domain, Infrastructure, Web. |
 
-| Принцип | Соблюдение | Комментарий |
-|---------|------------|-------------|
-| **Инкапсуляция** | ⚠️ | Domain-сущности в целом с `private set`, но `Admin.Role` и `BaseEntity.Id` — `public set`; `BotSession`, `RentalApplicationDraft` — публичные сеттеры. |
-| **Наследование** | ✅ | `BaseEntity → BaseAuditableEntity → Entities`; `BaseTextCommand/BaseCallbackCommand/BaseMessage`; `IUpdateHandler` стратегии. |
-| **Полиморфизм** | ✅ | MediatR handlers, pipeline behaviors, `IUpdateHandler`, `ICommandAnalyzer`, `ITextCommandRouter` подменяются через DI. |
-| **Абстракция** | ✅ | Интерфейсы в `Application.Common.Interfaces` и `Bot.Common.Interfaces`; `IBotDbContext`, `IDateTime`, `IUserNotifier` и т.д. |
-
-### 3.2. SOLID
-
-| Принцип | Соблюдение | Комментарий |
-|---------|------------|-------------|
-| **S — SRP** | ⚠️ | `GetAdminDashboardHandler`, `Index.cshtml.cs`, `TmaController`, `RentalApplicationForwardProcessor`, `BaseMessage` и `CommandAnalyzer` — несколько обязанностей. |
-| **O — OCP** | ⚠️ | Pipeline и `IUpdateHandler` расширяемы; но `ApplicationMessages`, `Message.BodyEn/BodyKa`, `BotI18n` словари, `GlobalExceptionMiddleware` switch требуют правки кода. |
-| **L — LSP** | ✅ | Наследники `BaseTextCommand`, `BaseMessage`, `BaseCallbackCommand` корректны; no LSP-нарушений. |
-| **I — ISP** | ⚠️ | `IMessageService` (7 методов), `ITmaValidationService` (валидация+парсинг) широкие; `IBotDbContext` узкий. |
-| **D — DIP** | ⚠️ | Web/Bot зависят от интерфейсов; `global using Microsoft.EntityFrameworkCore` в Application, `ConfigureServices` делает `new ConnectionStringProvider`, `ConnectionStringFactory` статический. |
-
----
-
-## 4. Критичные проблемы и план рефакторинга
-
-### 4.1. Критичный приоритет
-
-1. **Web: убрать дублирование валидации `initData`**
-   - Создать атрибут `[ValidateTmaInitData]` / фильтр или базовый контроллер `TmaControllerBase`.
-   - `GetManager` должен валидировать пользователя.
-
-2. **Web: валидация webhook SecretToken в middleware**
-   - Вынести из `TelegramBotController` в middleware.
-   - Использовать константу для заголовка `X-Telegram-Bot-Api-Secret-Token`.
-
-3. **Web / Tma: разделить `TmaValidationService` на `ITmaInitDataParser` + `ITmaInitDataValidator`**
-   - Кэшировать результат парсинга.
-   - Вынести `WebAppData` в константу.
-
-4. **Bot: `CallbackCommandRouter` должен выполнять только первую подходящую команду**
-   - Заменить `IEnumerable` на `Dictionary` для O(1) поиска.
-
-5. **Bot: `MessageService` не должен делать silent fail**
-   - При null `pathToPhoto` выбрасывать исключение или логировать явно.
-
-6. **Application: убрать `global using Microsoft.EntityFrameworkCore`**
-   - Вынести EF-зависимость в Infrastructure; в Application работать через `IQueryable` из `IBotDbContext` без глобального using.
-
-7. **Infrastructure: исправить `ConnectionStringProvider/Factory` зависимости**
-   - Убрать прямое `new ConnectionStringProvider` в `ConfigureServices`.
-   - `ConnectionStringFactory` сделать нестатическим / заменить на `Uri` + `NpgsqlConnectionStringBuilder`.
-   - `catch (Exception)` заменить на `catch (UriFormatException)`.
-
-### 4.2. Высокий приоритет
-
-8. **Domain: усилить инкапсуляцию и валидацию**
-   - `Admin.Role` → `private set` + `SetRole`.
-   - `BaseEntity.Id` убрать setter.
-   - Добавить null/role проверки в `Client.ChangeManager`, `Admin.AssignClient`.
-
-9. **Domain: локализация `Message` — OCP**
-   - Вынести `BodyEn/BodyKa` в сущность/JSONB `MessageTranslation`.
-   - `Message.GetLocalizedBody(language)` в Domain.
-
-10. **Application: `IDateTime` в handler'ах**
-    - Заменить `DateTime.UtcNow` на `_dateTime.Now`.
-
-11. **Application: `Result<T>` для всех Query и Validators**
-    - `CheckAdminStatus`, `GetMessageBody`, `GetUserLanguage`, `CheckUserStatus` — `Result<T>` + валидаторы.
-
-12. **Application: декомпозиция `GetAdminDashboardHandler`**
-    - Разбить на 3 отдельных query: `GetDashboardApplications`, `GetDashboardFlats`, `GetDashboardManagers`.
-
-13. **Bot: `BaseMessage` SRP/ISP**
-    - Вынести язык в `ILanguageResolver`.
-    - Разделить `IMessageService` на `IMessageSender`, `IMessageEditor`, `IMessageRepository`.
-
-14. **Tests: расширить покрытие**
-    - `Domain.Tests` (ChatId, invariants).
-    - `Infrastructure.Tests` (ConnectionString, DateTime, Interceptor).
-    - `Web.Tests` (`WebApplicationFactory`, TMA, webhook).
-    - `Bot.Tests` (`CommandAnalyzer`, `TextCommandRouter`, `MessageUpdateHandler`).
-
-### 4.3. Средний и низкий приоритет
-
-15. **Bot: локализация из кода → ресурсы/JSON**
-    - `BotI18n` словарь перенести в конфигурационный файл.
-
-16. **Bot: `TelegramBot.cs` разделить на `TelegramBotClientProvider.cs` и `WebhookSetupService.cs`**
-    - Рассмотреть `Lazy<TelegramBotClient>`.
-
-17. **Web: `Index.cshtml.cs` PageModel**
-    - Вынести POST-handlers в отдельные PageModels / API endpoints.
-    - Вынести маппинг в `DashboardMapper`.
-    - `GetCurrentAdminChatId` возвращать `long?`.
-
-18. **Web: `GlobalExceptionMiddleware` OCP**
-    - `Dictionary<Type, HttpStatusCode>` или `IExceptionHandler` стратегии.
-
-19. **Infrastructure: наполнить `IEntityTypeConfiguration<>`**
-    - Индексы (`TlgUser.ChatId`, `Admin.ChatId`, `Client.ChatId`, `Message.Name`).
-    - `IsRequired`, ограничения, связи, `HasData` seeding.
-
-20. **Infrastructure: `HomeGeBotDbContext` пустой конструктор**
-    - Сделать `protected` для использования только EF proxy / design-time.
-
-21. **Общее: убрать magic strings**
-    - `"ru"`, `"DefaultConnection"`, `"DATABASE_URL"`, `"WebAppData"`, `"AdminAuth"`, `"X-Telegram-Bot-Api-Secret-Token"` — вынести в константы / options.
-
----
-
-## 5. Общий вывод
-
-Проект построен на хорошей архитектурной основе: Clean Architecture, CQRS, MediatR, EF Core, Telegram.Bot. Доменная модель в целом инкапсулирована, Web и Bot зависят от абстракций, pipeline behaviors обеспечивают централизованную валидацию и авторизацию. Основные риски связаны с **дублированием валидации `initData` в Web**, **широкими интерфейсами**, **анемичными EF-конфигурациями**, **захардкоженной локализацией** и **недостаточным тестовым покрытием** Web/Bot. Рекомендуется начать с критичных Web-правок (валидация TMA/webhook) и устранения EF-зависимости в Application, затем перейти к декомпозиции тяжёлых классов и расширению тестов.
-
----
-
-## 6. Выполненная первая итерация рефакторинга (2026-08-02)
-
-### 6.1. Что сделано
-
-- Создан `ValidateTmaInitDataAttribute` (`Web/Filters`) — action filter на базе `TypeFilter` с DI-получением `ITmaValidationService`.
-- Добавлен `TmaControllerBase` (`Web/Controllers`) с `TmaUserId`, `TmaUserData`, `TmaInitData`.
-- Переписаны `TmaController` и `AdminAuthController`: убрано повторяющееся `if (!_tmaValidation.ValidateInitData(...))` и `if (userId == null)`; `initData` валидируется через `[ValidateTmaInitData]`.
-- Сборка прошла успешно: `dotnet build` — 0 ошибок, 0 предупреждений.
-
-### 6.2. Текущее состояние
-
-- Критичное дублирование валидации `initData` в Web устранено.
-- Валидация webhook SecretToken вынесена из `TelegramBotController` в middleware.
-- Остальные критичные и приоритетные пункты из раздела 4 остаются на последующие итерации.
-
-### 6.3. Вторая итерация: валидация webhook в middleware (2026-08-02)
-
-- Создан `ValidateTelegramWebhookMiddleware` (`Web/Middleware`).
-- Middleware проверяет путь `/api/message/update` и заголовок `X-Telegram-Bot-Api-Secret-Token`.
-- В dev-режиме отсутствие `SecretToken` допускается, в production — запрос отклоняется.
-- `TelegramBotController` очищен: удалены `_webhookConfig`, `_environment` и метод `ValidateWebhookRequest`.
-- Middleware зарегистрировано в `Program.cs` между `UseForwardedHeaders` и `UseStaticFiles`.
-- Сборка прошла успешно: `dotnet build Web -p:UseAppHost=false` — 0 ошибок, 0 предупреждений.
-
-### 6.4. Третья итерация: разделение `TmaValidationService` (2026-08-02)
-
-- Удалены монолитные `ITmaValidationService` / `TmaValidationService`.
-- Созданы `ITmaInitDataParser` / `TmaInitDataParser` и `ITmaInitDataValidator` / `TmaInitDataValidator`.
-- `TmaInitDataParser` выполняет разбор `initData` один раз; `TmaInitDataValidator` проверяет HMAC-SHA256 по разобранному словарю.
-- `ValidateTmaInitDataFilter` теперь использует parser + validator, устраняя повторный парсинг.
-- `TmaUserData` (record) перенесено в `Web/Services/ITmaInitDataParser.cs`.
-- "WebAppData" вынесен в константу `TelegramMiniAppDataKey`.
-- Сборка прошла успешно: `dotnet build` — 0 ошибок, 0 предупреждений.
-
-### 6.5. Четвёртый этап: `CallbackCommandRouter` (2026-08-02)
-
-- Переписан `CallbackCommandRouter` (`Bot/Routers`).
-- Построен `IReadOnlyDictionary<char, BaseCallbackCommand>` по `CallbackDataCode` — поиск O(1).
-- Роутер выполняет **только первую** найденную callback-команду и сразу возвращается.
-- При отсутствии команды для кода выводится `LogDebug`.
-- Сборка прошла успешно: `dotnet build` — 0 ошибок, 0 предупреждений.
+Конкретные рекомендации и приоритеты — см. [`REFACTORING_PLAN.md`](../REFACTORING_PLAN.md).

@@ -99,7 +99,7 @@
 - **Application** — use cases как MediatR `IRequest`/`IRequestHandler`, FluentValidation-валидаторы, pipeline behaviors (`ResultValidationBehavior`, `ResultAuthorizationBehavior`, `ResultSuperAdminAuthorizationBehavior`), Result-pattern, интерфейсы `IBotDbContext`, `IDateTime`, `IUserNotifier`.
 - **Infrastructure** — `HomeGeBotDbContext` (PostgreSQL), `AuditableEntitySaveChangesInterceptor`, `ConnectionStringFactory` (поддержка `DATABASE_URL`), миграции EF Core, `DateTimeService`.
 - **Bot** — `TelegramBot` (webhook), `CommandAnalyzer` (диспетчер Update), `BaseTextCommand`/`BaseCallbackCommand`, сообщения (`BaseMessage`), сессии (`IBotSessionStore`), статические сервисы `MessageService`/`BotI18n`.
-- **Web** — `Program.cs` (DI, middleware), контроллеры (`TelegramBotController`, `AdminAuthController`, `TmaController`, `DashboardApiController`), Razor Pages (`Index`, `Login`, `Tma`), `TmaValidationService`, `GlobalExceptionMiddleware`, `BotInitializationService` (IHostedService).
+- **Web** — `Program.cs` (DI, middleware), контроллеры (`TelegramBotController`, `AdminAuthController`, `TmaController`, `DashboardApiController`), Razor Pages (`Index`, `Login`, `Tma`), `TmaInitDataParser`/`TmaInitDataValidator`, `GlobalExceptionMiddleware`, `BotInitializationService` (IHostedService).
 
 ### Паттерны
 - **CQRS + MediatR**: каждый use case — отдельный `IRequest` с собственным handler'ом и опциональным validator'ом.
@@ -117,7 +117,7 @@
 ### Поток авторизации админ-панели
 1. Админ открывает панель через WebApp-кнопку бота → `Login.cshtml` читает `Telegram.WebApp.initData`.
 2. JS отправляет `POST /api/admin/auth` с `initData` → `AdminAuthController`.
-3. `TmaValidationService` проверяет HMAC-SHA256 подпись по спецификации Telegram.
+3. `TmaInitDataValidator` проверяет HMAC-SHA256 подпись по спецификации Telegram.
 4. Через MediatR `CheckAdminStatusQuery` проверяется, что chat id — активная запись в `Admins`.
 5. При успехе выдаётся cookie `AdminAuth` с claim `ChatId`; при открытии вне Telegram показывается сообщение об ошибке.
 
@@ -176,7 +176,7 @@ Property In Tbilisi bot/
 ├── Infrastructure/              # EF Core, PostgreSQL, миграции
 │   ├── Persistence/             # DbContext, ConnectionStringFactory, Interceptors
 │   ├── Services/                # DateTimeService
-│   └── Migrations/              # 11 миграций + snapshot
+│   └── Migrations/              # 14 миграций + snapshot
 ├── Bot/                         # Логика Telegram-бота
 │   ├── Common/                  # TelegramBot, CommandAnalyzer, Abstractions
 │   ├── Commands/                # General/Client text & callback commands
@@ -190,7 +190,7 @@ Property In Tbilisi bot/
 │   ├── Middleware/              # GlobalExceptionMiddleware
 │   ├── Models/                  # ViewModels + Validators
 │   ├── Pages/                   # Razor Pages: Index, Login, Tma + Shared partials
-│   ├── Services/                # TmaValidationService, BotInitializationService
+│   ├── Services/                # TmaInitDataParser, TmaInitDataValidator, AdminClaimsFactory, BotInitializationService
 │   └── wwwroot/                 # js (tma-*, dashboard, login, common), css, img
 ├── HomeGeBot.sln
 └── README.md
@@ -287,21 +287,9 @@ dotnet run --project Web
 
 ---
 
-## 🩺 Актуальный аудит и план рефакторинга (2026-08-02)
-
-Последнее комплексное ревью показало, что проект успешно собирается (`dotnet build`) и все существующие тесты проходят (`dotnet test` — 40 тестов). Архитектура в целом здорова, однако выявлен ряд проблем, которые отражены в [`REFACTORING_PLAN.md`](./REFACTORING_PLAN.md) и [`Application/ARCHITECTURE_AUDIT.md`](./Application/ARCHITECTURE_AUDIT.md):
-
-- **Безопасность**: `TmaController` и `Login.cshtml.cs` отключают antiforgery; `DashboardApiController` возвращает URL с токеном бота; webhook пропускает запросы без `SecretToken`.
-- **Архитектура**: `TmaController` напрямую использует `IBotDbContext`, обходя слой Application.
-- **OOP/SOLID**: сущности Domain не инкапсулируют инварианты; `ChatId` имеет неявные преобразования, сводящие на нет типобезопасность; `CommandAnalyzer` и `AppTextCommand` берут на себя слишком много ответственности.
-- **Производительность**: N+1-запрос в `GetUserApplicationsHandler`.
-- **Тесты**: покрытие низкое (~5%), присутствуют пустые `UnitTest1.cs`.
-
-Ключевые рекомендации: убрать прямую работу Web с `IBotDbContext`, добавить Application use-cases для TMA, закрыть CSRF-уязвимости, вынести локализацию из контроллеров/команд, усилить инкапсуляцию сущностей и расширить тестовое покрытие.
-
----
-
 ## 📚 Документация
 
-- [`REFACTORING_PLAN.md`](./REFACTORING_PLAN.md) — актуальный отчёт код-ревью на соответствие OOP/SOLID и пошаговый план рефакторинга.
-- [`Application/ARCHITECTURE_AUDIT.md`](./Application/ARCHITECTURE_AUDIT.md) — проектный архитектурный аудит и план рефакторинга (Domain, Infrastructure, Application, Bot, Web, Tests, OOP/SOLID).
+- [`REFACTORING_PLAN.md`](./REFACTORING_PLAN.md) — текущее состояние код-ревью на соответствие OOP/SOLID и приоритизированный план рефакторинга.
+- [`Application/ARCHITECTURE_AUDIT.md`](./Application/ARCHITECTURE_AUDIT.md) — пофайловый архитектурный аудит (Domain, Application, Infrastructure, Bot, Web, Tests) и рекомендации.
+
+Сборка (`dotnet build`) проходит без ошибок и предупреждений; тесты (`dotnet test`) — 42/42 пройдены (33 в `Application.Tests`, 9 в `Bot.Tests`).
