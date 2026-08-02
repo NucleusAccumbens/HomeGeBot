@@ -1,6 +1,8 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Results;
 using Application.Dashboard.Dtos;
+using Application.Dashboard.Mappings;
 using Domain.Common;
 using Domain.Enums;
 using MediatR;
@@ -36,7 +38,7 @@ public class GetAdminDashboardHandler : IRequestHandler<GetAdminDashboardRequest
             .Select(u => new { u.Username, u.FirstName, u.LastName })
             .FirstOrDefaultAsync(cancellationToken);
 
-        var adminName = GetFullName(adminUser?.FirstName, adminUser?.LastName);
+        var adminName = UserExtensions.GetFullName(adminUser?.FirstName, adminUser?.LastName);
 
         List<ApplicationDto> applications;
         List<FlatDto> flats;
@@ -87,15 +89,9 @@ public class GetAdminDashboardHandler : IRequestHandler<GetAdminDashboardRequest
             Term = c.Term,
             TermOther = c.TermOther,
             ManagerUsername = userInfo.GetValueOrDefault(c.AdminChatId)?.Username,
-            ManagerName = GetFullName(userInfo.GetValueOrDefault(c.AdminChatId)?.FirstName, userInfo.GetValueOrDefault(c.AdminChatId)?.LastName),
+            ManagerName = UserExtensions.GetFullName(userInfo.GetValueOrDefault(c.AdminChatId)?.FirstName, userInfo.GetValueOrDefault(c.AdminChatId)?.LastName),
             IsCompleted = c.IsCompleted
         }).ToList();
-    }
-
-    private string? GetFullName(string? firstName, string? lastName)
-    {
-        var name = (firstName ?? "") + (string.IsNullOrWhiteSpace(lastName) ? "" : " " + lastName);
-        return string.IsNullOrWhiteSpace(name) ? null : name.Trim();
     }
 
     private async Task<List<ApplicationDto>> GetApplicationsForManagerAsync(ChatId managerChatId, CancellationToken cancellationToken)
@@ -164,14 +160,11 @@ public class GetAdminDashboardHandler : IRequestHandler<GetAdminDashboardRequest
         return admins.Select(a =>
         {
             var info = userInfo.GetValueOrDefault(a.ChatId);
-            var firstName = info?.FirstName;
-            var lastName = info?.LastName;
-            var name = (firstName != null ? firstName : "") + (lastName != null ? " " + lastName : "");
             return new ManagerDto
             {
                 ChatId = a.ChatId,
                 Username = info?.Username,
-                Name = string.IsNullOrWhiteSpace(name) ? null : name.Trim(),
+                Name = UserExtensions.GetFullName(info?.FirstName, info?.LastName),
                 ApplicationCount = a.Clients.Count(c => !c.IsCompleted),
                 IsSuperAdmin = a.Role == AdminRole.SuperAdmin
             };

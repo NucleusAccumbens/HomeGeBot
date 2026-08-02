@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
 using Application.Common.Results;
 using Application.Dashboard.Dtos;
+using Application.Dashboard.Mappings;
 using MediatR;
 
 namespace Application.Dashboard.Commands.UpdateFlatComment;
@@ -27,14 +28,7 @@ public class UpdateFlatCommentHandler : IRequestHandler<UpdateFlatCommentRequest
         flat.Comment = request.Comment;
         await _context.SaveChangesAsync(cancellationToken);
 
-        var flatDto = new FlatDto
-        {
-            ItemId = flat.ItemId ?? "",
-            PublicationDate = flat.CreatedAt.ToShortDateString(),
-            Link = flat.Link ?? "",
-            OwnerNumber = flat.OwnerNumber ?? "",
-            Comment = flat.Comment
-        };
+        var flatDto = flat.ToDto();
 
         return Result<UpdateFlatCommentResult>.Success(UpdateFlatCommentResult.Success(flatDto));
     }
