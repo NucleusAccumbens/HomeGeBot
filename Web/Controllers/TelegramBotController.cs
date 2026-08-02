@@ -59,9 +59,9 @@ public class TelegramBotController : ControllerBase
                     $"[{ex.GetType().Name}] {ex.Message}",
                     _adminNotifications.ChatIds);
             }
-            catch
+            catch (Exception notifyEx)
             {
-                // не даём упасть, если уведомление недоступно
+                _logger.LogError(notifyEx, "Failed to send exception notification to admins");
             }
 
             return Ok();

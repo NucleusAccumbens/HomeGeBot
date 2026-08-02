@@ -2,6 +2,7 @@ using Bot.Common;
 using Bot.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -15,11 +16,14 @@ public class DashboardApiController : ControllerBase
 {
     private readonly TelegramBot _telegramBot;
     private readonly TelegramBotConfiguration _botConfig;
+    private readonly ILogger<DashboardApiController> _logger;
 
-    public DashboardApiController(TelegramBot telegramBot, IOptions<TelegramBotConfiguration> botConfig)
+    public DashboardApiController(TelegramBot telegramBot, IOptions<TelegramBotConfiguration> botConfig,
+        ILogger<DashboardApiController> logger)
     {
         _telegramBot = telegramBot;
         _botConfig = botConfig.Value;
+        _logger = logger;
     }
 
     [HttpGet("user-photo")]
@@ -42,8 +46,9 @@ public class DashboardApiController : ControllerBase
             var fileUrl = $"https://api.telegram.org/file/bot{_botConfig.Token}/{file.FilePath}";
             return Ok(new { photoUrl = fileUrl });
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to fetch user photo for chatId {ChatId}", chatId);
             return StatusCode(500, "Failed to fetch user photo");
         }
     }

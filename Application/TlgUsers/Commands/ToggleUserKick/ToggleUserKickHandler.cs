@@ -1,9 +1,11 @@
+using Application.Common.Interfaces;
+using Application.Common.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.TlgUsers.Commands.ToggleUserKick;
 
-public class ToggleUserKickHandler : IRequestHandler<ToggleUserKickCommand>
+public class ToggleUserKickHandler : IRequestHandler<ToggleUserKickCommand, Result<ToggleUserKickResult>>
 {
     private readonly IBotDbContext _context;
 
@@ -12,15 +14,19 @@ public class ToggleUserKickHandler : IRequestHandler<ToggleUserKickCommand>
         _context = context;
     }
 
-    public async Task Handle(ToggleUserKickCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ToggleUserKickResult>> Handle(ToggleUserKickCommand request, CancellationToken cancellationToken)
     {
         var tlgUser = await _context.TlgUsers
             .SingleOrDefaultAsync(u => u.ChatId == request.ChatId, cancellationToken);
 
-        if (tlgUser != null)
+        if (tlgUser == null)
         {
-            tlgUser.IsKicked = !tlgUser.IsKicked;
-            await _context.SaveChangesAsync(cancellationToken);
+            return Result<ToggleUserKickResult>.Failure("Пользователь не найден.");
         }
+
+        tlgUser.IsKicked = !tlgUser.IsKicked;
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Result<ToggleUserKickResult>.Success(ToggleUserKickResult.Success(tlgUser.IsKicked));
     }
 }
