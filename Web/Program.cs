@@ -38,6 +38,7 @@ builder.Services.Configure<BotConfiguration>(
 
 builder.Services.AddTelegramBotServices();
 builder.Services.AddScoped<ITmaValidationService, TmaValidationService>();
+builder.Services.AddSingleton<IAdminClaimsFactory, AdminClaimsFactory>();
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "XSRF-TOKEN";

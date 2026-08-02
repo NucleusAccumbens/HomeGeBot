@@ -17,12 +17,14 @@ public static class ConfigureService
     {
         services.AddMemoryCache();
         services.AddSingleton<TelegramBot>();
+        services.AddSingleton<IWebhookSetupService, WebhookSetupService>();
         services.AddScoped<IMessageService, MessageService>();
         services.AddSingleton<IBotI18n, BotI18n>();
         services.AddScoped<IBotSessionStore, DistributedBotSessionStore>();
         services.AddScoped<ICommandAnalyzer, CommandAnalyzer>();
         services.AddSingleton<IExceptionNotification, ExceptionNotification>();
         services.AddSingleton<IUserNotifier, UserNotifier>();
+        services.AddScoped<IManagerNotificationFormatter, ManagerNotificationFormatter>();
 
         AddMessages(services);
         AddTextCommands(services);

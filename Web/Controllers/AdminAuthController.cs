@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Application.AdminManagement.Queries.CheckAdminStatus;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -15,12 +14,15 @@ public class AdminAuthController : ControllerBase
     private readonly ITmaValidationService _tmaValidation;
     private readonly IMediator _mediator;
     private readonly IWebHostEnvironment _environment;
+    private readonly IAdminClaimsFactory _claimsFactory;
 
-    public AdminAuthController(ITmaValidationService tmaValidation, IMediator mediator, IWebHostEnvironment environment)
+    public AdminAuthController(ITmaValidationService tmaValidation, IMediator mediator,
+        IWebHostEnvironment environment, IAdminClaimsFactory claimsFactory)
     {
         _tmaValidation = tmaValidation;
         _mediator = mediator;
         _environment = environment;
+        _claimsFactory = claimsFactory;
     }
 
     [HttpGet("auth-debug")]
@@ -37,16 +39,7 @@ public class AdminAuthController : ControllerBase
             return StatusCode(StatusCodes.Status403Forbidden, "Debug Access denied. User is not an administrator.");
         }
 
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.Name, $"DebugAdmin_{chatId}"),
-            new(ClaimTypes.Role, "Admin"),
-            new("ChatId", chatId.ToString())
-        };
-
-        var identity = new ClaimsIdentity(claims, "AdminAuth");
-        var principal = new ClaimsPrincipal(identity);
-
+        var principal = _claimsFactory.CreatePrincipal(chatId, $"DebugAdmin_{chatId}");
         await HttpContext.SignInAsync("AdminAuth", principal, new AuthenticationProperties { IsPersistent = true });
 
         return Ok();
@@ -73,17 +66,7 @@ public class AdminAuthController : ControllerBase
         }
 
         var username = _tmaValidation.GetUsername(request.InitData) ?? "Admin";
-
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.Name, username),
-            new(ClaimTypes.Role, "Admin"),
-            new("ChatId", userId.Value.ToString())
-        };
-
-        var identity = new ClaimsIdentity(claims, "AdminAuth");
-        var principal = new ClaimsPrincipal(identity);
-
+        var principal = _claimsFactory.CreatePrincipal(userId.Value, username);
         await HttpContext.SignInAsync("AdminAuth", principal, new AuthenticationProperties { IsPersistent = true });
 
         return Ok();
