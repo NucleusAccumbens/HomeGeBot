@@ -304,4 +304,4 @@ dotnet run --project Web
 ## 📚 Документация
 
 - [`REFACTORING_PLAN.md`](./REFACTORING_PLAN.md) — актуальный отчёт код-ревью на соответствие OOP/SOLID и пошаговый план рефакторинга.
-- [`Application/ARCHITECTURE_AUDIT.md`](./Application/ARCHITECTURE_AUDIT.md) — аудит слоя Application.
+- [`Application/ARCHITECTURE_AUDIT.md`](./Application/ARCHITECTURE_AUDIT.md) — проектный архитектурный аудит и план рефакторинга (Domain, Infrastructure, Application, Bot, Web, Tests, OOP/SOLID).
