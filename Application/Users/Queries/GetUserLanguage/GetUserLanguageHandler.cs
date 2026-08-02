@@ -1,5 +1,5 @@
+using Application.Common.Localization;
 using Application.Common.Interfaces;
-using Domain.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,10 +17,10 @@ public class GetUserLanguageHandler : IRequestHandler<GetUserLanguageQuery, stri
     public async Task<string> Handle(GetUserLanguageQuery request, CancellationToken cancellationToken)
     {
         var language = await _context.TlgUsers
-            .Where(u => u.ChatId == new ChatId(request.ChatId))
+            .Where(u => u.ChatId == request.ChatId)
             .Select(u => u.Language)
             .FirstOrDefaultAsync(cancellationToken);
 
-        return language ?? "ru";
+        return language ?? SupportedLanguages.Default;
     }
 }

@@ -19,7 +19,7 @@ public static class ConfigureService
         services.AddScoped<IBotDbContext>(provider => 
             provider.GetRequiredService<HomeGeBotDbContext>());
 
-        services.AddTransient<IDateTime, DateTimeService>();
+        services.AddSingleton<IDateTime, DateTimeService>();
 
         return services;
     }

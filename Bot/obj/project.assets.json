@@ -363,9 +363,6 @@
       "Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
-        "dependencies": {
-          "Microsoft.Extensions.Configuration": "7.0.0"
-        },
         "compile": {
           "bin/placeholder/Domain.dll": {}
         },

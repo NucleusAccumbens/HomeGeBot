@@ -8,14 +8,6 @@ public abstract class BaseCallbackCommand
 
     public virtual bool Contains(CallbackQuery callbackQuery)
     {
-        if (callbackQuery == null || callbackQuery.Data == null)
-            return false;
-
-        char code = callbackQuery.Data.FirstOrDefault();
-
-        if (code != CallbackDataCode)
-            return false;
-
-        return callbackQuery.Data.Contains(CallbackDataCode);
+        return callbackQuery?.Data != null && callbackQuery.Data.FirstOrDefault() == CallbackDataCode;
     }
 }
