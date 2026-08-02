@@ -7,13 +7,20 @@ namespace Bot.Routers;
 
 public class CallbackCommandRouter : ICallbackCommandRouter
 {
-    private readonly IEnumerable<BaseCallbackCommand> _baseCallbackCommands;
+    private readonly IReadOnlyDictionary<char, BaseCallbackCommand> _commandsByCode;
     private readonly ILogger<CallbackCommandRouter> _logger;
 
     public CallbackCommandRouter(IEnumerable<BaseCallbackCommand> callbackCommands,
         ILogger<CallbackCommandRouter> logger)
     {
-        _baseCallbackCommands = callbackCommands;
+        var commands = new Dictionary<char, BaseCallbackCommand>();
+
+        foreach (var command in callbackCommands)
+        {
+            commands[command.CallbackDataCode] = command;
+        }
+
+        _commandsByCode = commands;
         _logger = logger;
     }
 
@@ -24,12 +31,14 @@ public class CallbackCommandRouter : ICallbackCommandRouter
         _logger.LogInformation("Получена команда \"{CallbackData}\" от пользователя №{ChatId} username {Username}",
             update.CallbackQuery.Data, update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.Chat.Username);
 
-        foreach (var command in _baseCallbackCommands)
+        var code = update.CallbackQuery.Data.FirstOrDefault();
+
+        if (_commandsByCode.TryGetValue(code, out var command))
         {
-            if (command.Contains(update.CallbackQuery))
-            {
-                await command.CallbackExecute(update, client);
-            }
+            await command.CallbackExecute(update, client);
+            return;
         }
+
+        _logger.LogDebug("No callback command registered for code {CallbackDataCode}", code);
     }
 }

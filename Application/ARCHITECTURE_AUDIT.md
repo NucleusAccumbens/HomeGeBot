@@ -359,3 +359,11 @@
 - `TmaUserData` (record) перенесено в `Web/Services/ITmaInitDataParser.cs`.
 - "WebAppData" вынесен в константу `TelegramMiniAppDataKey`.
 - Сборка прошла успешно: `dotnet build` — 0 ошибок, 0 предупреждений.
+
+### 6.5. Четвёртый этап: `CallbackCommandRouter` (2026-08-02)
+
+- Переписан `CallbackCommandRouter` (`Bot/Routers`).
+- Построен `IReadOnlyDictionary<char, BaseCallbackCommand>` по `CallbackDataCode` — поиск O(1).
+- Роутер выполняет **только первую** найденную callback-команду и сразу возвращается.
+- При отсутствии команды для кода выводится `LogDebug`.
+- Сборка прошла успешно: `dotnet build` — 0 ошибок, 0 предупреждений.
