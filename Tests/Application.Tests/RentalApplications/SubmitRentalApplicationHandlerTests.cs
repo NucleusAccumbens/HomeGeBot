@@ -76,8 +76,8 @@ public class SubmitRentalApplicationHandlerTests
         result.Value.ManagerUsername.Should().Be("manager_user");
         result.Value.ClientUsername.Should().Be("client_user");
 
-        var savedClient = await context.Clients.SingleAsync();
-        savedClient.AdminChatId.Should().Be(new ChatId(999));
+        var savedClient = await context.Clients.Include(c => c.Admin).SingleAsync();
+        savedClient.Admin.ChatId.Should().Be(new ChatId(999));
         savedClient.Profession.Should().Be("Engineer");
     }
 
@@ -101,7 +101,7 @@ public class SubmitRentalApplicationHandlerTests
                 hasPets: null,
                 term: null,
                 termOther: null,
-                adminChatId: new ChatId(999)));
+                admin: manager));
         }
         await context.SaveChangesAsync();
 
@@ -126,8 +126,8 @@ public class SubmitRentalApplicationHandlerTests
             ChatId = new ChatId(1),
             Role = AdminRole.Admin
         };
-        busyManager.AssignClient(new Client(new ChatId(10), country: null, countryOther: null, profession: null, hasPets: null, term: null, termOther: null, adminChatId: new ChatId(1)));
-        busyManager.AssignClient(new Client(new ChatId(11), country: null, countryOther: null, profession: null, hasPets: null, term: null, termOther: null, adminChatId: new ChatId(1)));
+        busyManager.AssignClient(new Client(new ChatId(10), country: null, countryOther: null, profession: null, hasPets: null, term: null, termOther: null, admin: busyManager));
+        busyManager.AssignClient(new Client(new ChatId(11), country: null, countryOther: null, profession: null, hasPets: null, term: null, termOther: null, admin: busyManager));
         var freeManager = new Admin
         {
             ChatId = new ChatId(2),

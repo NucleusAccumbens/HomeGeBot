@@ -29,11 +29,11 @@ public class GetUserApplicationsHandler : IRequestHandler<GetUserApplicationsReq
                 c.Term,
                 c.TermOther,
                 c.CreatedAt,
-                c.AdminChatId
+                ManagerChatId = c.Admin.ChatId
             })
             .ToListAsync(cancellationToken);
 
-        var adminChatIds = clients.Select(c => c.AdminChatId).Distinct().ToList();
+        var adminChatIds = clients.Select(c => c.ManagerChatId).Distinct().ToList();
         var usernames = await _context.TlgUsers
             .AsNoTracking()
             .Where(u => adminChatIds.Contains(u.ChatId))
@@ -49,7 +49,7 @@ public class GetUserApplicationsHandler : IRequestHandler<GetUserApplicationsReq
                 Term = c.Term,
                 TermOther = c.TermOther,
                 CreatedAt = c.CreatedAt,
-                ManagerUsername = usernames.GetValueOrDefault(c.AdminChatId)
+                ManagerUsername = usernames.GetValueOrDefault(c.ManagerChatId)
             })
             .ToList();
 

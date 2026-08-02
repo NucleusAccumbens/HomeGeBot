@@ -36,7 +36,7 @@ public class ReassignClientHandler : IRequestHandler<ReassignClientRequest, Resu
 
         foreach (var client in clients)
         {
-            client.ChangeManager(request.NewManagerChatId);
+            client.ChangeManager(newManager);
         }
 
         await _context.SaveChangesAsync(cancellationToken);

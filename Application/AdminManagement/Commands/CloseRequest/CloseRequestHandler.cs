@@ -16,8 +16,16 @@ public class CloseRequestHandler : IRequestHandler<CloseRequestRequest, Result<C
 
     public async Task<Result<CloseRequestResult>> Handle(CloseRequestRequest request, CancellationToken cancellationToken)
     {
+        var admin = await _context.Admins
+            .FirstOrDefaultAsync(a => a.ChatId == request.AdminChatId, cancellationToken);
+
+        if (admin == null)
+        {
+            return Result<CloseRequestResult>.Failure("Администратор не найден.");
+        }
+
         var client = await _context.Clients
-            .FirstOrDefaultAsync(c => c.Id == request.ClientId && c.AdminChatId == request.AdminChatId, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Id == request.ClientId && c.AdminId == admin.Id, cancellationToken);
 
         if (client == null)
         {

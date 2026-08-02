@@ -12,7 +12,7 @@ public class Client : BaseAuditableEntity
         bool? hasPets,
         Term? term,
         string? termOther,
-        ChatId adminChatId)
+        Admin admin)
     {
         ChatId = chatId;
         Country = country;
@@ -21,7 +21,7 @@ public class Client : BaseAuditableEntity
         HasPets = hasPets;
         Term = term;
         TermOther = termOther;
-        AdminChatId = adminChatId;
+        Admin = admin;
         IsCompleted = false;
     }
 
@@ -34,12 +34,19 @@ public class Client : BaseAuditableEntity
     public bool? HasPets { get; private set; }
     public Term? Term { get; private set; }
     public string? TermOther { get; private set; }
-    public ChatId AdminChatId { get; private set; }
+
+    public long AdminId { get; private set; }
+    public Admin Admin { get; private set; } = null!;
+
     public bool IsCompleted { get; private set; }
 
     public void Complete() => IsCompleted = true;
 
-    public void ChangeManager(ChatId adminChatId) => AdminChatId = adminChatId;
+    public void ChangeManager(Admin admin)
+    {
+        Admin = admin;
+        AdminId = admin.Id;
+    }
 
     public void UpdateDetails(string? profession, bool? hasPets)
     {

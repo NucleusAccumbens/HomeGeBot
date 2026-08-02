@@ -41,23 +41,22 @@ public class RevokeAdminRightsHandler : IRequestHandler<RevokeAdminRightsRequest
 
         /* Redistribute non-completed requests to other active admins (including superadmin) */
         var openClients = await _context.Clients
-            .Where(c => c.AdminChatId == request.TargetAdminChatId && !c.IsCompleted)
+            .Where(c => c.AdminId == targetAdmin.Id && !c.IsCompleted)
             .ToListAsync(cancellationToken);
 
         if (openClients.Count > 0)
         {
-            var activeAdminChatIds = await _context.Admins
+            var activeAdmins = await _context.Admins
                 .AsNoTracking()
                 .Where(a => a.IsActive)
-                .Select(a => a.ChatId)
                 .ToListAsync(cancellationToken);
 
-            if (activeAdminChatIds.Count > 0)
+            if (activeAdmins.Count > 0)
             {
                 for (int i = 0; i < openClients.Count; i++)
                 {
-                    var adminChatId = activeAdminChatIds[i % activeAdminChatIds.Count];
-                    openClients[i].ChangeManager(adminChatId);
+                    var admin = activeAdmins[i % activeAdmins.Count];
+                    openClients[i].ChangeManager(admin);
                 }
             }
         }

@@ -52,7 +52,7 @@ public class SubmitRentalApplicationHandler : IRequestHandler<SubmitRentalApplic
             hasPets: request.HasPets,
             term: request.Term,
             termOther: request.TermOther,
-            adminChatId: manager.ChatId);
+            admin: manager);
 
         manager.AssignClient(client);
 

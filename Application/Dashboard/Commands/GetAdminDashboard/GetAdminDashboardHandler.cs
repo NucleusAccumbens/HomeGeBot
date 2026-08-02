@@ -65,11 +65,12 @@ public class GetAdminDashboardHandler : IRequestHandler<GetAdminDashboardRequest
     {
         var clients = await _context.Clients
             .AsNoTracking()
+            .Include(c => c.Admin)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(cancellationToken);
 
         var clientChatIds = clients.Select(c => c.ChatId).ToList();
-        var adminChatIds = clients.Select(c => c.AdminChatId).Distinct().ToList();
+        var adminChatIds = clients.Select(c => c.Admin.ChatId).Distinct().ToList();
 
         var userInfo = await _context.TlgUsers
             .AsNoTracking()
@@ -88,8 +89,8 @@ public class GetAdminDashboardHandler : IRequestHandler<GetAdminDashboardRequest
             HasPets = c.HasPets == null ? "—" : c.HasPets.Value ? "Да" : "Нет",
             Term = c.Term,
             TermOther = c.TermOther,
-            ManagerUsername = userInfo.GetValueOrDefault(c.AdminChatId)?.Username,
-            ManagerName = UserExtensions.GetFullName(userInfo.GetValueOrDefault(c.AdminChatId)?.FirstName, userInfo.GetValueOrDefault(c.AdminChatId)?.LastName),
+            ManagerUsername = userInfo.GetValueOrDefault(c.Admin.ChatId)?.Username,
+            ManagerName = UserExtensions.GetFullName(userInfo.GetValueOrDefault(c.Admin.ChatId)?.FirstName, userInfo.GetValueOrDefault(c.Admin.ChatId)?.LastName),
             IsCompleted = c.IsCompleted
         }).ToList();
     }
@@ -98,7 +99,8 @@ public class GetAdminDashboardHandler : IRequestHandler<GetAdminDashboardRequest
     {
         var clients = await _context.Clients
             .AsNoTracking()
-            .Where(c => c.AdminChatId == managerChatId)
+            .Include(c => c.Admin)
+            .Where(c => c.Admin.ChatId == managerChatId)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(cancellationToken);
 
