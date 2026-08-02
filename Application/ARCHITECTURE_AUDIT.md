@@ -349,3 +349,13 @@
 - `TelegramBotController` очищен: удалены `_webhookConfig`, `_environment` и метод `ValidateWebhookRequest`.
 - Middleware зарегистрировано в `Program.cs` между `UseForwardedHeaders` и `UseStaticFiles`.
 - Сборка прошла успешно: `dotnet build Web -p:UseAppHost=false` — 0 ошибок, 0 предупреждений.
+
+### 6.4. Третья итерация: разделение `TmaValidationService` (2026-08-02)
+
+- Удалены монолитные `ITmaValidationService` / `TmaValidationService`.
+- Созданы `ITmaInitDataParser` / `TmaInitDataParser` и `ITmaInitDataValidator` / `TmaInitDataValidator`.
+- `TmaInitDataParser` выполняет разбор `initData` один раз; `TmaInitDataValidator` проверяет HMAC-SHA256 по разобранному словарю.
+- `ValidateTmaInitDataFilter` теперь использует parser + validator, устраняя повторный парсинг.
+- `TmaUserData` (record) перенесено в `Web/Services/ITmaInitDataParser.cs`.
+- "WebAppData" вынесен в константу `TelegramMiniAppDataKey`.
+- Сборка прошла успешно: `dotnet build` — 0 ошибок, 0 предупреждений.

@@ -14,11 +14,13 @@ public sealed class ValidateTmaInitDataAttribute : TypeFilterAttribute
 
 public sealed class ValidateTmaInitDataFilter : IAsyncActionFilter
 {
-    private readonly ITmaValidationService _tmaValidation;
+    private readonly ITmaInitDataParser _parser;
+    private readonly ITmaInitDataValidator _validator;
 
-    public ValidateTmaInitDataFilter(ITmaValidationService tmaValidation)
+    public ValidateTmaInitDataFilter(ITmaInitDataParser parser, ITmaInitDataValidator validator)
     {
-        _tmaValidation = tmaValidation;
+        _parser = parser;
+        _validator = validator;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -30,13 +32,15 @@ public sealed class ValidateTmaInitDataFilter : IAsyncActionFilter
             return;
         }
 
-        if (!_tmaValidation.ValidateInitData(initData))
+        var data = _parser.Parse(initData);
+
+        if (!_validator.Validate(data))
         {
             context.Result = new UnauthorizedObjectResult("Invalid initData");
             return;
         }
 
-        var userData = _tmaValidation.GetUserData(initData);
+        var userData = _parser.GetUserData(data);
         if (userData is null)
         {
             context.Result = new BadRequestObjectResult("Could not extract user data from initData");

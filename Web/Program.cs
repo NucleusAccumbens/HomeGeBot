@@ -38,7 +38,8 @@ builder.Services.Configure<BotConfiguration>(
     builder.Configuration.GetSection("Bot"));
 
 builder.Services.AddTelegramBotServices();
-builder.Services.AddScoped<ITmaValidationService, TmaValidationService>();
+builder.Services.AddScoped<ITmaInitDataParser, TmaInitDataParser>();
+builder.Services.AddScoped<ITmaInitDataValidator, TmaInitDataValidator>();
 builder.Services.AddSingleton<IAdminClaimsFactory, AdminClaimsFactory>();
 builder.Services.AddAntiforgery(options =>
 {
