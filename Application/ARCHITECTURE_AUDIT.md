@@ -338,4 +338,14 @@
 ### 6.2. Текущее состояние
 
 - Критичное дублирование валидации `initData` в Web устранено.
+- Валидация webhook SecretToken вынесена из `TelegramBotController` в middleware.
 - Остальные критичные и приоритетные пункты из раздела 4 остаются на последующие итерации.
+
+### 6.3. Вторая итерация: валидация webhook в middleware (2026-08-02)
+
+- Создан `ValidateTelegramWebhookMiddleware` (`Web/Middleware`).
+- Middleware проверяет путь `/api/message/update` и заголовок `X-Telegram-Bot-Api-Secret-Token`.
+- В dev-режиме отсутствие `SecretToken` допускается, в production — запрос отклоняется.
+- `TelegramBotController` очищен: удалены `_webhookConfig`, `_environment` и метод `ValidateWebhookRequest`.
+- Middleware зарегистрировано в `Program.cs` между `UseForwardedHeaders` и `UseStaticFiles`.
+- Сборка прошла успешно: `dotnet build Web -p:UseAppHost=false` — 0 ошибок, 0 предупреждений.

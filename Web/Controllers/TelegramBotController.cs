@@ -17,38 +17,28 @@ public class TelegramBotController : ControllerBase
     private readonly ICommandAnalyzer _commandAnalyzer;
     private readonly ITelegramBotClientProvider _bot;
     private readonly AdminNotificationConfiguration _adminNotifications;
-    private readonly WebhookConfiguration _webhookConfig;
-    private readonly IWebHostEnvironment _environment;
 
-    public TelegramBotController(ILogger<TelegramBotController> logger, ICommandAnalyzer commandAnalyzer,
-        ITelegramBotClientProvider bot, IExceptionNotification exceptionNotification,
-        IOptions<AdminNotificationConfiguration> adminNotifications,
-        IOptions<WebhookConfiguration> webhookConfig,
-        IWebHostEnvironment environment)
+    public TelegramBotController(
+        ILogger<TelegramBotController> logger,
+        ICommandAnalyzer commandAnalyzer,
+        ITelegramBotClientProvider bot,
+        IExceptionNotification exceptionNotification,
+        IOptions<AdminNotificationConfiguration> adminNotifications)
     {
         _logger = logger;
         _commandAnalyzer = commandAnalyzer;
         _bot = bot;
         _exceptionNotification = exceptionNotification;
         _adminNotifications = adminNotifications.Value;
-        _webhookConfig = webhookConfig.Value;
-        _environment = environment;
     }
 
     [HttpPost]
     public async Task<IActionResult> Update([FromBody] Update update)
     {
-        if (!ValidateWebhookRequest())
-        {
-            _logger.LogWarning("Unauthorized webhook request rejected");
-            return Unauthorized();
-        }
-
         try
         {
             _logger.LogInformation("Получен Update.");
-            await _commandAnalyzer.AnalyzeCommandsAsync(await _bot.GetBot(),
-                update);
+            await _commandAnalyzer.AnalyzeCommandsAsync(await _bot.GetBot(), update);
         }
         catch (Exception ex)
         {
@@ -71,29 +61,5 @@ public class TelegramBotController : ControllerBase
         }
 
         return Ok();
-    }
-
-    private bool ValidateWebhookRequest()
-    {
-        var webhookSecret = _webhookConfig.SecretToken;
-
-        if (string.IsNullOrEmpty(webhookSecret))
-        {
-            if (_environment.IsProduction())
-            {
-                _logger.LogError("Webhook SecretToken is not configured in production. Rejecting request.");
-                return false;
-            }
-
-            _logger.LogWarning("Webhook SecretToken not configured, skipping validation");
-            return true;
-        }
-
-        if (Request.Headers.TryGetValue("X-Telegram-Bot-Api-Secret-Token", out var headerValue))
-        {
-            return headerValue == webhookSecret;
-        }
-
-        return false;
     }
 }

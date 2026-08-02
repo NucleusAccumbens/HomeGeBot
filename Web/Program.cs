@@ -65,6 +65,7 @@ var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseForwardedHeaders();
+app.UseMiddleware<ValidateTelegramWebhookMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
