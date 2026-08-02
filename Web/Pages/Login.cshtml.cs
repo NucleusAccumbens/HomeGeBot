@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Web.Pages;
 
-[IgnoreAntiforgeryToken]
 public class LoginModel : PageModel
 {
     public string? ReturnUrl { get; set; }

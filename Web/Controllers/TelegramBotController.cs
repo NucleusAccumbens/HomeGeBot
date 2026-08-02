@@ -18,11 +18,13 @@ public class TelegramBotController : ControllerBase
     private readonly TelegramBot _bot;
     private readonly AdminNotificationConfiguration _adminNotifications;
     private readonly WebhookConfiguration _webhookConfig;
+    private readonly IWebHostEnvironment _environment;
 
     public TelegramBotController(ILogger<TelegramBotController> logger, ICommandAnalyzer commandAnalyzer,
         TelegramBot bot, IExceptionNotification exceptionNotification,
         IOptions<AdminNotificationConfiguration> adminNotifications,
-        IOptions<WebhookConfiguration> webhookConfig)
+        IOptions<WebhookConfiguration> webhookConfig,
+        IWebHostEnvironment environment)
     {
         _logger = logger;
         _commandAnalyzer = commandAnalyzer;
@@ -30,6 +32,7 @@ public class TelegramBotController : ControllerBase
         _exceptionNotification = exceptionNotification;
         _adminNotifications = adminNotifications.Value;
         _webhookConfig = webhookConfig.Value;
+        _environment = environment;
     }
 
     [HttpPost]
@@ -76,6 +79,12 @@ public class TelegramBotController : ControllerBase
 
         if (string.IsNullOrEmpty(webhookSecret))
         {
+            if (_environment.IsProduction())
+            {
+                _logger.LogError("Webhook SecretToken is not configured in production. Rejecting request.");
+                return false;
+            }
+
             _logger.LogWarning("Webhook SecretToken not configured, skipping validation");
             return true;
         }

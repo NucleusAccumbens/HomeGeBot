@@ -52,7 +52,7 @@
 
     <script src="~/js/login.js" asp-append-version="true"></script>
     <script>
-        const returnUrl = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ReturnUrl ?? "/"));
+        const returnUrl = @Json.Serialize(Model.ReturnUrl ?? "/");
         initLogin(returnUrl);
     </script>
 </body>

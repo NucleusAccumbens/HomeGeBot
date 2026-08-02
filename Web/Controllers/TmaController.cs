@@ -1,12 +1,14 @@
 using Application.Common.Interfaces;
 using Application.Common.Localization;
 using Application.RentalApplications.Queries.GetUserApplications;
+using Application.Users.Commands.SetUserLanguage;
+using Application.Users.Queries.GetManagerContact;
+using Application.Users.Queries.GetUserLanguage;
 using Bot.Session;
 using Domain.Common;
 using Domain.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Web.Models;
 using Web.Services;
 
@@ -21,15 +23,13 @@ public class TmaController : ControllerBase
     private readonly IBotSessionStore _sessionStore;
     private readonly IUserNotifier _notifier;
     private readonly IMediator _mediator;
-    private readonly IBotDbContext _dbContext;
 
-    public TmaController(ITmaValidationService tmaValidation, IBotSessionStore sessionStore, IUserNotifier notifier, IMediator mediator, IBotDbContext dbContext)
+    public TmaController(ITmaValidationService tmaValidation, IBotSessionStore sessionStore, IUserNotifier notifier, IMediator mediator)
     {
         _tmaValidation = tmaValidation;
         _sessionStore = sessionStore;
         _notifier = notifier;
         _mediator = mediator;
-        _dbContext = dbContext;
     }
 
     [HttpPost("submit-application")]
@@ -68,10 +68,7 @@ public class TmaController : ControllerBase
         var termDisplay = request.Term == Term.Other && !string.IsNullOrWhiteSpace(request.TermOther)
             ? request.TermOther : request.Term.GetDisplayName();
 
-        var user = await _dbContext.TlgUsers
-            .Where(u => u.ChatId == new ChatId(userId.Value))
-            .Select(u => u.Language)
-            .FirstOrDefaultAsync() ?? "ru";
+        var user = await _mediator.Send(new GetUserLanguageQuery(new ChatId(userId.Value)));
 
         var (petsYes, petsNo) = user switch
         {
@@ -131,24 +128,14 @@ public class TmaController : ControllerBase
             return Unauthorized("Invalid initData");
         }
 
-        var superAdmin = await _dbContext.Admins
-            .AsNoTracking()
-            .Where(a => a.Role == AdminRole.SuperAdmin && a.IsActive)
-            .Select(a => new { a.ChatId })
-            .FirstOrDefaultAsync();
+        var result = await _mediator.Send(new GetManagerContactQuery());
 
-        if (superAdmin == null)
+        if (result.IsFailure)
         {
-            return NotFound("Super admin not found");
+            return StatusCode(500, result.Error);
         }
 
-        var username = await _dbContext.TlgUsers
-            .AsNoTracking()
-            .Where(u => u.ChatId == superAdmin.ChatId)
-            .Select(u => u.Username)
-            .FirstOrDefaultAsync();
-
-        return Ok(new { username });
+        return Ok(new { username = result.Value!.Username });
     }
 
     [HttpGet("profile")]
@@ -189,22 +176,12 @@ public class TmaController : ControllerBase
             return BadRequest("Could not find user ID in initData");
         }
 
-        if (!SupportedLanguages.IsValid(request.Language))
+        var result = await _mediator.Send(new SetUserLanguageRequest(new ChatId(userId.Value), request.Language));
+
+        if (result.IsFailure)
         {
-            return BadRequest("Invalid language code");
+            return BadRequest(result.Error);
         }
-
-        var user = await _dbContext.TlgUsers
-            .Where(u => u.ChatId == new ChatId(userId.Value))
-            .FirstOrDefaultAsync();
-
-        if (user == null)
-        {
-            return NotFound("User not found");
-        }
-
-        user.Language = request.Language;
-        await _dbContext.SaveChangesAsync();
 
         return Ok();
     }
